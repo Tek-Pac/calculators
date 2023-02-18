@@ -181,32 +181,32 @@ view model =
         res =
             case parsedModel of
                 { t = Just t, r = Just r, ba = Just ba, a = Just a, k = Nothing, ty = BendAllowance } ->
-                    { emptyResult | k = Just ((-r + (180 * ba) / (a * Math.pi)) / t) }
+                    { emptyResult | k = formatF ((-r + (180 * ba) / (a * Math.pi)) / t) }
 
                 { t = Just t, r = Just r, ba = Just ba, a = Nothing, k = Just k, ty = BendAllowance } ->
-                    { emptyResult | a = Just (ba / (Math.pi * (k * t + r) / 180)) }
+                    { emptyResult | a = formatF (ba / (Math.pi * (k * t + r) / 180)) }
 
                 { t = Just t, r = Just r, ba = Nothing, a = Just a, k = Just k, ty = BendAllowance } ->
-                    { emptyResult | ba = Just ((Math.pi * (k * t + r)) / 180 * a) }
+                    { emptyResult | ba = formatF ((Math.pi * (k * t + r)) / 180 * a) }
 
                 { t = Just t, r = Nothing, ba = Just ba, a = Just a, k = Just k, ty = BendAllowance } ->
-                    { emptyResult | r = Just -(k * t - 180 * ba / (Math.pi * a)) }
+                    { emptyResult | r = formatF -(k * t - 180 * ba / (Math.pi * a)) }
 
                 { t = Nothing, r = Just r, ba = Just ba, a = Just a, k = Just k, ty = BendAllowance } ->
-                    { emptyResult | t = Just ((-r + ba / (Math.pi * a / 180)) / k) }
+                    { emptyResult | t = formatF ((-r + ba / (Math.pi * a / 180)) / k) }
 
                 -- Extra allowance (assuming a == 90)
                 { t = Just t, r = Just r, xa = Just xa, k = Nothing, ty = ExtraAllowance } ->
-                    { emptyResult | k = Just ((((xa + 2 * r) * 2 / Math.pi) - r) / t) }
+                    { emptyResult | k = formatF ((((xa + 2 * r) * 2 / Math.pi) - r) / t) }
 
                 { t = Just t, r = Just r, xa = Nothing, k = Just k, ty = ExtraAllowance } ->
-                    { emptyResult | xa = Just (Math.pi * (k * t + r) / 2 - 2 * r) }
+                    { emptyResult | xa = formatF (Math.pi * (k * t + r) / 2 - 2 * r) }
 
                 { t = Just t, r = Nothing, xa = Just xa, k = Just k, ty = ExtraAllowance } ->
-                    { emptyResult | r = Just ((2 * xa - Math.pi * k * t) / (Math.pi - 360)) }
+                    { emptyResult | r = formatF ((2 * xa - Math.pi * k * t) / (Math.pi - 360)) }
 
                 { t = Nothing, r = Just r, xa = Just xa, k = Just k, ty = ExtraAllowance } ->
-                    { emptyResult | t = Just ((2 * xa + 4 * r) / (Math.pi * k) - r / k) }
+                    { emptyResult | t = formatF ((2 * xa + 4 * r) / (Math.pi * k) - r / k) }
 
                 _ ->
                     emptyResult

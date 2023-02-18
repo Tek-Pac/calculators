@@ -4860,6 +4860,24 @@ var $gren_lang$core$Basics$toFloat = _Basics_toFloat;
 var $gren_lang$browser$Html$Attributes$value = $gren_lang$browser$Html$Attributes$stringProperty('value');
 var $author$project$Page$KFactor$view = function (model) {
 	var parsedModel = $author$project$Page$KFactor$parseModel(model);
+	var makeInputDiv = F2(
+		function (txt, input) {
+			return A2(
+				$gren_lang$browser$Html$div,
+				[],
+				[
+					$gren_lang$browser$Html$text(txt),
+					A2(
+					$gren_lang$browser$Html$br,
+					[],
+					[]),
+					input
+				]);
+		});
+	var formatF = function (value) {
+		return $gren_lang$core$Maybe$Just(
+			$gren_lang$core$Math$round(value * 10000000000) / 10000000000);
+	};
 	var res = function () {
 		_v7$9:
 		while (true) {
@@ -4877,7 +4895,7 @@ var $author$project$Page$KFactor$view = function (model) {
 								return _Utils_update(
 									$author$project$Page$KFactor$emptyResult,
 									{
-										k: $gren_lang$core$Maybe$Just(((-r) + ((180 * ba) / (a * $gren_lang$core$Math$pi))) / t)
+										k: formatF(((-r) + ((180 * ba) / (a * $gren_lang$core$Math$pi))) / t)
 									});
 							} else {
 								break _v7$9;
@@ -4892,7 +4910,7 @@ var $author$project$Page$KFactor$view = function (model) {
 								return _Utils_update(
 									$author$project$Page$KFactor$emptyResult,
 									{
-										k: $gren_lang$core$Maybe$Just(((((xa + (2 * r)) * 2) / $gren_lang$core$Math$pi) - r) / t)
+										k: formatF(((((xa + (2 * r)) * 2) / $gren_lang$core$Math$pi) - r) / t)
 									});
 							} else {
 								break _v7$9;
@@ -4911,7 +4929,7 @@ var $author$project$Page$KFactor$view = function (model) {
 									return _Utils_update(
 										$author$project$Page$KFactor$emptyResult,
 										{
-											a: $gren_lang$core$Maybe$Just(ba / (($gren_lang$core$Math$pi * ((k * t) + r)) / 180))
+											a: formatF(ba / (($gren_lang$core$Math$pi * ((k * t) + r)) / 180))
 										});
 								} else {
 									break _v7$9;
@@ -4927,7 +4945,7 @@ var $author$project$Page$KFactor$view = function (model) {
 									return _Utils_update(
 										$author$project$Page$KFactor$emptyResult,
 										{
-											ba: $gren_lang$core$Maybe$Just((($gren_lang$core$Math$pi * ((k * t) + r)) / 180) * a)
+											ba: formatF((($gren_lang$core$Math$pi * ((k * t) + r)) / 180) * a)
 										});
 								} else {
 									break _v7$9;
@@ -4943,7 +4961,7 @@ var $author$project$Page$KFactor$view = function (model) {
 								return _Utils_update(
 									$author$project$Page$KFactor$emptyResult,
 									{
-										xa: $gren_lang$core$Maybe$Just((($gren_lang$core$Math$pi * ((k * t) + r)) / 2) - (2 * r))
+										xa: formatF((($gren_lang$core$Math$pi * ((k * t) + r)) / 2) - (2 * r))
 									});
 							} else {
 								break _v7$9;
@@ -4963,7 +4981,7 @@ var $author$project$Page$KFactor$view = function (model) {
 								return _Utils_update(
 									$author$project$Page$KFactor$emptyResult,
 									{
-										r: $gren_lang$core$Maybe$Just(-((k * t) - ((180 * ba) / ($gren_lang$core$Math$pi * a))))
+										r: formatF(-((k * t) - ((180 * ba) / ($gren_lang$core$Math$pi * a))))
 									});
 							} else {
 								break _v7$9;
@@ -4978,7 +4996,7 @@ var $author$project$Page$KFactor$view = function (model) {
 								return _Utils_update(
 									$author$project$Page$KFactor$emptyResult,
 									{
-										r: $gren_lang$core$Maybe$Just(((2 * xa) - (($gren_lang$core$Math$pi * k) * t)) / ($gren_lang$core$Math$pi - 360))
+										r: formatF(((2 * xa) - (($gren_lang$core$Math$pi * k) * t)) / ($gren_lang$core$Math$pi - 360))
 									});
 							} else {
 								break _v7$9;
@@ -5001,7 +5019,7 @@ var $author$project$Page$KFactor$view = function (model) {
 							return _Utils_update(
 								$author$project$Page$KFactor$emptyResult,
 								{
-									t: $gren_lang$core$Maybe$Just(((-r) + (ba / (($gren_lang$core$Math$pi * a) / 180))) / k)
+									t: formatF(((-r) + (ba / (($gren_lang$core$Math$pi * a) / 180))) / k)
 								});
 						} else {
 							break _v7$9;
@@ -5016,7 +5034,7 @@ var $author$project$Page$KFactor$view = function (model) {
 							return _Utils_update(
 								$author$project$Page$KFactor$emptyResult,
 								{
-									t: $gren_lang$core$Maybe$Just((((2 * xa) + (4 * r)) / ($gren_lang$core$Math$pi * k)) - (r / k))
+									t: formatF((((2 * xa) + (4 * r)) / ($gren_lang$core$Math$pi * k)) - (r / k))
 								});
 						} else {
 							break _v7$9;
@@ -5029,24 +5047,6 @@ var $author$project$Page$KFactor$view = function (model) {
 		}
 		return $author$project$Page$KFactor$emptyResult;
 	}();
-	var makeInputDiv = F2(
-		function (txt, input) {
-			return A2(
-				$gren_lang$browser$Html$div,
-				[],
-				[
-					$gren_lang$browser$Html$text(txt),
-					A2(
-					$gren_lang$browser$Html$br,
-					[],
-					[]),
-					input
-				]);
-		});
-	var formatF = function (value) {
-		return $gren_lang$core$Maybe$Just(
-			$gren_lang$core$Math$round(value * 10000000000) / 10000000000);
-	};
 	return {
 		body: [
 			A2(
