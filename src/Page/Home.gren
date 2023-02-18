@@ -1,0 +1,58 @@
+module Page.Home exposing ( Model, Msg, init, update, view )
+
+{-| The homepage
+-}
+
+import Html exposing (..)
+
+
+type alias Model =
+    {}
+
+
+init :
+    { model : Model
+    , command : Cmd Msg
+    }
+init =
+    { model = {}
+    , command = Cmd.none
+    }
+
+
+view :
+    Model
+    -> { title : String
+       , content : Html Msg
+       }
+view model =
+    { title = "Calculators"
+    , content =
+        div
+            []
+            [ h1 "Calculators"
+            , button
+                [ onClick GoToKFactor
+                ]
+                [ text "K-Factors"
+                ]
+            ]
+    }
+
+
+type Msg
+    = GoToKFactor
+
+
+update :
+    Msg
+    -> Model
+    -> { model : Model
+       , command : Cmd Msg
+       }
+update msg model =
+    case msg of
+        GoToKFactor ->
+            { model = model
+            , command = Cmd.none
+            }

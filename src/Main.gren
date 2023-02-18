@@ -1,0 +1,17 @@
+module Main exposing (..)
+
+import Html exposing (..)
+import Page.Home as Home
+
+
+type Model
+    = Home Home.Model
+
+
+main : Program Value Model Msg
+main =
+    Api.application
+        Viewer.decoder
+        { init = init
+        , onUrlChange = ChangedUrl
+        }
