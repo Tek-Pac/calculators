@@ -42,7 +42,7 @@ init =
     , a = "90"
     , k = ""
     , xa = ""
-    , ty = BendAllowance
+    , ty = ExtraAllowance
     }
 
 

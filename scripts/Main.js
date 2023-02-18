@@ -4482,8 +4482,8 @@ var $author$project$Main$KFactorModel = function (a) {
 	return {$: 'KFactorModel', a: a};
 };
 var $author$project$Page$Home$init = {};
-var $author$project$Page$KFactor$BendAllowance = {$: 'BendAllowance'};
-var $author$project$Page$KFactor$init = {a: '90', ba: '', k: '', r: '', t: '', ty: $author$project$Page$KFactor$BendAllowance, xa: ''};
+var $author$project$Page$KFactor$ExtraAllowance = {$: 'ExtraAllowance'};
+var $author$project$Page$KFactor$init = {a: '90', ba: '', k: '', r: '', t: '', ty: $author$project$Page$KFactor$ExtraAllowance, xa: ''};
 var $author$project$Main$modelForPageId = function (id) {
 	if (id.$ === 'Home') {
 		return $author$project$Main$HomeModel($author$project$Page$Home$init);
@@ -4774,10 +4774,10 @@ var $author$project$Page$Home$view = function (model) {
 		title: 'Calculators'
 	};
 };
+var $author$project$Page$KFactor$BendAllowance = {$: 'BendAllowance'};
 var $author$project$Page$KFactor$DoCopy = function (a) {
 	return {$: 'DoCopy', a: a};
 };
-var $author$project$Page$KFactor$ExtraAllowance = {$: 'ExtraAllowance'};
 var $author$project$Page$KFactor$HomePage = {$: 'HomePage'};
 var $author$project$Page$KFactor$UpdateAllowance = function (a) {
 	return {$: 'UpdateAllowance', a: a};
