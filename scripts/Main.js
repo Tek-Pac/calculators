@@ -4473,7 +4473,7 @@ var $gren_lang$core$Task$perform = F2(
 			$gren_lang$core$Task$Perform(
 				A2($gren_lang$core$Task$map, toMessage, task)));
 	});
-var $gren_lang$browser$Browser$element = _Browser_element;
+var $gren_lang$browser$Browser$document = _Browser_document;
 var $author$project$Main$HomeModel = function (a) {
 	return {$: 'HomeModel', a: a};
 };
@@ -4646,6 +4646,16 @@ var $author$project$Main$update = F2(
 	});
 var $gren_lang$browser$VirtualDom$map = _VirtualDom_map;
 var $gren_lang$browser$Html$map = $gren_lang$browser$VirtualDom$map;
+var $author$project$Main$mapDocument = F2(
+	function (map, doc) {
+		return {
+			body: A2(
+				$gren_lang$core$Array$map,
+				$gren_lang$browser$Html$map(map),
+				doc.body),
+			title: doc.title
+		};
+	});
 var $author$project$Page$Home$GoToKFactor = {$: 'GoToKFactor'};
 var $gren_lang$browser$VirtualDom$node = function (tag) {
 	return _VirtualDom_node(
@@ -4675,25 +4685,30 @@ var $gren_lang$browser$Html$Events$onClick = function (msg) {
 var $gren_lang$browser$VirtualDom$text = _VirtualDom_text;
 var $gren_lang$browser$Html$text = $gren_lang$browser$VirtualDom$text;
 var $author$project$Page$Home$view = function (model) {
-	return A2(
-		$gren_lang$browser$Html$div,
-		[],
-		[
+	return {
+		body: [
 			A2(
-			$gren_lang$browser$Html$h1,
+			$gren_lang$browser$Html$div,
 			[],
 			[
-				$gren_lang$browser$Html$text('Calculators')
-			]),
-			A2(
-			$gren_lang$browser$Html$button,
-			[
-				$gren_lang$browser$Html$Events$onClick($author$project$Page$Home$GoToKFactor)
-			],
-			[
-				$gren_lang$browser$Html$text('K-Factors')
+				A2(
+				$gren_lang$browser$Html$h1,
+				[],
+				[
+					$gren_lang$browser$Html$text('Calculators')
+				]),
+				A2(
+				$gren_lang$browser$Html$button,
+				[
+					$gren_lang$browser$Html$Events$onClick($author$project$Page$Home$GoToKFactor)
+				],
+				[
+					$gren_lang$browser$Html$text('K-Factors')
+				])
 			])
-		]);
+		],
+		title: 'Calculators'
+	};
 };
 var $author$project$Page$KFactor$Allowance = function (a) {
 	return {$: 'Allowance', a: a};
@@ -4881,128 +4896,133 @@ var $author$project$Page$KFactor$view = function (model) {
 			return model.a;
 		}
 	}();
-	return A2(
-		$gren_lang$browser$Html$div,
-		[
-			$gren_lang$browser$Html$Attributes$id('k-factor'),
-			$gren_lang$browser$Html$Attributes$class('center'),
-			A2($gren_lang$browser$Html$Attributes$style, 'padding', '50px')
+	return {
+		body: [
+			A2(
+			$gren_lang$browser$Html$div,
+			[
+				$gren_lang$browser$Html$Attributes$id('k-factor'),
+				$gren_lang$browser$Html$Attributes$class('center'),
+				A2($gren_lang$browser$Html$Attributes$style, 'padding', '50px')
+			],
+			[
+				$gren_lang$browser$Html$text('Thickness: '),
+				function () {
+				if (res.$ === 'Thickness') {
+					var t = res.a;
+					return $gren_lang$browser$Html$text(
+						$gren_lang$core$String$fromFloat(t));
+				} else {
+					return A2(
+						$gren_lang$browser$Html$input,
+						[
+							$gren_lang$browser$Html$Attributes$value(tStr),
+							$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateThickness)
+						],
+						[]);
+				}
+			}(),
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
+				$gren_lang$browser$Html$text('Radius: '),
+				function () {
+				if (res.$ === 'Radius') {
+					var r = res.a;
+					return $gren_lang$browser$Html$text(
+						$gren_lang$core$String$fromFloat(r));
+				} else {
+					return A2(
+						$gren_lang$browser$Html$input,
+						[
+							$gren_lang$browser$Html$Attributes$value(rStr),
+							$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateRadius)
+						],
+						[]);
+				}
+			}(),
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
+				$gren_lang$browser$Html$text('Bend Allowance: '),
+				function () {
+				if (res.$ === 'Allowance') {
+					var ba = res.a;
+					return $gren_lang$browser$Html$text(
+						$gren_lang$core$String$fromFloat(ba));
+				} else {
+					return A2(
+						$gren_lang$browser$Html$input,
+						[
+							$gren_lang$browser$Html$Attributes$value(baStr),
+							$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateAllowance)
+						],
+						[]);
+				}
+			}(),
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
+				$gren_lang$browser$Html$text('Angle: '),
+				function () {
+				if (res.$ === 'Angle') {
+					var a = res.a;
+					return $gren_lang$browser$Html$text(
+						$gren_lang$core$String$fromFloat(a));
+				} else {
+					return A2(
+						$gren_lang$browser$Html$input,
+						[
+							$gren_lang$browser$Html$Attributes$value(aStr),
+							$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateAngle)
+						],
+						[]);
+				}
+			}(),
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
+				$gren_lang$browser$Html$text('K Factor: '),
+				function () {
+				if (res.$ === 'KFactor') {
+					var k = res.a;
+					return $gren_lang$browser$Html$text(
+						$gren_lang$core$String$fromFloat(k));
+				} else {
+					return A2(
+						$gren_lang$browser$Html$input,
+						[
+							$gren_lang$browser$Html$Attributes$value(kStr),
+							$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateKFactor)
+						],
+						[]);
+				}
+			}()
+			])
 		],
-		[
-			$gren_lang$browser$Html$text('Thickness: '),
-			function () {
-			if (res.$ === 'Thickness') {
-				var t = res.a;
-				return $gren_lang$browser$Html$text(
-					$gren_lang$core$String$fromFloat(t));
-			} else {
-				return A2(
-					$gren_lang$browser$Html$input,
-					[
-						$gren_lang$browser$Html$Attributes$value(tStr),
-						$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateThickness)
-					],
-					[]);
-			}
-		}(),
-			A2(
-			$gren_lang$browser$Html$br,
-			[],
-			[]),
-			$gren_lang$browser$Html$text('Radius: '),
-			function () {
-			if (res.$ === 'Radius') {
-				var r = res.a;
-				return $gren_lang$browser$Html$text(
-					$gren_lang$core$String$fromFloat(r));
-			} else {
-				return A2(
-					$gren_lang$browser$Html$input,
-					[
-						$gren_lang$browser$Html$Attributes$value(rStr),
-						$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateRadius)
-					],
-					[]);
-			}
-		}(),
-			A2(
-			$gren_lang$browser$Html$br,
-			[],
-			[]),
-			$gren_lang$browser$Html$text('Bend Allowance: '),
-			function () {
-			if (res.$ === 'Allowance') {
-				var ba = res.a;
-				return $gren_lang$browser$Html$text(
-					$gren_lang$core$String$fromFloat(ba));
-			} else {
-				return A2(
-					$gren_lang$browser$Html$input,
-					[
-						$gren_lang$browser$Html$Attributes$value(baStr),
-						$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateAllowance)
-					],
-					[]);
-			}
-		}(),
-			A2(
-			$gren_lang$browser$Html$br,
-			[],
-			[]),
-			$gren_lang$browser$Html$text('Angle: '),
-			function () {
-			if (res.$ === 'Angle') {
-				var a = res.a;
-				return $gren_lang$browser$Html$text(
-					$gren_lang$core$String$fromFloat(a));
-			} else {
-				return A2(
-					$gren_lang$browser$Html$input,
-					[
-						$gren_lang$browser$Html$Attributes$value(aStr),
-						$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateAngle)
-					],
-					[]);
-			}
-		}(),
-			A2(
-			$gren_lang$browser$Html$br,
-			[],
-			[]),
-			$gren_lang$browser$Html$text('K Factor: '),
-			function () {
-			if (res.$ === 'KFactor') {
-				var k = res.a;
-				return $gren_lang$browser$Html$text(
-					$gren_lang$core$String$fromFloat(k));
-			} else {
-				return A2(
-					$gren_lang$browser$Html$input,
-					[
-						$gren_lang$browser$Html$Attributes$value(kStr),
-						$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateKFactor)
-					],
-					[]);
-			}
-		}()
-		]);
+		title: 'K Factors'
+	};
 };
 var $author$project$Main$view = function (model) {
 	if (model.$ === 'HomeModel') {
 		var m = model.a;
 		return A2(
-			$gren_lang$browser$Html$map,
+			$author$project$Main$mapDocument,
 			$author$project$Main$HomeMsg,
 			$author$project$Page$Home$view(m));
 	} else {
 		var m = model.a;
 		return A2(
-			$gren_lang$browser$Html$map,
+			$author$project$Main$mapDocument,
 			$author$project$Main$KFactorMsg,
 			$author$project$Page$KFactor$view(m));
 	}
 };
-var $author$project$Main$main = $gren_lang$browser$Browser$element(
+var $author$project$Main$main = $gren_lang$browser$Browser$document(
 	{
 		init: $author$project$Main$init,
 		subscriptions: function (_v0) {

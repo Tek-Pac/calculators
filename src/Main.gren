@@ -19,7 +19,7 @@ type Msg
 
 main : Program {} Model Msg
 main =
-    Browser.element
+    Browser.document
         { init = init
         , view = view
         , update = update
@@ -38,16 +38,25 @@ init {} =
     }
 
 
-view : Model -> Html Msg
+view : Model -> Browser.Document Msg
 view model =
     case model of
         HomeModel m ->
             Home.view m
-                |> Html.map HomeMsg
+                |> mapDocument HomeMsg
 
         KFactorModel m ->
             KFactor.view m
-                |> Html.map KFactorMsg
+                |> mapDocument KFactorMsg
+
+
+mapDocument : (a -> Msg) -> Browser.Document a -> Browser.Document Msg
+mapDocument map doc =
+    { title = doc.title
+    , body =
+        doc.body
+            |> Array.map (Html.map map)
+    }
 
 
 update :

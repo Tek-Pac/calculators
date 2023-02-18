@@ -3,6 +3,7 @@ module Page.Home exposing ( Model, Msg, init, update, view )
 {-| The homepage
 -}
 
+import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -24,20 +25,24 @@ init =
     {}
 
 
-view : Model -> Html Msg
+view : Model -> Browser.Document Msg
 view model =
-    div
-        []
-        [ h1
+    { title = "Calculators"
+    , body =
+        [ div
             []
-            [ text "Calculators"
-            ]
-        , button
-            [ onClick GoToKFactor
-            ]
-            [ text "K-Factors"
+            [ h1
+                []
+                [ text "Calculators"
+                ]
+            , button
+                [ onClick GoToKFactor
+                ]
+                [ text "K-Factors"
+                ]
             ]
         ]
+    }
 
 
 type Msg

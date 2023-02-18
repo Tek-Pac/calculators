@@ -3,6 +3,7 @@ module Page.KFactor exposing ( Model, Msg, init, update, view )
 {-| The k factor page
 -}
 
+import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -124,7 +125,7 @@ parseModel model =
     }
 
 
-view : Model -> Html Msg
+view : Model -> Browser.Document Msg
 view model =
     let
         parsedModel =
@@ -188,68 +189,72 @@ view model =
                 _ ->
                     model.k
     in
-    div
-        [ id "k-factor"
-        , class "center"
-        , style "padding" "50px"
+    { title = "K Factors"
+    , body =
+        [ div
+            [ id "k-factor"
+            , class "center"
+            , style "padding" "50px"
+            ]
+            [ text "Thickness: "
+            , case res of
+                Thickness t ->
+                    text (String.fromFloat t)
+
+                _ ->
+                    input
+                        [ value tStr
+                        , onInput UpdateThickness
+                        ]
+                        []
+            , br [] []
+            , text "Radius: "
+            , case res of
+                Radius r ->
+                    text (String.fromFloat r)
+
+                _ ->
+                    input
+                        [ value rStr
+                        , onInput UpdateRadius
+                        ]
+                        []
+            , br [] []
+            , text "Bend Allowance: "
+            , case res of
+                Allowance ba ->
+                    text (String.fromFloat ba)
+
+                _ ->
+                    input
+                        [ value baStr
+                        , onInput UpdateAllowance
+                        ]
+                        []
+            , br [] []
+            , text "Angle: "
+            , case res of
+                Angle a ->
+                    text (String.fromFloat a)
+
+                _ ->
+                    input
+                        [ value aStr
+                        , onInput UpdateAngle
+                        ]
+                        []
+            , br [] []
+            , text "K Factor: "
+            , case res of
+                KFactor k ->
+                    text (String.fromFloat k)
+
+                _ ->
+                    input
+                        [ value kStr
+                        , onInput UpdateKFactor
+                        ]
+                        []
+            ]
         ]
-        [ text "Thickness: "
-        , case res of
-            Thickness t ->
-                text (String.fromFloat t)
-
-            _ ->
-                input
-                    [ value tStr
-                    , onInput UpdateThickness
-                    ]
-                    []
-        , br [] []
-        , text "Radius: "
-        , case res of
-            Radius r ->
-                text (String.fromFloat r)
-
-            _ ->
-                input
-                    [ value rStr
-                    , onInput UpdateRadius
-                    ]
-                    []
-        , br [] []
-        , text "Bend Allowance: "
-        , case res of
-            Allowance ba ->
-                text (String.fromFloat ba)
-
-            _ ->
-                input
-                    [ value baStr
-                    , onInput UpdateAllowance
-                    ]
-                    []
-        , br [] []
-        , text "Angle: "
-        , case res of
-            Angle a ->
-                text (String.fromFloat a)
-
-            _ ->
-                input
-                    [ value aStr
-                    , onInput UpdateAngle
-                    ]
-                    []
-        , br [] []
-        , text "K Factor: "
-        , case res of
-            KFactor k ->
-                text (String.fromFloat k)
-
-            _ ->
-                input
-                    [ value kStr
-                    , onInput UpdateKFactor
-                    ]
-                    []
-        ]
+    }
