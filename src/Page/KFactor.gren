@@ -19,7 +19,13 @@ type alias Model =
     , a : String
     , k : String
     , xa : String
+    , ty : Ty
     }
+
+
+type Ty
+    = BendAllowance
+    | ExtraAllowance
 
 
 type alias Updated =
@@ -36,6 +42,7 @@ init =
     , a = "90"
     , k = ""
     , xa = ""
+    , ty = BendAllowance
     }
 
 
@@ -44,9 +51,10 @@ type Msg
     | UpdateThickness String
     | UpdateRadius String
     | UpdateAllowance String
+    | UpdateExtraAllowance String
     | UpdateAngle String
     | UpdateKFactor String
-    | UpdateExtraAllowance String
+    | UpdateTy Ty
 
 
 update : Msg -> Model -> Updated
@@ -72,6 +80,11 @@ update msg model =
             , command = SpaCmd.none
             }
 
+        UpdateExtraAllowance s ->
+            { model = { model | xa = s }
+            , command = SpaCmd.none
+            }
+
         UpdateAngle s ->
             { model = { model | a = s }
             , command = SpaCmd.none
@@ -82,8 +95,8 @@ update msg model =
             , command = SpaCmd.none
             }
 
-        UpdateExtraAllowance s ->
-            { model = { model | xa = s }
+        UpdateTy ty ->
+            { model = { model | ty = ty }
             , command = SpaCmd.none
             }
 
@@ -95,16 +108,7 @@ type alias ParsedResult =
     , a : Maybe Float
     , k : Maybe Float
     , xa : Maybe Float
-    }
-
-
-type alias CalcResult =
-    { t : Float
-    , r : Float
-    , ba : Float
-    , a : Float
-    , k : Float
-    , xa : Float
+    , ty : Ty
     }
 
 
@@ -116,26 +120,6 @@ emptyResult =
     , k = Nothing
     , xa = Nothing
     }
-
-
-isJust : Maybe a -> Bool
-isJust x =
-    case x of
-        Just _ ->
-            True
-
-        Nothing ->
-            False
-
-
-isJustInt : Maybe a -> Int
-isJustInt x =
-    case x of
-        Just _ ->
-            1
-
-        Nothing ->
-            0
 
 
 parseModel : Model -> ParsedResult
@@ -165,16 +149,11 @@ parseModel model =
     , a = a
     , k = k
     , xa = xa
+    , ty = model.ty
     }
 
 
 
--- calcXa : {t : Float, r : Float, a : Float, k : Float} -> CalcResult -> CalcResult
--- calcXa {t,r,a,k}model =
---    {model | xa = 
---    case model of
---        { t = Just t, r = Just r, a = Just a, k = Just k, xa = Nothing } ->
---    }
 {- K Factor Formula
 
 
@@ -186,226 +165,7 @@ k = K Factor
 x = extra allowance (our own creation)
 
 k = (-r + b / (pi * a / 180)) / t
-
-    kt = -r + b / (pi * a / 180)
-    kt + r = b / (pi * a / 180)
-
-b = (kt + r) * (pi * a / 180)
-
-t = (-r + b / (pi * a / 180)) / k
-
-    kt + r = b / (pi * a / 180)
-
-r = b / (pi * a / 180) - kt
-
-    r + kt = b / (pi * a / 180)
-    (r + kt) * a = b / (pi / 180)
-    a = b / ((pi / 180) * (r + kt))
-
-a = b / (pi * (r + kt) / 180)
-
-k = (-r+(180*x+360*r*TAN(90/360*PI()))/(90*PI()))/t
-k = (-r + (180x + 360r) / (90pi)) / t
-k = (-r + (2x + 4r) / pi) / t
-kt = -r + (2x + 4r) / pi
-
-
-x=(pi / 2) * (kt + r) - 2r
-
-k = (-r+(180*x+360*r*tan(a/2))/(a*PI))/t
-
-kt = -r + (180x + 360r * tan(a/2)) / (a * pi)
-kt + r = (180x + 360r * tan(a/2)) / (a * pi)
-
-kt + r = 180x / (a * pi) + (360r * tan(a/2)) / (a * pi)
-
-kt + r - (360r * tan(a/2)) / (a * pi) = 180x / (a * pi)
-
-180x / (a * pi) = kt + r - (360r * tan(a/2)) / (a * pi)
-
-180x = kt * a * pi + r * a * pi - 360r * tan(a/2)
-x = pi * a * (kt + r) / 180 - 2r * tan(a/2)
-
----
-
-x = Math.pi * a * (k * t + r) / 180 - 2 * r * Math.tan (Math.degrees a / 2)
-
-find t
-
-x + 2 * r * Math.tan (Math.degrees a / 2) = Math.pi * a * (k * t + r) / 180
-
-
-((x + 2 * r * Math.tan (Math.degrees a / 2)) * 180 / (a * Math.pi)) - r = k * t
-
-
-
-x = Math.pi * a * (k * t + r) / 180 - 2 * r * Math.tan (Math.degrees a / 2)
-find r
-
-r = (180 * x - Math.pi * a * k * t)/(Math.pi * a - 360 * Math.tan(Math.degrees a / 2))
-
  -}
-
-
-fillXa :
-    { t : Float
-    , r : Float
-    , ba : Float
-    , a : Float
-    , k : Float
-    }
-    -> CalcResult
-fillXa { t, r, ba, a, k } =
-    { t = t
-    , r = r
-    , ba = ba
-    , a = a
-    , k = k
-    , xa = Math.pi * a * (k * t + r) / 180 - 2 * r * Math.tan (Math.degrees a / 2)
-    }
-
-
-fillBa :
-    { t : Float
-    , r : Float
-    , a : Float
-    , k : Float
-    , xa : Float
-    }
-    -> CalcResult
-fillBa { t, r, a, k, xa } =
-    { t = t
-    , r = r
-    , ba = (Math.pi * (k * t + r)) / 180 * a
-    , a = a
-    , k = k
-    , xa = xa
-    }
-
-
-finishCalc : ParsedResult -> Result String CalcResult
-finishCalc m =
-    let
-        count =
-            isJustInt m.t + isJustInt m.r + isJustInt m.ba + isJustInt m.a + isJustInt m.k + isJustInt m.xa
-    in
-    if count /= 4 then
-        Err "I need four inputs"
-    else
-        case m of
-            -- ....11
-            -- ...1.1
-            -- ..1..1
-            -- .1...1
-            -- 1....1
-            -- ...11.
-            -- ..1.1.
-            -- .1..1.
-            -- 1...1.
-            -- ..11..
-            -- .1.1..
-            -- 1..1..
-            -- .11...
-            -- 1.1...
-            -- 11....
-            { t = Just t, r = Just r, ba = Just ba, a = Just a, k = Nothing, xa = Nothing } ->
-                Ok
-                    (fillXa
-                        { t = t
-                        , r = r
-                        , ba = ba
-                        , a = a
-                        , k = (-r + (180 * ba) / (a * Math.pi)) / t
-                        }
-                    )
-
-            { t = Just t, r = Just r, ba = Just ba, a = Nothing, k = Just k, xa = Nothing } ->
-                Ok
-                    (fillXa
-                        { t = t
-                        , r = r
-                        , ba = ba
-                        , a = ba / (Math.pi * (k * t + r) / 180)
-                        , k = k
-                        }
-                    )
-
-            { t = Just t, r = Just r, ba = Nothing, a = Just a, k = Just k, xa = Nothing } ->
-                Ok
-                    (fillXa
-                        { t = t
-                        , r = r
-                        , ba = (Math.pi * (k * t + r)) / 180 * a
-                        , a = a
-                        , k = k
-                        }
-                    )
-
-            { t = Just t, r = Nothing, ba = Just ba, a = Just a, k = Just k, xa = Nothing } ->
-                Ok
-                    (fillXa
-                        { t = t
-                        , r = -(k * t - 180 * ba / (Math.pi * a))
-                        , ba = ba
-                        , a = a
-                        , k = k
-                        }
-                    )
-
-            { t = Nothing, r = Just r, ba = Just ba, a = Just a, k = Just k, xa = Nothing } ->
-                Ok
-                    (fillXa
-                        { t = (-r + ba / (Math.pi * a / 180)) / k
-                        , r = r
-                        , ba = ba
-                        , a = a
-                        , k = k
-                        }
-                    )
-
-            { t = Nothing, r = Just r, ba = Nothing, a = Just a, k = Just k, xa = Just xa } ->
-                Ok
-                    (fillBa
-                        { t = (((xa + 2 * r * Math.tan (Math.degrees a / 2)) * 180 / (a * Math.pi)) - r) / k
-                        , r = r
-                        , a = a
-                        , k = k
-                        , xa = xa
-                        }
-                    )
-
-            { t = Just t, r = Nothing, ba = Nothing, a = Just a, k = Just k, xa = Just xa } ->
-                Ok
-                    (fillBa
-                        { t = t
-                        , r = (180 * xa - Math.pi * a * k * t) / (Math.pi * a - 360 * Math.tan (Math.degrees a / 2))
-                        , a = a
-                        , k = k
-                        , xa = xa
-                        }
-                    )
-
-            -- doesn't appear to have an easy solution
-            -- { t = Just t,  r = Just r,  ba = Nothing, a = Nothing, k =  Just k, xa = Just xa } ->
-            { t = Just t, r = Just r, ba = Nothing, a = Just a, k = Nothing, xa = Just xa } ->
-                Ok
-                    (fillBa
-                        { t = t
-                        , r = r
-                        , a = a
-                        , k = (((xa + 2 * r * Math.tan (Math.degrees a / 2)) * 180 / (a * Math.pi)) - r) / t
-                        , xa = xa
-                        }
-                    )
-
-            -- { t = Just t,  r = Just r,  ba = Just ba, a = Nothing, k = Nothing, xa = Just xa } ->
-            -- { t = Just t,  r = Nothing, ba = Just ba, a =  Just a, k = Nothing, xa = Just xa } ->
-            -- { t = Nothing, r = Just r,  ba = Just ba, a =  Just a, k = Nothing, xa = Just xa } ->
-            -- { t = Just t,  r = Nothing, ba = Just ba, a = Nothing, k =  Just k, xa = Just xa } ->
-            -- { t = Nothing, r = Just r,  ba = Just ba, a = Nothing, k =  Just k, xa = Just xa } ->
-            -- { t = Nothing, r = Nothing, ba = Just ba, a =  Just a, k =  Just k, xa = Just xa } ->
-            _ ->
-                Err "todo"
 
 
 view : Model -> Browser.Document Msg
@@ -414,41 +174,50 @@ view model =
         parsedModel =
             parseModel model
 
-        calculated =
-            finishCalc parsedModel
-
-        roundF : Float -> Float
-        roundF value =
-            toFloat (Math.round (value * 10000000000)) / 10000000000
-
-        valIfNothing : Maybe Float -> Float -> Maybe Float
-        valIfNothing parsed value =
-            case parsed of
-                Just _ ->
-                    Nothing
-
-                Nothing ->
-                    Just (roundF value)
+        formatF : Float -> Maybe Float
+        formatF value =
+            Just (toFloat (Math.round (value * 10000000000)) / 10000000000)
 
         res =
-            case calculated of
-                Ok { t, r, ba, a, k, xa } ->
-                    { t = valIfNothing parsedModel.t t
-                    , r = valIfNothing parsedModel.r r
-                    , ba = valIfNothing parsedModel.ba ba
-                    , a = valIfNothing parsedModel.a a
-                    , k = valIfNothing parsedModel.k k
-                    , xa = valIfNothing parsedModel.xa xa
-                    }
+            case parsedModel of
+                { t = Just t, r = Just r, ba = Just ba, a = Just a, k = Nothing, ty = BendAllowance } ->
+                    { emptyResult | k = Just ((-r + (180 * ba) / (a * Math.pi)) / t) }
 
-                Err _ ->
-                    { t = Nothing
-                    , r = Nothing
-                    , ba = Nothing
-                    , a = Nothing
-                    , k = Nothing
-                    , xa = Nothing
-                    }
+                { t = Just t, r = Just r, ba = Just ba, a = Nothing, k = Just k, ty = BendAllowance } ->
+                    { emptyResult | a = Just (ba / (Math.pi * (k * t + r) / 180)) }
+
+                { t = Just t, r = Just r, ba = Nothing, a = Just a, k = Just k, ty = BendAllowance } ->
+                    { emptyResult | ba = Just ((Math.pi * (k * t + r)) / 180 * a) }
+
+                { t = Just t, r = Nothing, ba = Just ba, a = Just a, k = Just k, ty = BendAllowance } ->
+                    { emptyResult | r = Just -(k * t - 180 * ba / (Math.pi * a)) }
+
+                { t = Nothing, r = Just r, ba = Just ba, a = Just a, k = Just k, ty = BendAllowance } ->
+                    { emptyResult | t = Just ((-r + ba / (Math.pi * a / 180)) / k) }
+
+                -- Extra allowance (assuming a == 90)
+                { t = Just t, r = Just r, xa = Just xa, k = Nothing, ty = ExtraAllowance } ->
+                    { emptyResult | k = Just ((((xa + 2 * r) * 2 / Math.pi) - r) / t) }
+
+                { t = Just t, r = Just r, xa = Nothing, k = Just k, ty = ExtraAllowance } ->
+                    { emptyResult | xa = Just (Math.pi * (k * t + r) / 2 - 2 * r) }
+
+                { t = Just t, r = Nothing, xa = Just xa, k = Just k, ty = ExtraAllowance } ->
+                    { emptyResult | r = Just ((2 * xa - Math.pi * k * t) / (Math.pi - 360)) }
+
+                { t = Nothing, r = Just r, xa = Just xa, k = Just k, ty = ExtraAllowance } ->
+                    { emptyResult | t = Just ((2 * xa + 4 * r) / (Math.pi * k) - r / k) }
+
+                _ ->
+                    emptyResult
+
+        makeInputDiv txt input =
+            div
+                []
+                [ text txt
+                , br [] []
+                , input
+                ]
     in
     { title = "K Factors"
     , body =
@@ -462,90 +231,103 @@ view model =
             [ id "k-factor"
             , class "center"
             ]
-            [ case calculated of
-                Ok _ ->
-                    text ""
-
-                Err e ->
-                    text e
-            , br [] []
-            , text "Thickness:"
-            , br [] []
-            , case res.t of
-                Just t ->
-                    text (String.fromFloat t)
-
-                Nothing ->
-                    input
-                        [ value model.t
-                        , onInput UpdateThickness
+            [ case model.ty of
+                ExtraAllowance ->
+                    button
+                        [ onClick (UpdateTy BendAllowance)
                         ]
-                        []
-            , br [] []
-            , text "Radius:"
-            , br [] []
-            , case res.r of
-                Just r ->
-                    text (String.fromFloat r)
-
-                Nothing ->
-                    input
-                        [ value model.r
-                        , onInput UpdateRadius
+                        [ text "Extra Allowance"
                         ]
-                        []
-            , br [] []
-            , text "Bend Allowance:"
-            , br [] []
-            , case res.ba of
-                Just ba ->
-                    text (String.fromFloat ba)
 
-                Nothing ->
-                    input
-                        [ value model.ba
-                        , onInput UpdateAllowance
+                BendAllowance ->
+                    button
+                        [ onClick (UpdateTy ExtraAllowance)
                         ]
-                        []
-            , br [] []
-            , text "Angle:"
-            , br [] []
-            , case res.a of
-                Just a ->
-                    text (String.fromFloat a)
+                        [ text "Bend Allowance"
+                        ]
+            , makeInputDiv
+                "Thickness:"
+                (case res.t of
+                    Just t ->
+                        text (String.fromFloat t)
 
-                Nothing ->
-                    input
-                        [ value model.a
-                        , onInput UpdateAngle
-                        ]
-                        []
-            , br [] []
-            , text "K Factor:"
-            , br [] []
-            , case res.k of
-                Just k ->
-                    text (String.fromFloat k)
+                    Nothing ->
+                        input
+                            [ value model.t
+                            , onInput UpdateThickness
+                            ]
+                            []
+                )
+            , makeInputDiv
+                "Radius:"
+                (case res.r of
+                    Just r ->
+                        text (String.fromFloat r)
 
-                Nothing ->
-                    input
-                        [ value model.k
-                        , onInput UpdateKFactor
-                        ]
-                        []
-            , br [] []
-            , text "Extra Allowance:"
-            , br [] []
-            , case res.xa of
-                Just xa ->
-                    text (String.fromFloat xa)
+                    Nothing ->
+                        input
+                            [ value model.r
+                            , onInput UpdateRadius
+                            ]
+                            []
+                )
+            , if model.ty == BendAllowance then
+                makeInputDiv
+                    "Bend Allowance:"
+                    (case res.ba of
+                        Just ba ->
+                            text (String.fromFloat ba)
 
-                Nothing ->
-                    input
-                        [ value model.xa
-                        , onInput UpdateExtraAllowance
-                        ]
-                        []
+                        Nothing ->
+                            input
+                                [ value model.ba
+                                , onInput UpdateAllowance
+                                ]
+                                []
+                    )
+              else
+                makeInputDiv
+                    "Extra Allowance:"
+                    (case res.xa of
+                        Just xa ->
+                            text (String.fromFloat xa)
+
+                        Nothing ->
+                            input
+                                [ value model.xa
+                                , onInput UpdateExtraAllowance
+                                ]
+                                []
+                    )
+            , if model.ty == BendAllowance then
+                makeInputDiv
+                    "Angle:"
+                    (case res.a of
+                        Just a ->
+                            text (String.fromFloat a)
+
+                        Nothing ->
+                            input
+                                [ value model.a
+                                , onInput UpdateAngle
+                                ]
+                                []
+                    )
+              else
+                text ""
+            , makeInputDiv
+                "K Factor:"
+                (case res.k of
+                    Just k ->
+                        text (String.fromFloat k)
+
+                    Nothing ->
+                        input
+                            [ value model.k
+                            , onInput UpdateKFactor
+                            ]
+                            []
+                )
             ]
         ]
     }
