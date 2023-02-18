@@ -20,7 +20,22 @@ try {
 
   app.ports.changePage.subscribe(function(hash) {
     window.history.pushState({}, "", hash);
-  })
+  });
+
+  app.ports.copyId.subscribe(function(id) {
+    var input = document.getElementById(id);
+
+    input.focus();
+    input.select();
+
+    try {
+      var successful = document.execCommand("copy");
+      if (!successful)
+        window.alert("Failed to copy to clipboard");
+    } catch (e) {
+      window.alert("Failed to copy to clipboard: " + e);
+    }
+  });
 }
 catch (e)
 {

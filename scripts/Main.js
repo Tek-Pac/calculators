@@ -4537,6 +4537,7 @@ var $author$project$Main$KFactorMsg = function (a) {
 	return {$: 'KFactorMsg', a: a};
 };
 var $gren_lang$core$Json$Encode$string = _Json_wrap;
+var $author$project$Main$copyId = _Platform_outgoingPort('copyId', $gren_lang$core$Json$Encode$string);
 var $author$project$Main$changePage = _Platform_outgoingPort('changePage', $gren_lang$core$Json$Encode$string);
 var $author$project$PageId$pageIdToString = function (id) {
 	if (id.$ === 'Home') {
@@ -4651,7 +4652,7 @@ var $author$project$Page$KFactor$update = F2(
 						model,
 						{k: s})
 				};
-			default:
+			case 'UpdateTy':
 				var ty = msg.a;
 				return {
 					command: $author$project$SpaCmd$none,
@@ -4659,15 +4660,18 @@ var $author$project$Page$KFactor$update = F2(
 						model,
 						{ty: ty})
 				};
+			default:
+				var id = msg.a;
+				return {command: $author$project$SpaCmd$none, model: model};
 		}
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		var _v0 = {m: model, v: msg};
-		_v0$2:
+		_v0$3:
 		while (true) {
-			if (_v0.m.$ === 'HomeModel') {
-				if (_v0.v.$ === 'HomeMsg') {
+			if (_v0.v.$ === 'HomeMsg') {
+				if (_v0.m.$ === 'HomeModel') {
 					var m = _v0.m.a;
 					var v = _v0.v.a;
 					return $author$project$Main$handlePageChanges(
@@ -4677,20 +4681,28 @@ var $author$project$Main$update = F2(
 							$author$project$Main$HomeMsg,
 							A2($author$project$Page$Home$update, v, m)));
 				} else {
-					break _v0$2;
+					break _v0$3;
 				}
 			} else {
-				if (_v0.v.$ === 'KFactorMsg') {
-					var m = _v0.m.a;
-					var v = _v0.v.a;
-					return $author$project$Main$handlePageChanges(
-						A3(
-							$author$project$Main$mapPage,
-							$author$project$Main$KFactorModel,
-							$author$project$Main$KFactorMsg,
-							A2($author$project$Page$KFactor$update, v, m)));
+				if (_v0.v.a.$ === 'DoCopy') {
+					var id = _v0.v.a.a;
+					return {
+						command: $author$project$Main$copyId(id),
+						model: model
+					};
 				} else {
-					break _v0$2;
+					if (_v0.m.$ === 'KFactorModel') {
+						var m = _v0.m.a;
+						var v = _v0.v.a;
+						return $author$project$Main$handlePageChanges(
+							A3(
+								$author$project$Main$mapPage,
+								$author$project$Main$KFactorModel,
+								$author$project$Main$KFactorMsg,
+								A2($author$project$Page$KFactor$update, v, m)));
+					} else {
+						break _v0$3;
+					}
 				}
 			}
 		}
@@ -4761,6 +4773,9 @@ var $author$project$Page$Home$view = function (model) {
 		],
 		title: 'Calculators'
 	};
+};
+var $author$project$Page$KFactor$DoCopy = function (a) {
+	return {$: 'DoCopy', a: a};
 };
 var $author$project$Page$KFactor$ExtraAllowance = {$: 'ExtraAllowance'};
 var $author$project$Page$KFactor$HomePage = {$: 'HomePage'};
@@ -4854,14 +4869,34 @@ var $author$project$Page$KFactor$parseModel = function (model) {
 	return {a: a, ba: ba, k: k, r: r, t: t, ty: model.ty, xa: xa};
 };
 var $gren_lang$core$Math$pi = _Math_pi;
+var $gren_lang$core$Json$Encode$bool = _Json_wrap;
+var $gren_lang$browser$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			$gren_lang$browser$Html$Attributes$property,
+			key,
+			$gren_lang$core$Json$Encode$bool(bool));
+	});
+var $gren_lang$browser$Html$Attributes$readonly = $gren_lang$browser$Html$Attributes$boolProperty('readOnly');
 var $gren_lang$core$Math$round = _Math_round;
 var $gren_lang$core$Basics$sub = _Basics_sub;
 var $gren_lang$core$Basics$toFloat = _Basics_toFloat;
 var $gren_lang$browser$Html$Attributes$value = $gren_lang$browser$Html$Attributes$stringProperty('value');
 var $author$project$Page$KFactor$view = function (model) {
 	var parsedModel = $author$project$Page$KFactor$parseModel(model);
-	var makeInputDiv = F2(
-		function (txt, input) {
+	var makeSwapButton = function (updatedTy) {
+		return A2(
+			$gren_lang$browser$Html$button,
+			[
+				$gren_lang$browser$Html$Events$onClick(
+				$author$project$Page$KFactor$UpdateTy(updatedTy))
+			],
+			[
+				$gren_lang$browser$Html$text('Swap')
+			]);
+	};
+	var makeInputDiv = F5(
+		function (txt, idTxt, calcF, modelT, msgF) {
 			return A2(
 				$gren_lang$browser$Html$div,
 				[],
@@ -4871,7 +4906,45 @@ var $author$project$Page$KFactor$view = function (model) {
 					$gren_lang$browser$Html$br,
 					[],
 					[]),
-					input
+					function () {
+					if (calcF.$ === 'Just') {
+						var t = calcF.a;
+						return A2(
+							$gren_lang$browser$Html$input,
+							[
+								$gren_lang$browser$Html$Attributes$value(
+								$gren_lang$core$String$fromFloat(t)),
+								$gren_lang$browser$Html$Attributes$readonly(true),
+								$gren_lang$browser$Html$Attributes$id(idTxt)
+							],
+							[]);
+					} else {
+						return A2(
+							$gren_lang$browser$Html$input,
+							[
+								$gren_lang$browser$Html$Attributes$value(modelT),
+								$gren_lang$browser$Html$Events$onInput(msgF),
+								$gren_lang$browser$Html$Attributes$id(idTxt)
+							],
+							[]);
+					}
+				}(),
+					function () {
+					if (calcF.$ === 'Just') {
+						var t = calcF.a;
+						return A2(
+							$gren_lang$browser$Html$button,
+							[
+								$gren_lang$browser$Html$Events$onClick(
+								$author$project$Page$KFactor$DoCopy(idTxt))
+							],
+							[
+								$gren_lang$browser$Html$text('📋')
+							]);
+					} else {
+						return $gren_lang$browser$Html$text('');
+					}
+				}()
 				]);
 		});
 	var formatF = function (value) {
@@ -4879,7 +4952,7 @@ var $author$project$Page$KFactor$view = function (model) {
 			$gren_lang$core$Math$round(value * 10000000000) / 10000000000);
 	};
 	var res = function () {
-		_v7$9:
+		_v2$9:
 		while (true) {
 			if (parsedModel.t.$ === 'Just') {
 				if (parsedModel.r.$ === 'Just') {
@@ -4890,30 +4963,30 @@ var $author$project$Page$KFactor$view = function (model) {
 								var r = parsedModel.r.a;
 								var ba = parsedModel.ba.a;
 								var a = parsedModel.a.a;
-								var _v8 = parsedModel.k;
-								var _v9 = parsedModel.ty;
+								var _v3 = parsedModel.k;
+								var _v4 = parsedModel.ty;
 								return _Utils_update(
 									$author$project$Page$KFactor$emptyResult,
 									{
 										k: formatF(((-r) + ((180 * ba) / (a * $gren_lang$core$Math$pi))) / t)
 									});
 							} else {
-								break _v7$9;
+								break _v2$9;
 							}
 						} else {
 							if (parsedModel.xa.$ === 'Just') {
 								var t = parsedModel.t.a;
 								var r = parsedModel.r.a;
 								var xa = parsedModel.xa.a;
-								var _v18 = parsedModel.k;
-								var _v19 = parsedModel.ty;
+								var _v13 = parsedModel.k;
+								var _v14 = parsedModel.ty;
 								return _Utils_update(
 									$author$project$Page$KFactor$emptyResult,
 									{
 										k: formatF(((((xa + (2 * r)) * 2) / $gren_lang$core$Math$pi) - r) / t)
 									});
 							} else {
-								break _v7$9;
+								break _v2$9;
 							}
 						}
 					} else {
@@ -4923,48 +4996,48 @@ var $author$project$Page$KFactor$view = function (model) {
 									var t = parsedModel.t.a;
 									var r = parsedModel.r.a;
 									var ba = parsedModel.ba.a;
-									var _v10 = parsedModel.a;
+									var _v5 = parsedModel.a;
 									var k = parsedModel.k.a;
-									var _v11 = parsedModel.ty;
+									var _v6 = parsedModel.ty;
 									return _Utils_update(
 										$author$project$Page$KFactor$emptyResult,
 										{
 											a: formatF(ba / (($gren_lang$core$Math$pi * ((k * t) + r)) / 180))
 										});
 								} else {
-									break _v7$9;
+									break _v2$9;
 								}
 							} else {
 								if (parsedModel.a.$ === 'Just') {
 									var t = parsedModel.t.a;
 									var r = parsedModel.r.a;
-									var _v12 = parsedModel.ba;
+									var _v7 = parsedModel.ba;
 									var a = parsedModel.a.a;
 									var k = parsedModel.k.a;
-									var _v13 = parsedModel.ty;
+									var _v8 = parsedModel.ty;
 									return _Utils_update(
 										$author$project$Page$KFactor$emptyResult,
 										{
 											ba: formatF((($gren_lang$core$Math$pi * ((k * t) + r)) / 180) * a)
 										});
 								} else {
-									break _v7$9;
+									break _v2$9;
 								}
 							}
 						} else {
 							if (parsedModel.xa.$ === 'Nothing') {
 								var t = parsedModel.t.a;
 								var r = parsedModel.r.a;
-								var _v20 = parsedModel.xa;
+								var _v15 = parsedModel.xa;
 								var k = parsedModel.k.a;
-								var _v21 = parsedModel.ty;
+								var _v16 = parsedModel.ty;
 								return _Utils_update(
 									$author$project$Page$KFactor$emptyResult,
 									{
 										xa: formatF((($gren_lang$core$Math$pi * ((k * t) + r)) / 2) - (2 * r))
 									});
 							} else {
-								break _v7$9;
+								break _v2$9;
 							}
 						}
 					}
@@ -4973,75 +5046,75 @@ var $author$project$Page$KFactor$view = function (model) {
 						if (parsedModel.ty.$ === 'BendAllowance') {
 							if ((parsedModel.ba.$ === 'Just') && (parsedModel.a.$ === 'Just')) {
 								var t = parsedModel.t.a;
-								var _v14 = parsedModel.r;
+								var _v9 = parsedModel.r;
 								var ba = parsedModel.ba.a;
 								var a = parsedModel.a.a;
 								var k = parsedModel.k.a;
-								var _v15 = parsedModel.ty;
+								var _v10 = parsedModel.ty;
 								return _Utils_update(
 									$author$project$Page$KFactor$emptyResult,
 									{
 										r: formatF(-((k * t) - ((180 * ba) / ($gren_lang$core$Math$pi * a))))
 									});
 							} else {
-								break _v7$9;
+								break _v2$9;
 							}
 						} else {
 							if (parsedModel.xa.$ === 'Just') {
 								var t = parsedModel.t.a;
-								var _v22 = parsedModel.r;
+								var _v17 = parsedModel.r;
 								var xa = parsedModel.xa.a;
 								var k = parsedModel.k.a;
-								var _v23 = parsedModel.ty;
+								var _v18 = parsedModel.ty;
 								return _Utils_update(
 									$author$project$Page$KFactor$emptyResult,
 									{
 										r: formatF(((2 * xa) - (($gren_lang$core$Math$pi * k) * t)) / ($gren_lang$core$Math$pi - 360))
 									});
 							} else {
-								break _v7$9;
+								break _v2$9;
 							}
 						}
 					} else {
-						break _v7$9;
+						break _v2$9;
 					}
 				}
 			} else {
 				if ((parsedModel.r.$ === 'Just') && (parsedModel.k.$ === 'Just')) {
 					if (parsedModel.ty.$ === 'BendAllowance') {
 						if ((parsedModel.ba.$ === 'Just') && (parsedModel.a.$ === 'Just')) {
-							var _v16 = parsedModel.t;
+							var _v11 = parsedModel.t;
 							var r = parsedModel.r.a;
 							var ba = parsedModel.ba.a;
 							var a = parsedModel.a.a;
 							var k = parsedModel.k.a;
-							var _v17 = parsedModel.ty;
+							var _v12 = parsedModel.ty;
 							return _Utils_update(
 								$author$project$Page$KFactor$emptyResult,
 								{
 									t: formatF(((-r) + (ba / (($gren_lang$core$Math$pi * a) / 180))) / k)
 								});
 						} else {
-							break _v7$9;
+							break _v2$9;
 						}
 					} else {
 						if (parsedModel.xa.$ === 'Just') {
-							var _v24 = parsedModel.t;
+							var _v19 = parsedModel.t;
 							var r = parsedModel.r.a;
 							var xa = parsedModel.xa.a;
 							var k = parsedModel.k.a;
-							var _v25 = parsedModel.ty;
+							var _v20 = parsedModel.ty;
 							return _Utils_update(
 								$author$project$Page$KFactor$emptyResult,
 								{
 									t: formatF((((2 * xa) + (4 * r)) / ($gren_lang$core$Math$pi * k)) - (r / k))
 								});
 						} else {
-							break _v7$9;
+							break _v2$9;
 						}
 					}
 				} else {
-					break _v7$9;
+					break _v2$9;
 				}
 			}
 		}
@@ -5068,140 +5141,24 @@ var $author$project$Page$KFactor$view = function (model) {
 				function () {
 				var _v0 = model.ty;
 				if (_v0.$ === 'ExtraAllowance') {
-					return A2(
-						$gren_lang$browser$Html$button,
-						[
-							$gren_lang$browser$Html$Events$onClick(
-							$author$project$Page$KFactor$UpdateTy($author$project$Page$KFactor$BendAllowance))
-						],
-						[
-							$gren_lang$browser$Html$text('Extra Allowance')
-						]);
+					return $gren_lang$browser$Html$text('Extra Allowance ');
 				} else {
-					return A2(
-						$gren_lang$browser$Html$button,
-						[
-							$gren_lang$browser$Html$Events$onClick(
-							$author$project$Page$KFactor$UpdateTy($author$project$Page$KFactor$ExtraAllowance))
-						],
-						[
-							$gren_lang$browser$Html$text('Bend Allowance')
-						]);
+					return $gren_lang$browser$Html$text('Bend Allowance ');
 				}
 			}(),
-				A2(
-				makeInputDiv,
-				'Thickness:',
 				function () {
-					var _v1 = res.t;
-					if (_v1.$ === 'Just') {
-						var t = _v1.a;
-						return $gren_lang$browser$Html$text(
-							$gren_lang$core$String$fromFloat(t));
-					} else {
-						return A2(
-							$gren_lang$browser$Html$input,
-							[
-								$gren_lang$browser$Html$Attributes$value(model.t),
-								$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateThickness)
-							],
-							[]);
-					}
-				}()),
-				A2(
-				makeInputDiv,
-				'Radius:',
-				function () {
-					var _v2 = res.r;
-					if (_v2.$ === 'Just') {
-						var r = _v2.a;
-						return $gren_lang$browser$Html$text(
-							$gren_lang$core$String$fromFloat(r));
-					} else {
-						return A2(
-							$gren_lang$browser$Html$input,
-							[
-								$gren_lang$browser$Html$Attributes$value(model.r),
-								$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateRadius)
-							],
-							[]);
-					}
-				}()),
-				_Utils_eq(model.ty, $author$project$Page$KFactor$BendAllowance) ? A2(
-				makeInputDiv,
-				'Bend Allowance:',
-				function () {
-					var _v3 = res.ba;
-					if (_v3.$ === 'Just') {
-						var ba = _v3.a;
-						return $gren_lang$browser$Html$text(
-							$gren_lang$core$String$fromFloat(ba));
-					} else {
-						return A2(
-							$gren_lang$browser$Html$input,
-							[
-								$gren_lang$browser$Html$Attributes$value(model.ba),
-								$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateAllowance)
-							],
-							[]);
-					}
-				}()) : A2(
-				makeInputDiv,
-				'Extra Allowance:',
-				function () {
-					var _v4 = res.xa;
-					if (_v4.$ === 'Just') {
-						var xa = _v4.a;
-						return $gren_lang$browser$Html$text(
-							$gren_lang$core$String$fromFloat(xa));
-					} else {
-						return A2(
-							$gren_lang$browser$Html$input,
-							[
-								$gren_lang$browser$Html$Attributes$value(model.xa),
-								$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateExtraAllowance)
-							],
-							[]);
-					}
-				}()),
-				_Utils_eq(model.ty, $author$project$Page$KFactor$BendAllowance) ? A2(
-				makeInputDiv,
-				'Angle:',
-				function () {
-					var _v5 = res.a;
-					if (_v5.$ === 'Just') {
-						var a = _v5.a;
-						return $gren_lang$browser$Html$text(
-							$gren_lang$core$String$fromFloat(a));
-					} else {
-						return A2(
-							$gren_lang$browser$Html$input,
-							[
-								$gren_lang$browser$Html$Attributes$value(model.a),
-								$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateAngle)
-							],
-							[]);
-					}
-				}()) : $gren_lang$browser$Html$text(''),
-				A2(
-				makeInputDiv,
-				'K Factor:',
-				function () {
-					var _v6 = res.k;
-					if (_v6.$ === 'Just') {
-						var k = _v6.a;
-						return $gren_lang$browser$Html$text(
-							$gren_lang$core$String$fromFloat(k));
-					} else {
-						return A2(
-							$gren_lang$browser$Html$input,
-							[
-								$gren_lang$browser$Html$Attributes$value(model.k),
-								$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateKFactor)
-							],
-							[]);
-					}
-				}())
+				var _v1 = model.ty;
+				if (_v1.$ === 'ExtraAllowance') {
+					return makeSwapButton($author$project$Page$KFactor$BendAllowance);
+				} else {
+					return makeSwapButton($author$project$Page$KFactor$ExtraAllowance);
+				}
+			}(),
+				A5(makeInputDiv, 'Thickness:', 'thickness', res.t, model.t, $author$project$Page$KFactor$UpdateThickness),
+				A5(makeInputDiv, 'Radius:', 'radius', res.r, model.r, $author$project$Page$KFactor$UpdateRadius),
+				_Utils_eq(model.ty, $author$project$Page$KFactor$BendAllowance) ? A5(makeInputDiv, 'Bend Allowance:', 'bendallowance', res.ba, model.ba, $author$project$Page$KFactor$UpdateAllowance) : A5(makeInputDiv, 'Extra Allowance:', 'extraallowance', res.xa, model.xa, $author$project$Page$KFactor$UpdateExtraAllowance),
+				_Utils_eq(model.ty, $author$project$Page$KFactor$BendAllowance) ? A5(makeInputDiv, 'Angle:', 'angle', res.a, model.a, $author$project$Page$KFactor$UpdateAngle) : $gren_lang$browser$Html$text(''),
+				A5(makeInputDiv, 'K Factor:', 'kfactor', res.k, model.k, $author$project$Page$KFactor$UpdateKFactor)
 			])
 		],
 		title: 'K Factors'

@@ -11,6 +11,9 @@ import SpaCmd exposing ( SpaCmd(..) )
 port changePage : String -> Cmd msg
 
 
+port copyId : String -> Cmd msg
+
+
 type Model
     = HomeModel Home.Model
     | KFactorModel KFactor.Model
@@ -78,6 +81,11 @@ update msg model =
         , v = msg
         }
     of
+        { v = KFactorMsg (KFactor.DoCopy id) } ->
+            { model = model
+            , command = copyId id
+            }
+
         { m = HomeModel m, v = HomeMsg v } ->
             handlePageChanges (mapPage HomeModel HomeMsg (Home.update v m))
 

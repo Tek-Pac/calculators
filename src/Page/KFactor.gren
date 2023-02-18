@@ -1,4 +1,4 @@
-module Page.KFactor exposing ( Model, Msg, init, update, view )
+module Page.KFactor exposing ( Model, Msg(..), init, update, view )
 
 {-| The k factor page
 -}
@@ -55,6 +55,8 @@ type Msg
     | UpdateAngle String
     | UpdateKFactor String
     | UpdateTy Ty
+        -- id
+    | DoCopy String
 
 
 update : Msg -> Model -> Updated
@@ -97,6 +99,11 @@ update msg model =
 
         UpdateTy ty ->
             { model = { model | ty = ty }
+            , command = SpaCmd.none
+            }
+
+        DoCopy id ->
+            { model = model
             , command = SpaCmd.none
             }
 
@@ -211,12 +218,46 @@ view model =
                 _ ->
                     emptyResult
 
-        makeInputDiv txt input =
+        makeInputDiv : String -> String -> Maybe Float -> String -> (String -> Msg) -> Html Msg
+        makeInputDiv txt idTxt calcF modelT msgF =
             div
                 []
                 [ text txt
                 , br [] []
-                , input
+                , case calcF of
+                    Just t ->
+                        input
+                            [ value (String.fromFloat t)
+                            , readonly True
+                            , id idTxt
+                            ]
+                            []
+
+                    Nothing ->
+                        input
+                            [ value modelT
+                            , onInput msgF
+                            , id idTxt
+                            ]
+                            []
+                , case calcF of
+                    Just t ->
+                        button
+                            [ onClick (DoCopy idTxt)
+                            ]
+                            [ text "📋"
+                            ]
+
+                    Nothing ->
+                        text ""
+                ]
+
+        makeSwapButton : Ty -> Html Msg
+        makeSwapButton updatedTy =
+            button
+                [ onClick (UpdateTy updatedTy)
+                ]
+                [ text "Swap"
                 ]
     in
     { title = "K Factors"
@@ -233,101 +274,27 @@ view model =
             ]
             [ case model.ty of
                 ExtraAllowance ->
-                    button
-                        [ onClick (UpdateTy BendAllowance)
-                        ]
-                        [ text "Extra Allowance"
-                        ]
+                    text "Extra Allowance "
 
                 BendAllowance ->
-                    button
-                        [ onClick (UpdateTy ExtraAllowance)
-                        ]
-                        [ text "Bend Allowance"
-                        ]
-            , makeInputDiv
-                "Thickness:"
-                (case res.t of
-                    Just t ->
-                        text (String.fromFloat t)
+                    text "Bend Allowance "
+            , case model.ty of
+                ExtraAllowance ->
+                    makeSwapButton BendAllowance
 
-                    Nothing ->
-                        input
-                            [ value model.t
-                            , onInput UpdateThickness
-                            ]
-                            []
-                )
-            , makeInputDiv
-                "Radius:"
-                (case res.r of
-                    Just r ->
-                        text (String.fromFloat r)
-
-                    Nothing ->
-                        input
-                            [ value model.r
-                            , onInput UpdateRadius
-                            ]
-                            []
-                )
+                BendAllowance ->
+                    makeSwapButton ExtraAllowance
+            , makeInputDiv "Thickness:" "thickness" res.t model.t UpdateThickness
+            , makeInputDiv "Radius:" "radius" res.r model.r UpdateRadius
             , if model.ty == BendAllowance then
-                makeInputDiv
-                    "Bend Allowance:"
-                    (case res.ba of
-                        Just ba ->
-                            text (String.fromFloat ba)
-
-                        Nothing ->
-                            input
-                                [ value model.ba
-                                , onInput UpdateAllowance
-                                ]
-                                []
-                    )
+                makeInputDiv "Bend Allowance:" "bendallowance" res.ba model.ba UpdateAllowance
               else
-                makeInputDiv
-                    "Extra Allowance:"
-                    (case res.xa of
-                        Just xa ->
-                            text (String.fromFloat xa)
-
-                        Nothing ->
-                            input
-                                [ value model.xa
-                                , onInput UpdateExtraAllowance
-                                ]
-                                []
-                    )
+                makeInputDiv "Extra Allowance:" "extraallowance" res.xa model.xa UpdateExtraAllowance
             , if model.ty == BendAllowance then
-                makeInputDiv
-                    "Angle:"
-                    (case res.a of
-                        Just a ->
-                            text (String.fromFloat a)
-
-                        Nothing ->
-                            input
-                                [ value model.a
-                                , onInput UpdateAngle
-                                ]
-                                []
-                    )
+                makeInputDiv "Angle:" "angle" res.a model.a UpdateAngle
               else
                 text ""
-            , makeInputDiv
-                "K Factor:"
-                (case res.k of
-                    Just k ->
-                        text (String.fromFloat k)
-
-                    Nothing ->
-                        input
-                            [ value model.k
-                            , onInput UpdateKFactor
-                            ]
-                            []
-                )
+            , makeInputDiv "K Factor:" "kfactor" res.k model.k UpdateKFactor
             ]
         ]
     }
