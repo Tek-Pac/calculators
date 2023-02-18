@@ -4482,8 +4482,7 @@ var $author$project$Main$KFactorModel = function (a) {
 	return {$: 'KFactorModel', a: a};
 };
 var $author$project$Page$Home$init = {};
-var $author$project$Page$KFactor$emptyModel = {a: '', ba: '', k: '', r: '', t: ''};
-var $author$project$Page$KFactor$init = $author$project$Page$KFactor$emptyModel;
+var $author$project$Page$KFactor$init = {a: '90', ba: '', k: '', r: '', t: ''};
 var $author$project$Main$modelForPageId = function (id) {
 	if (id.$ === 'Home') {
 		return $author$project$Main$HomeModel($author$project$Page$Home$init);
@@ -4839,14 +4838,12 @@ var $author$project$Page$KFactor$parseModel = function (model) {
 	return {a: a, ba: ba, k: k, r: r, t: t};
 };
 var $gren_lang$core$Math$pi = _Math_pi;
-var $gren_lang$browser$VirtualDom$style = _VirtualDom_style;
-var $gren_lang$browser$Html$Attributes$style = $gren_lang$browser$VirtualDom$style;
 var $gren_lang$core$Basics$sub = _Basics_sub;
 var $gren_lang$browser$Html$Attributes$value = $gren_lang$browser$Html$Attributes$stringProperty('value');
 var $author$project$Page$KFactor$view = function (model) {
 	var parsedModel = $author$project$Page$KFactor$parseModel(model);
 	var res = function () {
-		_v10$3:
+		_v5$3:
 		while (true) {
 			if (parsedModel.t.$ === 'Just') {
 				if (parsedModel.r.$ === 'Just') {
@@ -4856,80 +4853,40 @@ var $author$project$Page$KFactor$view = function (model) {
 							var r = parsedModel.r.a;
 							var ba = parsedModel.ba.a;
 							var a = parsedModel.a.a;
-							var _v11 = parsedModel.k;
+							var _v6 = parsedModel.k;
 							return $author$project$Page$KFactor$KFactor(((-r) + ((180 * ba) / (a * $gren_lang$core$Math$pi))) / t);
 						} else {
-							break _v10$3;
+							break _v5$3;
 						}
 					} else {
 						if ((parsedModel.a.$ === 'Just') && (parsedModel.k.$ === 'Just')) {
 							var t = parsedModel.t.a;
 							var r = parsedModel.r.a;
-							var _v12 = parsedModel.ba;
+							var _v7 = parsedModel.ba;
 							var a = parsedModel.a.a;
 							var k = parsedModel.k.a;
 							return $author$project$Page$KFactor$Allowance((($gren_lang$core$Math$pi * ((k * t) + r)) / 180) * a);
 						} else {
-							break _v10$3;
+							break _v5$3;
 						}
 					}
 				} else {
 					if (((parsedModel.ba.$ === 'Just') && (parsedModel.a.$ === 'Just')) && (parsedModel.k.$ === 'Just')) {
 						var t = parsedModel.t.a;
-						var _v13 = parsedModel.r;
+						var _v8 = parsedModel.r;
 						var ba = parsedModel.ba.a;
 						var a = parsedModel.a.a;
 						var k = parsedModel.k.a;
 						return $author$project$Page$KFactor$Radius(-((k * t) - ((180 * ba) / ($gren_lang$core$Math$pi * a))));
 					} else {
-						break _v10$3;
+						break _v5$3;
 					}
 				}
 			} else {
-				break _v10$3;
+				break _v5$3;
 			}
 		}
 		return $author$project$Page$KFactor$Invalid;
-	}();
-	var rStr = function () {
-		if (res.$ === 'Radius') {
-			var r = res.a;
-			return $gren_lang$core$String$fromFloat(r);
-		} else {
-			return model.r;
-		}
-	}();
-	var tStr = function () {
-		if (res.$ === 'Thickness') {
-			var t = res.a;
-			return $gren_lang$core$String$fromFloat(t);
-		} else {
-			return model.t;
-		}
-	}();
-	var kStr = function () {
-		if (res.$ === 'KFactor') {
-			var k = res.a;
-			return $gren_lang$core$String$fromFloat(k);
-		} else {
-			return model.k;
-		}
-	}();
-	var baStr = function () {
-		if (res.$ === 'Allowance') {
-			var ba = res.a;
-			return $gren_lang$core$String$fromFloat(ba);
-		} else {
-			return model.ba;
-		}
-	}();
-	var aStr = function () {
-		if (res.$ === 'Angle') {
-			var a = res.a;
-			return $gren_lang$core$String$fromFloat(a);
-		} else {
-			return model.a;
-		}
 	}();
 	return {
 		body: [
@@ -4946,11 +4903,14 @@ var $author$project$Page$KFactor$view = function (model) {
 			$gren_lang$browser$Html$div,
 			[
 				$gren_lang$browser$Html$Attributes$id('k-factor'),
-				$gren_lang$browser$Html$Attributes$class('center'),
-				A2($gren_lang$browser$Html$Attributes$style, 'padding', '50px')
+				$gren_lang$browser$Html$Attributes$class('center')
 			],
 			[
-				$gren_lang$browser$Html$text('Thickness: '),
+				$gren_lang$browser$Html$text('Thickness:'),
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
 				function () {
 				if (res.$ === 'Thickness') {
 					var t = res.a;
@@ -4960,7 +4920,7 @@ var $author$project$Page$KFactor$view = function (model) {
 					return A2(
 						$gren_lang$browser$Html$input,
 						[
-							$gren_lang$browser$Html$Attributes$value(tStr),
+							$gren_lang$browser$Html$Attributes$value(model.t),
 							$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateThickness)
 						],
 						[]);
@@ -4970,7 +4930,11 @@ var $author$project$Page$KFactor$view = function (model) {
 				$gren_lang$browser$Html$br,
 				[],
 				[]),
-				$gren_lang$browser$Html$text('Radius: '),
+				$gren_lang$browser$Html$text('Radius:'),
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
 				function () {
 				if (res.$ === 'Radius') {
 					var r = res.a;
@@ -4980,7 +4944,7 @@ var $author$project$Page$KFactor$view = function (model) {
 					return A2(
 						$gren_lang$browser$Html$input,
 						[
-							$gren_lang$browser$Html$Attributes$value(rStr),
+							$gren_lang$browser$Html$Attributes$value(model.r),
 							$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateRadius)
 						],
 						[]);
@@ -4990,7 +4954,11 @@ var $author$project$Page$KFactor$view = function (model) {
 				$gren_lang$browser$Html$br,
 				[],
 				[]),
-				$gren_lang$browser$Html$text('Bend Allowance: '),
+				$gren_lang$browser$Html$text('Bend Allowance:'),
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
 				function () {
 				if (res.$ === 'Allowance') {
 					var ba = res.a;
@@ -5000,7 +4968,7 @@ var $author$project$Page$KFactor$view = function (model) {
 					return A2(
 						$gren_lang$browser$Html$input,
 						[
-							$gren_lang$browser$Html$Attributes$value(baStr),
+							$gren_lang$browser$Html$Attributes$value(model.ba),
 							$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateAllowance)
 						],
 						[]);
@@ -5010,7 +4978,11 @@ var $author$project$Page$KFactor$view = function (model) {
 				$gren_lang$browser$Html$br,
 				[],
 				[]),
-				$gren_lang$browser$Html$text('Angle: '),
+				$gren_lang$browser$Html$text('Angle:'),
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
 				function () {
 				if (res.$ === 'Angle') {
 					var a = res.a;
@@ -5020,7 +4992,7 @@ var $author$project$Page$KFactor$view = function (model) {
 					return A2(
 						$gren_lang$browser$Html$input,
 						[
-							$gren_lang$browser$Html$Attributes$value(aStr),
+							$gren_lang$browser$Html$Attributes$value(model.a),
 							$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateAngle)
 						],
 						[]);
@@ -5030,7 +5002,11 @@ var $author$project$Page$KFactor$view = function (model) {
 				$gren_lang$browser$Html$br,
 				[],
 				[]),
-				$gren_lang$browser$Html$text('K Factor: '),
+				$gren_lang$browser$Html$text('K Factor:'),
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
 				function () {
 				if (res.$ === 'KFactor') {
 					var k = res.a;
@@ -5040,7 +5016,7 @@ var $author$project$Page$KFactor$view = function (model) {
 					return A2(
 						$gren_lang$browser$Html$input,
 						[
-							$gren_lang$browser$Html$Attributes$value(kStr),
+							$gren_lang$browser$Html$Attributes$value(model.k),
 							$gren_lang$browser$Html$Events$onInput($author$project$Page$KFactor$UpdateKFactor)
 						],
 						[]);

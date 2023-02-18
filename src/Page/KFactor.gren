@@ -27,18 +27,14 @@ type alias Updated =
     }
 
 
-emptyModel =
+init : Model
+init =
     { t = ""
     , r = ""
     , ba = ""
-    , a = ""
+    , a = "90"
     , k = ""
     }
-
-
-init : Model
-init =
-    emptyModel
 
 
 type Msg
@@ -149,46 +145,6 @@ view model =
                 --    Thickness ((-r + (180 * ba) / (a * Math.pi)) / t)
                 _ ->
                     Invalid
-
-        tStr =
-            case res of
-                Thickness t ->
-                    String.fromFloat t
-
-                _ ->
-                    model.t
-
-        rStr =
-            case res of
-                Radius r ->
-                    String.fromFloat r
-
-                _ ->
-                    model.r
-
-        baStr =
-            case res of
-                Allowance ba ->
-                    String.fromFloat ba
-
-                _ ->
-                    model.ba
-
-        aStr =
-            case res of
-                Angle a ->
-                    String.fromFloat a
-
-                _ ->
-                    model.a
-
-        kStr =
-            case res of
-                KFactor k ->
-                    String.fromFloat k
-
-                _ ->
-                    model.k
     in
     { title = "K Factors"
     , body =
@@ -201,64 +157,68 @@ view model =
         , div
             [ id "k-factor"
             , class "center"
-            , style "padding" "50px"
             ]
-            [ text "Thickness: "
+            [ text "Thickness:"
+            , br [] []
             , case res of
                 Thickness t ->
                     text (String.fromFloat t)
 
                 _ ->
                     input
-                        [ value tStr
+                        [ value model.t
                         , onInput UpdateThickness
                         ]
                         []
             , br [] []
-            , text "Radius: "
+            , text "Radius:"
+            , br [] []
             , case res of
                 Radius r ->
                     text (String.fromFloat r)
 
                 _ ->
                     input
-                        [ value rStr
+                        [ value model.r
                         , onInput UpdateRadius
                         ]
                         []
             , br [] []
-            , text "Bend Allowance: "
+            , text "Bend Allowance:"
+            , br [] []
             , case res of
                 Allowance ba ->
                     text (String.fromFloat ba)
 
                 _ ->
                     input
-                        [ value baStr
+                        [ value model.ba
                         , onInput UpdateAllowance
                         ]
                         []
             , br [] []
-            , text "Angle: "
+            , text "Angle:"
+            , br [] []
             , case res of
                 Angle a ->
                     text (String.fromFloat a)
 
                 _ ->
                     input
-                        [ value aStr
+                        [ value model.a
                         , onInput UpdateAngle
                         ]
                         []
             , br [] []
-            , text "K Factor: "
+            , text "K Factor:"
+            , br [] []
             , case res of
                 KFactor k ->
                     text (String.fromFloat k)
 
                 _ ->
                     input
-                        [ value kStr
+                        [ value model.k
                         , onInput UpdateKFactor
                         ]
                         []
