@@ -1,10 +1,6 @@
 module SpaCmd exposing (..)
 
-
-
-type PageId
-    = Home
-    | KFactor
+import PageId exposing ( PageId )
 
 
 type SpaCmd msg

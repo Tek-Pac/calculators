@@ -8,6 +8,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Math
+import PageId
 import SpaCmd exposing ( SpaCmd(..) )
 
 
@@ -54,7 +55,7 @@ update msg model =
     case msg of
         HomePage ->
             { model = model
-            , command = ChangePage SpaCmd.Home
+            , command = ChangePage PageId.Home
             }
 
         UpdateThickness s ->
@@ -191,7 +192,13 @@ view model =
     in
     { title = "K Factors"
     , body =
-        [ div
+        [ button
+            [ class "left"
+            , onClick HomePage
+            ]
+            [ text "Home"
+            ]
+        , div
             [ id "k-factor"
             , class "center"
             , style "padding" "50px"

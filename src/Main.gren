@@ -1,10 +1,14 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Browser
 import Html exposing (..)
 import Page.Home as Home
 import Page.KFactor as KFactor
-import SpaCmd exposing ( SpaCmd(..), PageId(..) )
+import PageId exposing ( PageId(..), stringToPageId, pageIdToString )
+import SpaCmd exposing ( SpaCmd(..) )
+
+
+port changePage : String -> Cmd msg
 
 
 type Model
@@ -17,7 +21,7 @@ type Msg
     | KFactorMsg KFactor.Msg
 
 
-main : Program {} Model Msg
+main : Program String Model Msg
 main =
     Browser.document
         { init = init
@@ -28,12 +32,15 @@ main =
 
 
 init :
-    {}
+    String
     -> { model : Model
        , command : Cmd Msg
        }
-init {} =
-    { model = HomeModel Home.init
+init path =
+    { model =
+        stringToPageId path
+            |> Maybe.withDefault Home
+            |> modelForPageId
     , command = Cmd.none
     }
 
@@ -114,7 +121,7 @@ handlePageChanges { model, command } =
 
         ChangePage id ->
             { model = modelForPageId id
-            , command = Cmd.none
+            , command = changePage (pageIdToString id)
             }
 
 

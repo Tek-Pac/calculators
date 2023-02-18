@@ -4474,31 +4474,14 @@ var $gren_lang$core$Task$perform = F2(
 				A2($gren_lang$core$Task$map, toMessage, task)));
 	});
 var $gren_lang$browser$Browser$document = _Browser_document;
+var $author$project$PageId$Home = {$: 'Home'};
 var $author$project$Main$HomeModel = function (a) {
 	return {$: 'HomeModel', a: a};
-};
-var $author$project$Page$Home$init = {};
-var $gren_lang$core$Platform$Cmd$batch = _Platform_batch;
-var $gren_lang$core$Platform$Cmd$none = $gren_lang$core$Platform$Cmd$batch(
-	[]);
-var $author$project$Main$init = function (_v0) {
-	return {
-		command: $gren_lang$core$Platform$Cmd$none,
-		model: $author$project$Main$HomeModel($author$project$Page$Home$init)
-	};
-};
-var $gren_lang$core$Platform$Sub$batch = _Platform_batch;
-var $gren_lang$core$Platform$Sub$none = $gren_lang$core$Platform$Sub$batch(
-	[]);
-var $author$project$Main$HomeMsg = function (a) {
-	return {$: 'HomeMsg', a: a};
 };
 var $author$project$Main$KFactorModel = function (a) {
 	return {$: 'KFactorModel', a: a};
 };
-var $author$project$Main$KFactorMsg = function (a) {
-	return {$: 'KFactorMsg', a: a};
-};
+var $author$project$Page$Home$init = {};
 var $author$project$Page$KFactor$emptyModel = {a: '', ba: '', k: '', r: '', t: ''};
 var $author$project$Page$KFactor$init = $author$project$Page$KFactor$emptyModel;
 var $author$project$Main$modelForPageId = function (id) {
@@ -4506,6 +4489,60 @@ var $author$project$Main$modelForPageId = function (id) {
 		return $author$project$Main$HomeModel($author$project$Page$Home$init);
 	} else {
 		return $author$project$Main$KFactorModel($author$project$Page$KFactor$init);
+	}
+};
+var $gren_lang$core$Platform$Cmd$batch = _Platform_batch;
+var $gren_lang$core$Platform$Cmd$none = $gren_lang$core$Platform$Cmd$batch(
+	[]);
+var $author$project$PageId$KFactor = {$: 'KFactor'};
+var $author$project$PageId$stringToPageId = function (str) {
+	switch (str) {
+		case '':
+			return $gren_lang$core$Maybe$Just($author$project$PageId$Home);
+		case '#/':
+			return $gren_lang$core$Maybe$Just($author$project$PageId$Home);
+		case '#/k-factor':
+			return $gren_lang$core$Maybe$Just($author$project$PageId$KFactor);
+		default:
+			return $gren_lang$core$Maybe$Nothing;
+	}
+};
+var $gren_lang$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Main$init = function (path) {
+	return {
+		command: $gren_lang$core$Platform$Cmd$none,
+		model: $author$project$Main$modelForPageId(
+			A2(
+				$gren_lang$core$Maybe$withDefault,
+				$author$project$PageId$Home,
+				$author$project$PageId$stringToPageId(path)))
+	};
+};
+var $gren_lang$core$Platform$Sub$batch = _Platform_batch;
+var $gren_lang$core$Platform$Sub$none = $gren_lang$core$Platform$Sub$batch(
+	[]);
+var $gren_lang$core$Json$Decode$string = _Json_decodeString;
+var $author$project$Main$HomeMsg = function (a) {
+	return {$: 'HomeMsg', a: a};
+};
+var $author$project$Main$KFactorMsg = function (a) {
+	return {$: 'KFactorMsg', a: a};
+};
+var $gren_lang$core$Json$Encode$string = _Json_wrap;
+var $author$project$Main$changePage = _Platform_outgoingPort('changePage', $gren_lang$core$Json$Encode$string);
+var $author$project$PageId$pageIdToString = function (id) {
+	if (id.$ === 'Home') {
+		return '#/';
+	} else {
+		return '#/k-factor';
 	}
 };
 var $author$project$Main$handlePageChanges = function (_v0) {
@@ -4517,7 +4554,8 @@ var $author$project$Main$handlePageChanges = function (_v0) {
 	} else {
 		var id = command.a;
 		return {
-			command: $gren_lang$core$Platform$Cmd$none,
+			command: $author$project$Main$changePage(
+				$author$project$PageId$pageIdToString(id)),
 			model: $author$project$Main$modelForPageId(id)
 		};
 	}
@@ -4549,22 +4587,20 @@ var $author$project$Main$mapPage = F3(
 			model: wrapModel(model)
 		};
 	});
-var $author$project$SpaCmd$KFactor = {$: 'KFactor'};
 var $author$project$Page$Home$update = F2(
 	function (msg, model) {
 		return {
-			command: $author$project$SpaCmd$ChangePage($author$project$SpaCmd$KFactor),
+			command: $author$project$SpaCmd$ChangePage($author$project$PageId$KFactor),
 			model: model
 		};
 	});
-var $author$project$SpaCmd$Home = {$: 'Home'};
 var $author$project$SpaCmd$none = $author$project$SpaCmd$BaseCmd($gren_lang$core$Platform$Cmd$none);
 var $author$project$Page$KFactor$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'HomePage':
 				return {
-					command: $author$project$SpaCmd$ChangePage($author$project$SpaCmd$Home),
+					command: $author$project$SpaCmd$ChangePage($author$project$PageId$Home),
 					model: model
 				};
 			case 'UpdateThickness':
@@ -4713,6 +4749,7 @@ var $author$project$Page$Home$view = function (model) {
 var $author$project$Page$KFactor$Allowance = function (a) {
 	return {$: 'Allowance', a: a};
 };
+var $author$project$Page$KFactor$HomePage = {$: 'HomePage'};
 var $author$project$Page$KFactor$Invalid = {$: 'Invalid'};
 var $author$project$Page$KFactor$KFactor = function (a) {
 	return {$: 'KFactor', a: a};
@@ -4744,7 +4781,6 @@ var $gren_lang$browser$VirtualDom$property = F2(
 			_VirtualDom_noJavaScriptOrHtmlUri(value));
 	});
 var $gren_lang$browser$Html$Attributes$property = $gren_lang$browser$VirtualDom$property;
-var $gren_lang$core$Json$Encode$string = _Json_wrap;
 var $gren_lang$browser$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -4780,7 +4816,6 @@ var $gren_lang$core$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3($gren_lang$core$Array$foldr, $gren_lang$core$Json$Decode$field, decoder, fields);
 	});
-var $gren_lang$core$Json$Decode$string = _Json_decodeString;
 var $gren_lang$browser$Html$Events$targetValue = A2(
 	$gren_lang$core$Json$Decode$at,
 	['target', 'value'],
@@ -4898,6 +4933,15 @@ var $author$project$Page$KFactor$view = function (model) {
 	}();
 	return {
 		body: [
+			A2(
+			$gren_lang$browser$Html$button,
+			[
+				$gren_lang$browser$Html$Attributes$class('left'),
+				$gren_lang$browser$Html$Events$onClick($author$project$Page$KFactor$HomePage)
+			],
+			[
+				$gren_lang$browser$Html$text('Home')
+			]),
 			A2(
 			$gren_lang$browser$Html$div,
 			[
@@ -5031,6 +5075,4 @@ var $author$project$Main$main = $gren_lang$browser$Browser$document(
 		update: $author$project$Main$update,
 		view: $author$project$Main$view
 	});
-_Platform_export({'Main':{'init':$author$project$Main$main(
-	$gren_lang$core$Json$Decode$succeed(
-		{}))(0)}});}(this.module ? this.module.exports : this));
+_Platform_export({'Main':{'init':$author$project$Main$main($gren_lang$core$Json$Decode$string)(0)}});}(this.module ? this.module.exports : this));
