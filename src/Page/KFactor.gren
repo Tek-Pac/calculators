@@ -181,9 +181,15 @@ view model =
         parsedModel =
             parseModel model
 
+        -- 10 dp
         formatF : Float -> Maybe Float
         formatF value =
             Just (toFloat (Math.round (value * 10000000000)) / 10000000000)
+
+        -- 6 dp
+        formatFLow : Float -> Maybe Float
+        formatFLow value =
+            Just (toFloat (Math.round (value * 1000000)) / 1000000)
 
         res =
             case parsedModel of
@@ -191,29 +197,29 @@ view model =
                     { emptyResult | k = formatF ((-r + (180 * ba) / (a * Math.pi)) / t) }
 
                 { t = Just t, r = Just r, ba = Just ba, a = Nothing, k = Just k, ty = BendAllowance } ->
-                    { emptyResult | a = formatF (ba / (Math.pi * (k * t + r) / 180)) }
+                    { emptyResult | a = formatFLow (ba / (Math.pi * (k * t + r) / 180)) }
 
                 { t = Just t, r = Just r, ba = Nothing, a = Just a, k = Just k, ty = BendAllowance } ->
-                    { emptyResult | ba = formatF ((Math.pi * (k * t + r)) / 180 * a) }
+                    { emptyResult | ba = formatFLow ((Math.pi * (k * t + r)) / 180 * a) }
 
                 { t = Just t, r = Nothing, ba = Just ba, a = Just a, k = Just k, ty = BendAllowance } ->
-                    { emptyResult | r = formatF -(k * t - 180 * ba / (Math.pi * a)) }
+                    { emptyResult | r = formatFLow -(k * t - 180 * ba / (Math.pi * a)) }
 
                 { t = Nothing, r = Just r, ba = Just ba, a = Just a, k = Just k, ty = BendAllowance } ->
-                    { emptyResult | t = formatF ((-r + ba / (Math.pi * a / 180)) / k) }
+                    { emptyResult | t = formatFLow ((-r + ba / (Math.pi * a / 180)) / k) }
 
                 -- Extra allowance (assuming a == 90)
                 { t = Just t, r = Just r, xa = Just xa, k = Nothing, ty = ExtraAllowance } ->
                     { emptyResult | k = formatF ((((xa + 2 * r) * 2 / Math.pi) - r) / t) }
 
                 { t = Just t, r = Just r, xa = Nothing, k = Just k, ty = ExtraAllowance } ->
-                    { emptyResult | xa = formatF (Math.pi * (k * t + r) / 2 - 2 * r) }
+                    { emptyResult | xa = formatFLow (Math.pi * (k * t + r) / 2 - 2 * r) }
 
                 { t = Just t, r = Nothing, xa = Just xa, k = Just k, ty = ExtraAllowance } ->
-                    { emptyResult | r = formatF ((2 * xa - Math.pi * k * t) / (Math.pi - 360)) }
+                    { emptyResult | r = formatFLow ((2 * xa - Math.pi * k * t) / (Math.pi - 360)) }
 
                 { t = Nothing, r = Just r, xa = Just xa, k = Just k, ty = ExtraAllowance } ->
-                    { emptyResult | t = formatF ((2 * xa + 4 * r) / (Math.pi * k) - r / k) }
+                    { emptyResult | t = formatFLow ((2 * xa + 4 * r) / (Math.pi * k) - r / k) }
 
                 _ ->
                     emptyResult

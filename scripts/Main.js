@@ -4947,6 +4947,10 @@ var $author$project$Page$KFactor$view = function (model) {
 				}()
 				]);
 		});
+	var formatFLow = function (value) {
+		return $gren_lang$core$Maybe$Just(
+			$gren_lang$core$Math$round(value * 1000000) / 1000000);
+	};
 	var formatF = function (value) {
 		return $gren_lang$core$Maybe$Just(
 			$gren_lang$core$Math$round(value * 10000000000) / 10000000000);
@@ -5002,7 +5006,7 @@ var $author$project$Page$KFactor$view = function (model) {
 									return _Utils_update(
 										$author$project$Page$KFactor$emptyResult,
 										{
-											a: formatF(ba / (($gren_lang$core$Math$pi * ((k * t) + r)) / 180))
+											a: formatFLow(ba / (($gren_lang$core$Math$pi * ((k * t) + r)) / 180))
 										});
 								} else {
 									break _v2$9;
@@ -5018,7 +5022,7 @@ var $author$project$Page$KFactor$view = function (model) {
 									return _Utils_update(
 										$author$project$Page$KFactor$emptyResult,
 										{
-											ba: formatF((($gren_lang$core$Math$pi * ((k * t) + r)) / 180) * a)
+											ba: formatFLow((($gren_lang$core$Math$pi * ((k * t) + r)) / 180) * a)
 										});
 								} else {
 									break _v2$9;
@@ -5034,7 +5038,7 @@ var $author$project$Page$KFactor$view = function (model) {
 								return _Utils_update(
 									$author$project$Page$KFactor$emptyResult,
 									{
-										xa: formatF((($gren_lang$core$Math$pi * ((k * t) + r)) / 2) - (2 * r))
+										xa: formatFLow((($gren_lang$core$Math$pi * ((k * t) + r)) / 2) - (2 * r))
 									});
 							} else {
 								break _v2$9;
@@ -5054,7 +5058,7 @@ var $author$project$Page$KFactor$view = function (model) {
 								return _Utils_update(
 									$author$project$Page$KFactor$emptyResult,
 									{
-										r: formatF(-((k * t) - ((180 * ba) / ($gren_lang$core$Math$pi * a))))
+										r: formatFLow(-((k * t) - ((180 * ba) / ($gren_lang$core$Math$pi * a))))
 									});
 							} else {
 								break _v2$9;
@@ -5069,7 +5073,7 @@ var $author$project$Page$KFactor$view = function (model) {
 								return _Utils_update(
 									$author$project$Page$KFactor$emptyResult,
 									{
-										r: formatF(((2 * xa) - (($gren_lang$core$Math$pi * k) * t)) / ($gren_lang$core$Math$pi - 360))
+										r: formatFLow(((2 * xa) - (($gren_lang$core$Math$pi * k) * t)) / ($gren_lang$core$Math$pi - 360))
 									});
 							} else {
 								break _v2$9;
@@ -5092,7 +5096,7 @@ var $author$project$Page$KFactor$view = function (model) {
 							return _Utils_update(
 								$author$project$Page$KFactor$emptyResult,
 								{
-									t: formatF(((-r) + (ba / (($gren_lang$core$Math$pi * a) / 180))) / k)
+									t: formatFLow(((-r) + (ba / (($gren_lang$core$Math$pi * a) / 180))) / k)
 								});
 						} else {
 							break _v2$9;
@@ -5107,7 +5111,7 @@ var $author$project$Page$KFactor$view = function (model) {
 							return _Utils_update(
 								$author$project$Page$KFactor$emptyResult,
 								{
-									t: formatF((((2 * xa) + (4 * r)) / ($gren_lang$core$Math$pi * k)) - (r / k))
+									t: formatFLow((((2 * xa) + (4 * r)) / ($gren_lang$core$Math$pi * k)) - (r / k))
 								});
 						} else {
 							break _v2$9;
