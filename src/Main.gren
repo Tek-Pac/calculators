@@ -1,17 +1,119 @@
 module Main exposing (..)
 
+import Browser
 import Html exposing (..)
 import Page.Home as Home
+import Page.KFactor as KFactor
+import SpaCmd exposing ( SpaCmd(..), PageId(..) )
 
 
 type Model
-    = Home Home.Model
+    = HomeModel Home.Model
+    | KFactorModel KFactor.Model
 
 
-main : Program Value Model Msg
+type Msg
+    = HomeMsg Home.Msg
+    | KFactorMsg KFactor.Msg
+
+
+main : Program {} Model Msg
 main =
-    Api.application
-        Viewer.decoder
+    Browser.element
         { init = init
-        , onUrlChange = ChangedUrl
+        , view = view
+        , update = update
+        , subscriptions = \_ -> Sub.none
         }
+
+
+init :
+    {}
+    -> { model : Model
+       , command : Cmd Msg
+       }
+init {} =
+    { model = HomeModel Home.init
+    , command = Cmd.none
+    }
+
+
+view : Model -> Html Msg
+view model =
+    case model of
+        HomeModel m ->
+            Home.view m
+                |> Html.map HomeMsg
+
+        KFactorModel m ->
+            KFactor.view m
+                |> Html.map KFactorMsg
+
+
+update :
+    Msg
+    -> Model
+    -> { model : Model
+       , command : Cmd Msg
+       }
+update msg model =
+    case
+        { m = model
+        , v = msg
+        }
+    of
+        { m = HomeModel m, v = HomeMsg v } ->
+            handlePageChanges (mapPage HomeModel HomeMsg (Home.update v m))
+
+        { m = KFactorModel m, v = KFactorMsg v } ->
+            handlePageChanges (mapPage KFactorModel KFactorMsg (KFactor.update v m))
+
+        _ ->
+            { model = model
+            , command = Cmd.none
+            }
+
+
+mapPage :
+    (a -> Model)
+    -> (b -> Msg)
+    -> { model : a
+       , command : SpaCmd b
+       }
+    -> { model : Model
+       , command : SpaCmd Msg
+       }
+mapPage wrapModel wrapMsg { model, command } =
+    { model = wrapModel model
+    , command = SpaCmd.map wrapMsg command
+    }
+
+
+handlePageChanges :
+    { model : Model
+    , command : SpaCmd Msg
+    }
+    -> { model : Model
+       , command : Cmd Msg
+       }
+handlePageChanges { model, command } =
+    case command of
+        BaseCmd c ->
+            { model = model
+            , command = c
+            }
+
+        ChangePage id ->
+            { model = modelForPageId id
+            , command = Cmd.none
+            }
+
+
+modelForPageId : PageId -> Model
+modelForPageId id =
+    case id of
+        Home ->
+            HomeModel Home.init
+
+        KFactor ->
+            KFactorModel KFactor.init

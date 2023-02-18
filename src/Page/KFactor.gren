@@ -1,0 +1,255 @@
+module Page.KFactor exposing ( Model, Msg, init, update, view )
+
+{-| The k factor page
+-}
+
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
+import Math
+import SpaCmd exposing ( SpaCmd(..) )
+
+
+type alias Model =
+    { t : String
+    , r : String
+    , ba : String
+    , a : String
+    , k : String
+    }
+
+
+type alias Updated =
+    { model : Model
+    , command : SpaCmd Msg
+    }
+
+
+emptyModel =
+    { t = ""
+    , r = ""
+    , ba = ""
+    , a = ""
+    , k = ""
+    }
+
+
+init : Model
+init =
+    emptyModel
+
+
+type Msg
+    = HomePage
+    | UpdateThickness String
+    | UpdateRadius String
+    | UpdateAllowance String
+    | UpdateAngle String
+    | UpdateKFactor String
+
+
+update : Msg -> Model -> Updated
+update msg model =
+    case msg of
+        HomePage ->
+            { model = model
+            , command = ChangePage SpaCmd.Home
+            }
+
+        UpdateThickness s ->
+            { model = { model | t = s }
+            , command = SpaCmd.none
+            }
+
+        UpdateRadius s ->
+            { model = { model | r = s }
+            , command = SpaCmd.none
+            }
+
+        UpdateAllowance s ->
+            { model = { model | ba = s }
+            , command = SpaCmd.none
+            }
+
+        UpdateAngle s ->
+            { model = { model | a = s }
+            , command = SpaCmd.none
+            }
+
+        UpdateKFactor s ->
+            { model = { model | k = s }
+            , command = SpaCmd.none
+            }
+
+
+type CalcResult
+    = Thickness Float
+    | Radius Float
+    | Allowance Float
+    | Angle Float
+    | KFactor Float
+    | Invalid
+
+
+parseModel :
+    Model
+    -> { t : Maybe Float
+       , r : Maybe Float
+       , ba : Maybe Float
+       , a : Maybe Float
+       , k : Maybe Float
+       }
+parseModel model =
+    let
+        t =
+            String.toFloat model.t
+
+        r =
+            String.toFloat model.r
+
+        ba =
+            String.toFloat model.ba
+
+        a =
+            String.toFloat model.a
+
+        k =
+            String.toFloat model.k
+    in
+    { t = t
+    , r = r
+    , ba = ba
+    , a = a
+    , k = k
+    }
+
+
+view : Model -> Html Msg
+view model =
+    let
+        parsedModel =
+            parseModel model
+
+        res =
+            case parsedModel of
+                { t = Just t, r = Just r, ba = Just ba, a = Just a, k = Nothing } ->
+                    KFactor ((-r + (180 * ba) / (a * Math.pi)) / t)
+
+                -- { t = Just t, r = Just r, ba = Just ba, a = Nothing, k = Just k } ->
+                --    Angle ((-r + (180 * ba) / (a * Math.pi)) / t)
+                { t = Just t, r = Just r, ba = Nothing, a = Just a, k = Just k } ->
+                    Allowance ((Math.pi * (k * t + r)) / 180 * a)
+
+                { t = Just t, r = Nothing, ba = Just ba, a = Just a, k = Just k } ->
+                    Radius -(k * t - 180 * ba / (Math.pi * a))
+
+                -- { t = Nothing, r = Just r, ba = Just ba, a = Just a, k = Just k } ->
+                --    Thickness ((-r + (180 * ba) / (a * Math.pi)) / t)
+                _ ->
+                    Invalid
+
+        tStr =
+            case res of
+                Thickness t ->
+                    String.fromFloat t
+
+                _ ->
+                    model.t
+
+        rStr =
+            case res of
+                Radius r ->
+                    String.fromFloat r
+
+                _ ->
+                    model.r
+
+        baStr =
+            case res of
+                Allowance ba ->
+                    String.fromFloat ba
+
+                _ ->
+                    model.ba
+
+        aStr =
+            case res of
+                Angle a ->
+                    String.fromFloat a
+
+                _ ->
+                    model.a
+
+        kStr =
+            case res of
+                KFactor k ->
+                    String.fromFloat k
+
+                _ ->
+                    model.k
+    in
+    div
+        [ id "k-factor"
+        , class "center"
+        , style "padding" "50px"
+        ]
+        [ text "Thickness: "
+        , case res of
+            Thickness t ->
+                text (String.fromFloat t)
+
+            _ ->
+                input
+                    [ value tStr
+                    , onInput UpdateThickness
+                    ]
+                    []
+        , br [] []
+        , text "Radius: "
+        , case res of
+            Radius r ->
+                text (String.fromFloat r)
+
+            _ ->
+                input
+                    [ value rStr
+                    , onInput UpdateRadius
+                    ]
+                    []
+        , br [] []
+        , text "Bend Allowance: "
+        , case res of
+            Allowance ba ->
+                text (String.fromFloat ba)
+
+            _ ->
+                input
+                    [ value baStr
+                    , onInput UpdateAllowance
+                    ]
+                    []
+        , br [] []
+        , text "Angle: "
+        , case res of
+            Angle a ->
+                text (String.fromFloat a)
+
+            _ ->
+                input
+                    [ value aStr
+                    , onInput UpdateAngle
+                    ]
+                    []
+        , br [] []
+        , text "K Factor: "
+        , case res of
+            KFactor k ->
+                text (String.fromFloat k)
+
+            _ ->
+                input
+                    [ value kStr
+                    , onInput UpdateKFactor
+                    ]
+                    []
+        ]

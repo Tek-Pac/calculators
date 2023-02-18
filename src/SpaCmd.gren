@@ -1,0 +1,27 @@
+module SpaCmd exposing (..)
+
+
+
+type PageId
+    = Home
+    | KFactor
+
+
+type SpaCmd msg
+    = BaseCmd (Cmd msg)
+    | ChangePage PageId
+
+
+none : SpaCmd msg
+none =
+    BaseCmd Cmd.none
+
+
+map : (a -> msg) -> SpaCmd a -> SpaCmd msg
+map f msg =
+    case msg of
+        ChangePage id ->
+            ChangePage id
+
+        BaseCmd cb ->
+            BaseCmd (Cmd.map f cb)

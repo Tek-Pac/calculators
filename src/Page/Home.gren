@@ -4,55 +4,50 @@ module Page.Home exposing ( Model, Msg, init, update, view )
 -}
 
 import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
+import SpaCmd exposing ( SpaCmd(..) )
 
 
 type alias Model =
     {}
 
 
-init :
+type alias Updated =
     { model : Model
-    , command : Cmd Msg
+    , command : SpaCmd Msg
     }
+
+
+init : Model
 init =
-    { model = {}
-    , command = Cmd.none
-    }
+    {}
 
 
-view :
-    Model
-    -> { title : String
-       , content : Html Msg
-       }
+view : Model -> Html Msg
 view model =
-    { title = "Calculators"
-    , content =
-        div
+    div
+        []
+        [ h1
             []
-            [ h1 "Calculators"
-            , button
-                [ onClick GoToKFactor
-                ]
-                [ text "K-Factors"
-                ]
+            [ text "Calculators"
             ]
-    }
+        , button
+            [ onClick GoToKFactor
+            ]
+            [ text "K-Factors"
+            ]
+        ]
 
 
 type Msg
     = GoToKFactor
 
 
-update :
-    Msg
-    -> Model
-    -> { model : Model
-       , command : Cmd Msg
-       }
+update : Msg -> Model -> Updated
 update msg model =
     case msg of
         GoToKFactor ->
             { model = model
-            , command = Cmd.none
+            , command = ChangePage SpaCmd.KFactor
             }
