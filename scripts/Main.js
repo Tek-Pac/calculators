@@ -4895,8 +4895,12 @@ var $gren_lang$browser$Html$Attributes$boolProperty = F2(
 	});
 var $gren_lang$browser$Html$Attributes$readonly = $gren_lang$browser$Html$Attributes$boolProperty('readOnly');
 var $gren_lang$core$Math$round = _Math_round;
+var $gren_lang$browser$Html$Attributes$step = function (n) {
+	return A2($gren_lang$browser$Html$Attributes$stringProperty, 'step', n);
+};
 var $gren_lang$core$Basics$sub = _Basics_sub;
 var $gren_lang$core$Basics$toFloat = _Basics_toFloat;
+var $gren_lang$browser$Html$Attributes$type_ = $gren_lang$browser$Html$Attributes$stringProperty('type');
 var $gren_lang$browser$Html$Attributes$value = $gren_lang$browser$Html$Attributes$stringProperty('value');
 var $author$project$Page$KFactor$view = function (model) {
 	var parsedModel = $author$project$Page$KFactor$parseModel(model);
@@ -4911,8 +4915,8 @@ var $author$project$Page$KFactor$view = function (model) {
 				$gren_lang$browser$Html$text('Swap')
 			]);
 	};
-	var makeInputDiv = F5(
-		function (txt, idTxt, calcF, modelT, msgF) {
+	var makeInputDiv = F6(
+		function (txt, idTxt, stepV, calcF, modelT, msgF) {
 			return A2(
 				$gren_lang$browser$Html$div,
 				[],
@@ -4931,7 +4935,9 @@ var $author$project$Page$KFactor$view = function (model) {
 								$gren_lang$browser$Html$Attributes$value(
 								$gren_lang$core$String$fromFloat(t)),
 								$gren_lang$browser$Html$Attributes$readonly(true),
-								$gren_lang$browser$Html$Attributes$id(idTxt)
+								$gren_lang$browser$Html$Attributes$id(idTxt),
+								$gren_lang$browser$Html$Attributes$type_('number'),
+								$gren_lang$browser$Html$Attributes$step(stepV)
 							],
 							[]);
 					} else {
@@ -4940,7 +4946,9 @@ var $author$project$Page$KFactor$view = function (model) {
 							[
 								$gren_lang$browser$Html$Attributes$value(modelT),
 								$gren_lang$browser$Html$Events$onInput(msgF),
-								$gren_lang$browser$Html$Attributes$id(idTxt)
+								$gren_lang$browser$Html$Attributes$id(idTxt),
+								$gren_lang$browser$Html$Attributes$type_('number'),
+								$gren_lang$browser$Html$Attributes$step(stepV)
 							],
 							[]);
 					}
@@ -5174,11 +5182,11 @@ var $author$project$Page$KFactor$view = function (model) {
 					return makeSwapButton($author$project$Page$KFactor$ExtraAllowance);
 				}
 			}(),
-				A5(makeInputDiv, 'Thickness:', 'thickness', res.t, model.t, $author$project$Page$KFactor$UpdateThickness),
-				A5(makeInputDiv, 'Radius:', 'radius', res.r, model.r, $author$project$Page$KFactor$UpdateRadius),
-				_Utils_eq(model.ty, $author$project$Page$KFactor$BendAllowance) ? A5(makeInputDiv, 'Bend Allowance:', 'bendallowance', res.ba, model.ba, $author$project$Page$KFactor$UpdateAllowance) : A5(makeInputDiv, 'Extra Allowance:', 'extraallowance', res.xa, model.xa, $author$project$Page$KFactor$UpdateExtraAllowance),
-				_Utils_eq(model.ty, $author$project$Page$KFactor$BendAllowance) ? A5(makeInputDiv, 'Angle:', 'angle', res.a, model.a, $author$project$Page$KFactor$UpdateAngle) : $gren_lang$browser$Html$text(''),
-				A5(makeInputDiv, 'K Factor:', 'kfactor', res.k, model.k, $author$project$Page$KFactor$UpdateKFactor)
+				A6(makeInputDiv, 'Thickness:', 'thickness', '0.1', res.t, model.t, $author$project$Page$KFactor$UpdateThickness),
+				A6(makeInputDiv, 'Radius:', 'radius', '0.1', res.r, model.r, $author$project$Page$KFactor$UpdateRadius),
+				_Utils_eq(model.ty, $author$project$Page$KFactor$BendAllowance) ? A6(makeInputDiv, 'Bend Allowance:', 'bendallowance', '0.05', res.ba, model.ba, $author$project$Page$KFactor$UpdateAllowance) : A6(makeInputDiv, 'Extra Allowance:', 'extraallowance', '0.05', res.xa, model.xa, $author$project$Page$KFactor$UpdateExtraAllowance),
+				_Utils_eq(model.ty, $author$project$Page$KFactor$BendAllowance) ? A6(makeInputDiv, 'Angle:', 'angle', '1', res.a, model.a, $author$project$Page$KFactor$UpdateAngle) : $gren_lang$browser$Html$text(''),
+				A6(makeInputDiv, 'K Factor:', 'kfactor', '0.001', res.k, model.k, $author$project$Page$KFactor$UpdateKFactor)
 			])
 		],
 		title: 'K Factors'

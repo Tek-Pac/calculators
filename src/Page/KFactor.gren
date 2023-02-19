@@ -224,8 +224,8 @@ view model =
                 _ ->
                     emptyResult
 
-        makeInputDiv : String -> String -> Maybe Float -> String -> (String -> Msg) -> Html Msg
-        makeInputDiv txt idTxt calcF modelT msgF =
+        makeInputDiv : String -> String -> String -> Maybe Float -> String -> (String -> Msg) -> Html Msg
+        makeInputDiv txt idTxt stepV calcF modelT msgF =
             div
                 []
                 [ text txt
@@ -236,6 +236,8 @@ view model =
                             [ value (String.fromFloat t)
                             , readonly True
                             , id idTxt
+                            , type_ "number"
+                            , step stepV
                             ]
                             []
 
@@ -244,6 +246,8 @@ view model =
                             [ value modelT
                             , onInput msgF
                             , id idTxt
+                            , type_ "number"
+                            , step stepV
                             ]
                             []
                 , case calcF of
@@ -290,17 +294,17 @@ view model =
 
                 BendAllowance ->
                     makeSwapButton ExtraAllowance
-            , makeInputDiv "Thickness:" "thickness" res.t model.t UpdateThickness
-            , makeInputDiv "Radius:" "radius" res.r model.r UpdateRadius
+            , makeInputDiv "Thickness:" "thickness" "0.1" res.t model.t UpdateThickness
+            , makeInputDiv "Radius:" "radius" "0.1" res.r model.r UpdateRadius
             , if model.ty == BendAllowance then
-                makeInputDiv "Bend Allowance:" "bendallowance" res.ba model.ba UpdateAllowance
+                makeInputDiv "Bend Allowance:" "bendallowance" "0.05" res.ba model.ba UpdateAllowance
               else
-                makeInputDiv "Extra Allowance:" "extraallowance" res.xa model.xa UpdateExtraAllowance
+                makeInputDiv "Extra Allowance:" "extraallowance" "0.05" res.xa model.xa UpdateExtraAllowance
             , if model.ty == BendAllowance then
-                makeInputDiv "Angle:" "angle" res.a model.a UpdateAngle
+                makeInputDiv "Angle:" "angle" "1" res.a model.a UpdateAngle
               else
                 text ""
-            , makeInputDiv "K Factor:" "kfactor" res.k model.k UpdateKFactor
+            , makeInputDiv "K Factor:" "kfactor" "0.001" res.k model.k UpdateKFactor
             ]
         ]
     }
