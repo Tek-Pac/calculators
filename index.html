@@ -36,6 +36,10 @@ try {
       window.alert("Failed to copy to clipboard: " + e);
     }
   });
+
+  window.addEventListener("hashchange", function(event) {
+    app.ports.pageChanged.send(document.location.hash);
+  })
 }
 catch (e)
 {

@@ -4526,10 +4526,19 @@ var $author$project$Main$init = function (path) {
 				$author$project$PageId$stringToPageId(path)))
 	};
 };
-var $gren_lang$core$Platform$Sub$batch = _Platform_batch;
-var $gren_lang$core$Platform$Sub$none = $gren_lang$core$Platform$Sub$batch(
-	[]);
+var $author$project$Main$PageChanged = function (a) {
+	return {$: 'PageChanged', a: a};
+};
 var $gren_lang$core$Json$Decode$string = _Json_decodeString;
+var $author$project$Main$pageChanged = _Platform_incomingPort('pageChanged', $gren_lang$core$Json$Decode$string);
+var $author$project$Main$pageChangedSubscription = $author$project$Main$pageChanged(
+	function (path) {
+		return $author$project$Main$PageChanged(
+			A2(
+				$gren_lang$core$Maybe$withDefault,
+				$author$project$PageId$Home,
+				$author$project$PageId$stringToPageId(path)));
+	});
 var $author$project$Main$HomeMsg = function (a) {
 	return {$: 'HomeMsg', a: a};
 };
@@ -4668,42 +4677,49 @@ var $author$project$Page$KFactor$update = F2(
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		var _v0 = {m: model, v: msg};
-		_v0$3:
+		_v0$4:
 		while (true) {
-			if (_v0.v.$ === 'HomeMsg') {
-				if (_v0.m.$ === 'HomeModel') {
-					var m = _v0.m.a;
-					var v = _v0.v.a;
-					return $author$project$Main$handlePageChanges(
-						A3(
-							$author$project$Main$mapPage,
-							$author$project$Main$HomeModel,
-							$author$project$Main$HomeMsg,
-							A2($author$project$Page$Home$update, v, m)));
-				} else {
-					break _v0$3;
-				}
-			} else {
-				if (_v0.v.a.$ === 'DoCopy') {
-					var id = _v0.v.a.a;
+			switch (_v0.v.$) {
+				case 'PageChanged':
+					var id = _v0.v.a;
 					return {
-						command: $author$project$Main$copyId(id),
-						model: model
+						command: $gren_lang$core$Platform$Cmd$none,
+						model: $author$project$Main$modelForPageId(id)
 					};
-				} else {
-					if (_v0.m.$ === 'KFactorModel') {
+				case 'HomeMsg':
+					if (_v0.m.$ === 'HomeModel') {
 						var m = _v0.m.a;
 						var v = _v0.v.a;
 						return $author$project$Main$handlePageChanges(
 							A3(
 								$author$project$Main$mapPage,
-								$author$project$Main$KFactorModel,
-								$author$project$Main$KFactorMsg,
-								A2($author$project$Page$KFactor$update, v, m)));
+								$author$project$Main$HomeModel,
+								$author$project$Main$HomeMsg,
+								A2($author$project$Page$Home$update, v, m)));
 					} else {
-						break _v0$3;
+						break _v0$4;
 					}
-				}
+				default:
+					if (_v0.v.a.$ === 'DoCopy') {
+						var id = _v0.v.a.a;
+						return {
+							command: $author$project$Main$copyId(id),
+							model: model
+						};
+					} else {
+						if (_v0.m.$ === 'KFactorModel') {
+							var m = _v0.m.a;
+							var v = _v0.v.a;
+							return $author$project$Main$handlePageChanges(
+								A3(
+									$author$project$Main$mapPage,
+									$author$project$Main$KFactorModel,
+									$author$project$Main$KFactorMsg,
+									A2($author$project$Page$KFactor$update, v, m)));
+						} else {
+							break _v0$4;
+						}
+					}
 			}
 		}
 		return {command: $gren_lang$core$Platform$Cmd$none, model: model};
@@ -5187,7 +5203,7 @@ var $author$project$Main$main = $gren_lang$browser$Browser$document(
 	{
 		init: $author$project$Main$init,
 		subscriptions: function (_v0) {
-			return $gren_lang$core$Platform$Sub$none;
+			return $author$project$Main$pageChangedSubscription;
 		},
 		update: $author$project$Main$update,
 		view: $author$project$Main$view

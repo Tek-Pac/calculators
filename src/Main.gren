@@ -14,6 +14,9 @@ port changePage : String -> Cmd msg
 port copyId : String -> Cmd msg
 
 
+port pageChanged : (String -> msg) -> Sub msg
+
+
 type Model
     = HomeModel Home.Model
     | KFactorModel KFactor.Model
@@ -22,6 +25,7 @@ type Model
 type Msg
     = HomeMsg Home.Msg
     | KFactorMsg KFactor.Msg
+    | PageChanged PageId
 
 
 main : Program String Model Msg
@@ -30,8 +34,17 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = \_ -> pageChangedSubscription
         }
+
+
+pageChangedSubscription =
+    pageChanged
+        (\path ->
+            stringToPageId path
+                |> Maybe.withDefault Home
+                |> PageChanged
+        )
 
 
 init :
@@ -81,6 +94,11 @@ update msg model =
         , v = msg
         }
     of
+        { v = PageChanged id } ->
+            { model = modelForPageId id
+            , command = Cmd.none
+            }
+
         { v = KFactorMsg (KFactor.DoCopy id) } ->
             { model = model
             , command = copyId id
