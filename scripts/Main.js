@@ -4546,8 +4546,8 @@ var $author$project$Main$KFactorMsg = function (a) {
 	return {$: 'KFactorMsg', a: a};
 };
 var $gren_lang$core$Json$Encode$string = _Json_wrap;
-var $author$project$Main$copyId = _Platform_outgoingPort('copyId', $gren_lang$core$Json$Encode$string);
 var $author$project$Main$changePage = _Platform_outgoingPort('changePage', $gren_lang$core$Json$Encode$string);
+var $author$project$Main$copyId = _Platform_outgoingPort('copyId', $gren_lang$core$Json$Encode$string);
 var $author$project$PageId$pageIdToString = function (id) {
 	if (id.$ === 'Home') {
 		return '#/';
@@ -4555,19 +4555,26 @@ var $author$project$PageId$pageIdToString = function (id) {
 		return '#/k-factor';
 	}
 };
-var $author$project$Main$handlePageChanges = function (_v0) {
+var $author$project$Main$handleSpaCmd = function (_v0) {
 	var model = _v0.model;
 	var command = _v0.command;
-	if (command.$ === 'BaseCmd') {
-		var c = command.a;
-		return {command: c, model: model};
-	} else {
-		var id = command.a;
-		return {
-			command: $author$project$Main$changePage(
-				$author$project$PageId$pageIdToString(id)),
-			model: $author$project$Main$modelForPageId(id)
-		};
+	switch (command.$) {
+		case 'BaseCmd':
+			var c = command.a;
+			return {command: c, model: model};
+		case 'ChangePage':
+			var id = command.a;
+			return {
+				command: $author$project$Main$changePage(
+					$author$project$PageId$pageIdToString(id)),
+				model: $author$project$Main$modelForPageId(id)
+			};
+		default:
+			var id = command.a;
+			return {
+				command: $author$project$Main$copyId(id),
+				model: model
+			};
 	}
 };
 var $author$project$SpaCmd$BaseCmd = function (a) {
@@ -4576,16 +4583,23 @@ var $author$project$SpaCmd$BaseCmd = function (a) {
 var $author$project$SpaCmd$ChangePage = function (a) {
 	return {$: 'ChangePage', a: a};
 };
+var $author$project$SpaCmd$CopyId = function (a) {
+	return {$: 'CopyId', a: a};
+};
 var $gren_lang$core$Platform$Cmd$map = _Platform_map;
 var $author$project$SpaCmd$map = F2(
 	function (f, msg) {
-		if (msg.$ === 'ChangePage') {
-			var id = msg.a;
-			return $author$project$SpaCmd$ChangePage(id);
-		} else {
-			var cb = msg.a;
-			return $author$project$SpaCmd$BaseCmd(
-				A2($gren_lang$core$Platform$Cmd$map, f, cb));
+		switch (msg.$) {
+			case 'ChangePage':
+				var id = msg.a;
+				return $author$project$SpaCmd$ChangePage(id);
+			case 'CopyId':
+				var id = msg.a;
+				return $author$project$SpaCmd$CopyId(id);
+			default:
+				var cb = msg.a;
+				return $author$project$SpaCmd$BaseCmd(
+					A2($gren_lang$core$Platform$Cmd$map, f, cb));
 		}
 	});
 var $author$project$Main$mapPage = F3(
@@ -4671,13 +4685,16 @@ var $author$project$Page$KFactor$update = F2(
 				};
 			default:
 				var id = msg.a;
-				return {command: $author$project$SpaCmd$none, model: model};
+				return {
+					command: $author$project$SpaCmd$CopyId(id),
+					model: model
+				};
 		}
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		var _v0 = {m: model, v: msg};
-		_v0$4:
+		_v0$3:
 		while (true) {
 			switch (_v0.v.$) {
 				case 'PageChanged':
@@ -4690,35 +4707,27 @@ var $author$project$Main$update = F2(
 					if (_v0.m.$ === 'HomeModel') {
 						var m = _v0.m.a;
 						var v = _v0.v.a;
-						return $author$project$Main$handlePageChanges(
+						return $author$project$Main$handleSpaCmd(
 							A3(
 								$author$project$Main$mapPage,
 								$author$project$Main$HomeModel,
 								$author$project$Main$HomeMsg,
 								A2($author$project$Page$Home$update, v, m)));
 					} else {
-						break _v0$4;
+						break _v0$3;
 					}
 				default:
-					if (_v0.v.a.$ === 'DoCopy') {
-						var id = _v0.v.a.a;
-						return {
-							command: $author$project$Main$copyId(id),
-							model: model
-						};
+					if (_v0.m.$ === 'KFactorModel') {
+						var m = _v0.m.a;
+						var v = _v0.v.a;
+						return $author$project$Main$handleSpaCmd(
+							A3(
+								$author$project$Main$mapPage,
+								$author$project$Main$KFactorModel,
+								$author$project$Main$KFactorMsg,
+								A2($author$project$Page$KFactor$update, v, m)));
 					} else {
-						if (_v0.m.$ === 'KFactorModel') {
-							var m = _v0.m.a;
-							var v = _v0.v.a;
-							return $author$project$Main$handlePageChanges(
-								A3(
-									$author$project$Main$mapPage,
-									$author$project$Main$KFactorModel,
-									$author$project$Main$KFactorMsg,
-									A2($author$project$Page$KFactor$update, v, m)));
-						} else {
-							break _v0$4;
-						}
+						break _v0$3;
 					}
 			}
 		}

@@ -99,16 +99,11 @@ update msg model =
             , command = Cmd.none
             }
 
-        { v = KFactorMsg (KFactor.DoCopy id) } ->
-            { model = model
-            , command = copyId id
-            }
-
         { m = HomeModel m, v = HomeMsg v } ->
-            handlePageChanges (mapPage HomeModel HomeMsg (Home.update v m))
+            handleSpaCmd (mapPage HomeModel HomeMsg (Home.update v m))
 
         { m = KFactorModel m, v = KFactorMsg v } ->
-            handlePageChanges (mapPage KFactorModel KFactorMsg (KFactor.update v m))
+            handleSpaCmd (mapPage KFactorModel KFactorMsg (KFactor.update v m))
 
         _ ->
             { model = model
@@ -131,14 +126,14 @@ mapPage wrapModel wrapMsg { model, command } =
     }
 
 
-handlePageChanges :
+handleSpaCmd :
     { model : Model
     , command : SpaCmd Msg
     }
     -> { model : Model
        , command : Cmd Msg
        }
-handlePageChanges { model, command } =
+handleSpaCmd { model, command } =
     case command of
         BaseCmd c ->
             { model = model
@@ -148,6 +143,11 @@ handlePageChanges { model, command } =
         ChangePage id ->
             { model = modelForPageId id
             , command = changePage (pageIdToString id)
+            }
+
+        CopyId id ->
+            { model = model
+            , command = copyId id
             }
 
 

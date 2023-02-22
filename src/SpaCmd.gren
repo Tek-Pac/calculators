@@ -6,6 +6,7 @@ import PageId exposing ( PageId )
 type SpaCmd msg
     = BaseCmd (Cmd msg)
     | ChangePage PageId
+    | CopyId String
 
 
 none : SpaCmd msg
@@ -18,6 +19,9 @@ map f msg =
     case msg of
         ChangePage id ->
             ChangePage id
+
+        CopyId id ->
+            CopyId id
 
         BaseCmd cb ->
             BaseCmd (Cmd.map f cb)
