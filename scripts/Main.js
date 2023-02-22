@@ -4618,10 +4618,47 @@ var $author$project$Page$Home$update = F2(
 			model: model
 		};
 	});
+var $author$project$Page$KFactor$NoOp = {$: 'NoOp'};
+var $gren_lang$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $gren_lang$core$Task$onError = _Scheduler_onError;
+var $gren_lang$core$Task$attempt = F2(
+	function (resultToMessage, task) {
+		return $gren_lang$core$Task$command(
+			$gren_lang$core$Task$Perform(
+				A2(
+					$gren_lang$core$Task$onError,
+					A2(
+						$gren_lang$core$Basics$composeL,
+						A2($gren_lang$core$Basics$composeL, $gren_lang$core$Task$succeed, resultToMessage),
+						$gren_lang$core$Result$Err),
+					A2(
+						$gren_lang$core$Task$andThen,
+						A2(
+							$gren_lang$core$Basics$composeL,
+							A2($gren_lang$core$Basics$composeL, $gren_lang$core$Task$succeed, resultToMessage),
+							$gren_lang$core$Result$Ok),
+						task))));
+	});
+var $gren_lang$browser$Browser$Dom$focus = _Browser_call('focus');
+var $author$project$Page$KFactor$attemptFocus = function (id) {
+	return $author$project$SpaCmd$BaseCmd(
+		A2(
+			$gren_lang$core$Task$attempt,
+			function (_v0) {
+				return $author$project$Page$KFactor$NoOp;
+			},
+			$gren_lang$browser$Browser$Dom$focus(id)));
+};
 var $author$project$SpaCmd$none = $author$project$SpaCmd$BaseCmd($gren_lang$core$Platform$Cmd$none);
 var $author$project$Page$KFactor$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
+			case 'NoOp':
+				return {command: $author$project$SpaCmd$none, model: model};
 			case 'HomePage':
 				return {
 					command: $author$project$SpaCmd$ChangePage($author$project$PageId$Home),
@@ -4630,7 +4667,7 @@ var $author$project$Page$KFactor$update = F2(
 			case 'UpdateThickness':
 				var s = msg.a;
 				return {
-					command: $author$project$SpaCmd$none,
+					command: $author$project$Page$KFactor$attemptFocus('thickness'),
 					model: _Utils_update(
 						model,
 						{t: s})
@@ -4638,7 +4675,7 @@ var $author$project$Page$KFactor$update = F2(
 			case 'UpdateRadius':
 				var s = msg.a;
 				return {
-					command: $author$project$SpaCmd$none,
+					command: $author$project$Page$KFactor$attemptFocus('radius'),
 					model: _Utils_update(
 						model,
 						{r: s})
@@ -4646,7 +4683,7 @@ var $author$project$Page$KFactor$update = F2(
 			case 'UpdateAllowance':
 				var s = msg.a;
 				return {
-					command: $author$project$SpaCmd$none,
+					command: $author$project$Page$KFactor$attemptFocus('bend-allowance'),
 					model: _Utils_update(
 						model,
 						{ba: s})
@@ -4654,7 +4691,7 @@ var $author$project$Page$KFactor$update = F2(
 			case 'UpdateExtraAllowance':
 				var s = msg.a;
 				return {
-					command: $author$project$SpaCmd$none,
+					command: $author$project$Page$KFactor$attemptFocus('extra-allowance'),
 					model: _Utils_update(
 						model,
 						{xa: s})
@@ -4662,7 +4699,7 @@ var $author$project$Page$KFactor$update = F2(
 			case 'UpdateAngle':
 				var s = msg.a;
 				return {
-					command: $author$project$SpaCmd$none,
+					command: $author$project$Page$KFactor$attemptFocus('angle'),
 					model: _Utils_update(
 						model,
 						{a: s})
@@ -4670,7 +4707,7 @@ var $author$project$Page$KFactor$update = F2(
 			case 'UpdateKFactor':
 				var s = msg.a;
 				return {
-					command: $author$project$SpaCmd$none,
+					command: $author$project$Page$KFactor$attemptFocus('k-factor'),
 					model: _Utils_update(
 						model,
 						{k: s})
@@ -5179,7 +5216,7 @@ var $author$project$Page$KFactor$view = function (model) {
 			A2(
 			$gren_lang$browser$Html$div,
 			[
-				$gren_lang$browser$Html$Attributes$id('k-factor'),
+				$gren_lang$browser$Html$Attributes$id('k-factor-div'),
 				$gren_lang$browser$Html$Attributes$class('center')
 			],
 			[
@@ -5201,9 +5238,9 @@ var $author$project$Page$KFactor$view = function (model) {
 			}(),
 				A6(makeInputDiv, 'Thickness:', 'thickness', '0.1', res.t, model.t, $author$project$Page$KFactor$UpdateThickness),
 				A6(makeInputDiv, 'Radius:', 'radius', '0.1', res.r, model.r, $author$project$Page$KFactor$UpdateRadius),
-				_Utils_eq(model.ty, $author$project$Page$KFactor$BendAllowance) ? A6(makeInputDiv, 'Bend Allowance:', 'bendallowance', '0.05', res.ba, model.ba, $author$project$Page$KFactor$UpdateAllowance) : A6(makeInputDiv, 'Extra Allowance:', 'extraallowance', '0.05', res.xa, model.xa, $author$project$Page$KFactor$UpdateExtraAllowance),
+				_Utils_eq(model.ty, $author$project$Page$KFactor$BendAllowance) ? A6(makeInputDiv, 'Bend Allowance:', 'bend-allowance', '0.05', res.ba, model.ba, $author$project$Page$KFactor$UpdateAllowance) : A6(makeInputDiv, 'Extra Allowance:', 'extra-allowance', '0.05', res.xa, model.xa, $author$project$Page$KFactor$UpdateExtraAllowance),
 				_Utils_eq(model.ty, $author$project$Page$KFactor$BendAllowance) ? A6(makeInputDiv, 'Angle:', 'angle', '1', res.a, model.a, $author$project$Page$KFactor$UpdateAngle) : $gren_lang$browser$Html$text(''),
-				A6(makeInputDiv, 'K Factor:', 'kfactor', '0.001', res.k, model.k, $author$project$Page$KFactor$UpdateKFactor)
+				A6(makeInputDiv, 'K Factor:', 'k-factor', '0.001', res.k, model.k, $author$project$Page$KFactor$UpdateKFactor)
 			])
 		],
 		title: 'K Factors'

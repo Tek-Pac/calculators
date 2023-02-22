@@ -4,12 +4,14 @@ module Page.KFactor exposing ( Model, Msg(..), init, update, view )
 -}
 
 import Browser
+import Browser.Dom as Dom
 import Html exposing ( button, Html, text, input, div, br )
 import Html.Attributes exposing ( class, step, type_, id, value, readonly )
 import Html.Events exposing ( onClick, onInput )
 import Math
 import PageId
 import SpaCmd exposing ( SpaCmd(..) )
+import Task
 
 
 type alias Model =
@@ -57,11 +59,22 @@ type Msg
     | UpdateTy Ty
         -- id
     | DoCopy String
+    | NoOp
+
+
+attemptFocus : String -> SpaCmd Msg
+attemptFocus id =
+    BaseCmd (Task.attempt (\_ -> NoOp) (Dom.focus id))
 
 
 update : Msg -> Model -> Updated
 update msg model =
     case msg of
+        NoOp ->
+            { model = model
+            , command = SpaCmd.none
+            }
+
         HomePage ->
             { model = model
             , command = ChangePage PageId.Home
@@ -69,32 +82,32 @@ update msg model =
 
         UpdateThickness s ->
             { model = { model | t = s }
-            , command = SpaCmd.none
+            , command = attemptFocus "thickness"
             }
 
         UpdateRadius s ->
             { model = { model | r = s }
-            , command = SpaCmd.none
+            , command = attemptFocus "radius"
             }
 
         UpdateAllowance s ->
             { model = { model | ba = s }
-            , command = SpaCmd.none
+            , command = attemptFocus "bend-allowance"
             }
 
         UpdateExtraAllowance s ->
             { model = { model | xa = s }
-            , command = SpaCmd.none
+            , command = attemptFocus "extra-allowance"
             }
 
         UpdateAngle s ->
             { model = { model | a = s }
-            , command = SpaCmd.none
+            , command = attemptFocus "angle"
             }
 
         UpdateKFactor s ->
             { model = { model | k = s }
-            , command = SpaCmd.none
+            , command = attemptFocus "k-factor"
             }
 
         UpdateTy ty ->
@@ -286,7 +299,7 @@ view model =
             [ text "Home"
             ]
         , div
-            [ id "k-factor"
+            [ id "k-factor-div"
             , class "center"
             ]
             [ case model.ty of
@@ -304,14 +317,14 @@ view model =
             , makeInputDiv "Thickness:" "thickness" "0.1" res.t model.t UpdateThickness
             , makeInputDiv "Radius:" "radius" "0.1" res.r model.r UpdateRadius
             , if model.ty == BendAllowance then
-                makeInputDiv "Bend Allowance:" "bendallowance" "0.05" res.ba model.ba UpdateAllowance
+                makeInputDiv "Bend Allowance:" "bend-allowance" "0.05" res.ba model.ba UpdateAllowance
               else
-                makeInputDiv "Extra Allowance:" "extraallowance" "0.05" res.xa model.xa UpdateExtraAllowance
+                makeInputDiv "Extra Allowance:" "extra-allowance" "0.05" res.xa model.xa UpdateExtraAllowance
             , if model.ty == BendAllowance then
                 makeInputDiv "Angle:" "angle" "1" res.a model.a UpdateAngle
               else
                 text ""
-            , makeInputDiv "K Factor:" "kfactor" "0.001" res.k model.k UpdateKFactor
+            , makeInputDiv "K Factor:" "k-factor" "0.001" res.k model.k UpdateKFactor
             ]
         ]
     }
