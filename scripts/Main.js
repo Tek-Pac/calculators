@@ -4975,7 +4975,15 @@ var $author$project$Page$KFactor$view = function (model) {
 								$gren_lang$browser$Html$text('📋')
 							]);
 					} else {
-						return $gren_lang$browser$Html$text('');
+						return $gren_lang$core$String$isEmpty(modelT) ? $gren_lang$browser$Html$text('') : A2(
+							$gren_lang$browser$Html$button,
+							[
+								$gren_lang$browser$Html$Events$onClick(
+								msgF(''))
+							],
+							[
+								$gren_lang$browser$Html$text('❌')
+							]);
 					}
 				}()
 				]);

@@ -4,9 +4,9 @@ module Page.KFactor exposing ( Model, Msg(..), init, update, view )
 -}
 
 import Browser
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html exposing ( button, Html, text, input, div, br )
+import Html.Attributes exposing ( class, step, type_, id, value, readonly )
+import Html.Events exposing ( onClick, onInput )
 import Math
 import PageId
 import SpaCmd exposing ( SpaCmd(..) )
@@ -259,7 +259,14 @@ view model =
                             ]
 
                     Nothing ->
-                        text ""
+                        if String.isEmpty modelT then
+                            text ""
+                        else
+                            button
+                                [ onClick (msgF "")
+                                ]
+                                [ text "❌"
+                                ]
                 ]
 
         makeSwapButton : Ty -> Html Msg
