@@ -41,6 +41,11 @@ view model =
                 ]
                 [ text "K-Factors"
                 ]
+            , button
+                [ onClick GoToTriangle
+                ]
+                [ text "Triangles"
+                ]
             ]
         ]
     }
@@ -48,6 +53,7 @@ view model =
 
 type Msg
     = GoToKFactor
+    | GoToTriangle
 
 
 update : Msg -> Model -> Updated
@@ -56,4 +62,9 @@ update msg model =
         GoToKFactor ->
             { model = model
             , command = ChangePage PageId.KFactor
+            }
+
+        GoToTriangle ->
+            { model = model
+            , command = ChangePage PageId.Triangle
             }

@@ -5,6 +5,7 @@ module PageId exposing (..)
 type PageId
     = Home
     | KFactor
+    | Triangle
 
 
 stringToPageId : String -> Maybe PageId
@@ -19,6 +20,9 @@ stringToPageId str =
         "#/k-factor" ->
             Just KFactor
 
+        "#/triangle" ->
+            Just Triangle
+
         _ ->
             Nothing
 
@@ -31,3 +35,6 @@ pageIdToString id =
 
         KFactor ->
             "#/k-factor"
+
+        Triangle ->
+            "#/triangle"

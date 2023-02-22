@@ -4,6 +4,7 @@ import Browser
 import Html exposing (..)
 import Page.Home as Home
 import Page.KFactor as KFactor
+import Page.Triangle as Triangle
 import PageId exposing ( PageId(..), stringToPageId, pageIdToString )
 import SpaCmd exposing ( SpaCmd(..) )
 
@@ -20,11 +21,13 @@ port pageChanged : (String -> msg) -> Sub msg
 type Model
     = HomeModel Home.Model
     | KFactorModel KFactor.Model
+    | TriangleModel Triangle.Model
 
 
 type Msg
     = HomeMsg Home.Msg
     | KFactorMsg KFactor.Msg
+    | TriangleMsg Triangle.Msg
     | PageChanged PageId
 
 
@@ -72,6 +75,10 @@ view model =
             KFactor.view m
                 |> mapDocument KFactorMsg
 
+        TriangleModel m ->
+            Triangle.view m
+                |> mapDocument TriangleMsg
+
 
 mapDocument : (a -> Msg) -> Browser.Document a -> Browser.Document Msg
 mapDocument map doc =
@@ -104,6 +111,9 @@ update msg model =
 
         { m = KFactorModel m, v = KFactorMsg v } ->
             handleSpaCmd (mapPage KFactorModel KFactorMsg (KFactor.update v m))
+
+        { m = TriangleModel m, v = TriangleMsg v } ->
+            handleSpaCmd (mapPage TriangleModel TriangleMsg (Triangle.update v m))
 
         _ ->
             { model = model
@@ -159,3 +169,6 @@ modelForPageId id =
 
         KFactor ->
             KFactorModel KFactor.init
+
+        Triangle ->
+            TriangleModel Triangle.init

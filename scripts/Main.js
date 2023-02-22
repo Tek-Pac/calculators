@@ -4481,20 +4481,28 @@ var $author$project$Main$HomeModel = function (a) {
 var $author$project$Main$KFactorModel = function (a) {
 	return {$: 'KFactorModel', a: a};
 };
+var $author$project$Main$TriangleModel = function (a) {
+	return {$: 'TriangleModel', a: a};
+};
 var $author$project$Page$Home$init = {};
 var $author$project$Page$KFactor$ExtraAllowance = {$: 'ExtraAllowance'};
 var $author$project$Page$KFactor$init = {a: '90', ba: '', k: '', r: '', t: '', ty: $author$project$Page$KFactor$ExtraAllowance, xa: ''};
+var $author$project$Page$Triangle$init = {a: '', b: '', c: '', theta: ''};
 var $author$project$Main$modelForPageId = function (id) {
-	if (id.$ === 'Home') {
-		return $author$project$Main$HomeModel($author$project$Page$Home$init);
-	} else {
-		return $author$project$Main$KFactorModel($author$project$Page$KFactor$init);
+	switch (id.$) {
+		case 'Home':
+			return $author$project$Main$HomeModel($author$project$Page$Home$init);
+		case 'KFactor':
+			return $author$project$Main$KFactorModel($author$project$Page$KFactor$init);
+		default:
+			return $author$project$Main$TriangleModel($author$project$Page$Triangle$init);
 	}
 };
 var $gren_lang$core$Platform$Cmd$batch = _Platform_batch;
 var $gren_lang$core$Platform$Cmd$none = $gren_lang$core$Platform$Cmd$batch(
 	[]);
 var $author$project$PageId$KFactor = {$: 'KFactor'};
+var $author$project$PageId$Triangle = {$: 'Triangle'};
 var $author$project$PageId$stringToPageId = function (str) {
 	switch (str) {
 		case '':
@@ -4503,6 +4511,8 @@ var $author$project$PageId$stringToPageId = function (str) {
 			return $gren_lang$core$Maybe$Just($author$project$PageId$Home);
 		case '#/k-factor':
 			return $gren_lang$core$Maybe$Just($author$project$PageId$KFactor);
+		case '#/triangle':
+			return $gren_lang$core$Maybe$Just($author$project$PageId$Triangle);
 		default:
 			return $gren_lang$core$Maybe$Nothing;
 	}
@@ -4545,14 +4555,20 @@ var $author$project$Main$HomeMsg = function (a) {
 var $author$project$Main$KFactorMsg = function (a) {
 	return {$: 'KFactorMsg', a: a};
 };
+var $author$project$Main$TriangleMsg = function (a) {
+	return {$: 'TriangleMsg', a: a};
+};
 var $gren_lang$core$Json$Encode$string = _Json_wrap;
 var $author$project$Main$changePage = _Platform_outgoingPort('changePage', $gren_lang$core$Json$Encode$string);
 var $author$project$Main$copyId = _Platform_outgoingPort('copyId', $gren_lang$core$Json$Encode$string);
 var $author$project$PageId$pageIdToString = function (id) {
-	if (id.$ === 'Home') {
-		return '#/';
-	} else {
-		return '#/k-factor';
+	switch (id.$) {
+		case 'Home':
+			return '#/';
+		case 'KFactor':
+			return '#/k-factor';
+		default:
+			return '#/triangle';
 	}
 };
 var $author$project$Main$handleSpaCmd = function (_v0) {
@@ -4613,10 +4629,17 @@ var $author$project$Main$mapPage = F3(
 	});
 var $author$project$Page$Home$update = F2(
 	function (msg, model) {
-		return {
-			command: $author$project$SpaCmd$ChangePage($author$project$PageId$KFactor),
-			model: model
-		};
+		if (msg.$ === 'GoToKFactor') {
+			return {
+				command: $author$project$SpaCmd$ChangePage($author$project$PageId$KFactor),
+				model: model
+			};
+		} else {
+			return {
+				command: $author$project$SpaCmd$ChangePage($author$project$PageId$Triangle),
+				model: model
+			};
+		}
 	});
 var $author$project$Page$KFactor$NoOp = {$: 'NoOp'};
 var $gren_lang$core$Basics$composeL = F3(
@@ -4728,10 +4751,70 @@ var $author$project$Page$KFactor$update = F2(
 				};
 		}
 	});
+var $author$project$Page$Triangle$NoOp = {$: 'NoOp'};
+var $author$project$Page$Triangle$attemptFocus = function (id) {
+	return $author$project$SpaCmd$BaseCmd(
+		A2(
+			$gren_lang$core$Task$attempt,
+			function (_v0) {
+				return $author$project$Page$Triangle$NoOp;
+			},
+			$gren_lang$browser$Browser$Dom$focus(id)));
+};
+var $author$project$Page$Triangle$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'NoOp':
+				return {command: $author$project$SpaCmd$none, model: model};
+			case 'HomePage':
+				return {
+					command: $author$project$SpaCmd$ChangePage($author$project$PageId$Home),
+					model: model
+				};
+			case 'UpdateA':
+				var s = msg.a;
+				return {
+					command: $author$project$Page$Triangle$attemptFocus('a'),
+					model: _Utils_update(
+						model,
+						{a: s})
+				};
+			case 'UpdateB':
+				var s = msg.a;
+				return {
+					command: $author$project$Page$Triangle$attemptFocus('b'),
+					model: _Utils_update(
+						model,
+						{b: s})
+				};
+			case 'UpdateC':
+				var s = msg.a;
+				return {
+					command: $author$project$Page$Triangle$attemptFocus('c'),
+					model: _Utils_update(
+						model,
+						{c: s})
+				};
+			case 'UpdateTheta':
+				var s = msg.a;
+				return {
+					command: $author$project$Page$Triangle$attemptFocus('theta'),
+					model: _Utils_update(
+						model,
+						{theta: s})
+				};
+			default:
+				var id = msg.a;
+				return {
+					command: $author$project$SpaCmd$CopyId(id),
+					model: model
+				};
+		}
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		var _v0 = {m: model, v: msg};
-		_v0$3:
+		_v0$4:
 		while (true) {
 			switch (_v0.v.$) {
 				case 'PageChanged':
@@ -4751,9 +4834,9 @@ var $author$project$Main$update = F2(
 								$author$project$Main$HomeMsg,
 								A2($author$project$Page$Home$update, v, m)));
 					} else {
-						break _v0$3;
+						break _v0$4;
 					}
-				default:
+				case 'KFactorMsg':
 					if (_v0.m.$ === 'KFactorModel') {
 						var m = _v0.m.a;
 						var v = _v0.v.a;
@@ -4764,7 +4847,20 @@ var $author$project$Main$update = F2(
 								$author$project$Main$KFactorMsg,
 								A2($author$project$Page$KFactor$update, v, m)));
 					} else {
-						break _v0$3;
+						break _v0$4;
+					}
+				default:
+					if (_v0.m.$ === 'TriangleModel') {
+						var m = _v0.m.a;
+						var v = _v0.v.a;
+						return $author$project$Main$handleSpaCmd(
+							A3(
+								$author$project$Main$mapPage,
+								$author$project$Main$TriangleModel,
+								$author$project$Main$TriangleMsg,
+								A2($author$project$Page$Triangle$update, v, m)));
+					} else {
+						break _v0$4;
 					}
 			}
 		}
@@ -4783,6 +4879,7 @@ var $author$project$Main$mapDocument = F2(
 		};
 	});
 var $author$project$Page$Home$GoToKFactor = {$: 'GoToKFactor'};
+var $author$project$Page$Home$GoToTriangle = {$: 'GoToTriangle'};
 var $gren_lang$browser$VirtualDom$node = function (tag) {
 	return _VirtualDom_node(
 		_VirtualDom_noScript(tag));
@@ -4830,6 +4927,14 @@ var $author$project$Page$Home$view = function (model) {
 				],
 				[
 					$gren_lang$browser$Html$text('K-Factors')
+				]),
+				A2(
+				$gren_lang$browser$Html$button,
+				[
+					$gren_lang$browser$Html$Events$onClick($author$project$Page$Home$GoToTriangle)
+				],
+				[
+					$gren_lang$browser$Html$text('Triangles')
 				])
 			])
 		],
@@ -5246,19 +5351,282 @@ var $author$project$Page$KFactor$view = function (model) {
 		title: 'K Factors'
 	};
 };
+var $author$project$Page$Triangle$DoCopy = function (a) {
+	return {$: 'DoCopy', a: a};
+};
+var $author$project$Page$Triangle$HomePage = {$: 'HomePage'};
+var $author$project$Page$Triangle$UpdateA = function (a) {
+	return {$: 'UpdateA', a: a};
+};
+var $author$project$Page$Triangle$UpdateB = function (a) {
+	return {$: 'UpdateB', a: a};
+};
+var $author$project$Page$Triangle$UpdateC = function (a) {
+	return {$: 'UpdateC', a: a};
+};
+var $author$project$Page$Triangle$UpdateTheta = function (a) {
+	return {$: 'UpdateTheta', a: a};
+};
+var $gren_lang$core$Math$acos = _Math_acos;
+var $gren_lang$core$Math$asin = _Math_asin;
+var $gren_lang$core$Math$atan = _Math_atan;
+var $gren_lang$core$Math$cos = _Math_cos;
+var $gren_lang$core$Math$degrees = function (angleInDegrees) {
+	return (angleInDegrees * $gren_lang$core$Math$pi) / 180;
+};
+var $gren_lang$core$Math$sin = _Math_sin;
+var $gren_lang$core$Math$sqrt = _Math_sqrt;
+var $gren_lang$core$Math$tan = _Math_tan;
+var $author$project$Page$Triangle$undegrees = function (rad) {
+	return (rad * 180) / $gren_lang$core$Math$pi;
+};
+var $author$project$Page$Triangle$view = function (model) {
+	var parsedModel = {
+		a: $gren_lang$core$String$toFloat(model.a),
+		b: $gren_lang$core$String$toFloat(model.b),
+		c: $gren_lang$core$String$toFloat(model.c),
+		theta: $gren_lang$core$String$toFloat(model.theta)
+	};
+	var makeInputDiv = F6(
+		function (txt, idTxt, stepV, calcF, modelT, msgF) {
+			return A2(
+				$gren_lang$browser$Html$div,
+				[],
+				[
+					$gren_lang$browser$Html$text(txt),
+					A2(
+					$gren_lang$browser$Html$br,
+					[],
+					[]),
+					function () {
+					if (calcF.$ === 'Just') {
+						var t = calcF.a;
+						return A2(
+							$gren_lang$browser$Html$input,
+							[
+								$gren_lang$browser$Html$Attributes$value(
+								$gren_lang$core$String$fromFloat(t)),
+								$gren_lang$browser$Html$Attributes$readonly(true),
+								$gren_lang$browser$Html$Attributes$id(idTxt),
+								$gren_lang$browser$Html$Attributes$type_('number'),
+								$gren_lang$browser$Html$Attributes$step(stepV)
+							],
+							[]);
+					} else {
+						return A2(
+							$gren_lang$browser$Html$input,
+							[
+								$gren_lang$browser$Html$Attributes$value(modelT),
+								$gren_lang$browser$Html$Events$onInput(msgF),
+								$gren_lang$browser$Html$Attributes$id(idTxt),
+								$gren_lang$browser$Html$Attributes$type_('number'),
+								$gren_lang$browser$Html$Attributes$step(stepV)
+							],
+							[]);
+					}
+				}(),
+					function () {
+					if (calcF.$ === 'Just') {
+						var t = calcF.a;
+						return A2(
+							$gren_lang$browser$Html$button,
+							[
+								$gren_lang$browser$Html$Events$onClick(
+								$author$project$Page$Triangle$DoCopy(idTxt))
+							],
+							[
+								$gren_lang$browser$Html$text('📋')
+							]);
+					} else {
+						return $gren_lang$core$String$isEmpty(modelT) ? $gren_lang$browser$Html$text('') : A2(
+							$gren_lang$browser$Html$button,
+							[
+								$gren_lang$browser$Html$Events$onClick(
+								msgF(''))
+							],
+							[
+								$gren_lang$browser$Html$text('❌')
+							]);
+					}
+				}()
+				]);
+		});
+	var formatF = function (value) {
+		return $gren_lang$core$Maybe$Just(
+			$gren_lang$core$Math$round(value * 1000000) / 1000000);
+	};
+	var emptyResult = {a: $gren_lang$core$Maybe$Nothing, b: $gren_lang$core$Maybe$Nothing, c: $gren_lang$core$Maybe$Nothing, theta: $gren_lang$core$Maybe$Nothing};
+	var res = function () {
+		_v0$6:
+		while (true) {
+			if (parsedModel.a.$ === 'Just') {
+				if (parsedModel.b.$ === 'Just') {
+					if ((parsedModel.c.$ === 'Nothing') && (parsedModel.theta.$ === 'Nothing')) {
+						var a = parsedModel.a.a;
+						var b = parsedModel.b.a;
+						var _v1 = parsedModel.c;
+						var _v2 = parsedModel.theta;
+						var theta = $gren_lang$core$Math$atan(a / b);
+						var c = $gren_lang$core$Math$sqrt((a * a) + (b * b));
+						return _Utils_update(
+							emptyResult,
+							{
+								c: formatF(c),
+								theta: formatF(
+									$author$project$Page$Triangle$undegrees(theta))
+							});
+					} else {
+						break _v0$6;
+					}
+				} else {
+					if (parsedModel.c.$ === 'Just') {
+						if (parsedModel.theta.$ === 'Nothing') {
+							var a = parsedModel.a.a;
+							var _v3 = parsedModel.b;
+							var c = parsedModel.c.a;
+							var _v4 = parsedModel.theta;
+							var theta = $gren_lang$core$Math$asin(a / c);
+							var b = c * $gren_lang$core$Math$cos(theta);
+							return _Utils_update(
+								emptyResult,
+								{
+									b: formatF(b),
+									theta: formatF(
+										$author$project$Page$Triangle$undegrees(theta))
+								});
+						} else {
+							break _v0$6;
+						}
+					} else {
+						if (parsedModel.theta.$ === 'Just') {
+							var a = parsedModel.a.a;
+							var _v5 = parsedModel.b;
+							var _v6 = parsedModel.c;
+							var theta_d = parsedModel.theta.a;
+							var theta = $gren_lang$core$Math$degrees(theta_d);
+							var c = a / $gren_lang$core$Math$sin(theta);
+							var b = a / $gren_lang$core$Math$tan(theta);
+							return _Utils_update(
+								emptyResult,
+								{
+									b: formatF(b),
+									c: formatF(c)
+								});
+						} else {
+							break _v0$6;
+						}
+					}
+				}
+			} else {
+				if (parsedModel.b.$ === 'Just') {
+					if (parsedModel.c.$ === 'Just') {
+						if (parsedModel.theta.$ === 'Nothing') {
+							var _v7 = parsedModel.a;
+							var b = parsedModel.b.a;
+							var c = parsedModel.c.a;
+							var _v8 = parsedModel.theta;
+							var theta = $gren_lang$core$Math$acos(b / c);
+							var a = c * $gren_lang$core$Math$sin(theta);
+							return _Utils_update(
+								emptyResult,
+								{
+									a: formatF(a),
+									theta: formatF(
+										$author$project$Page$Triangle$undegrees(theta))
+								});
+						} else {
+							break _v0$6;
+						}
+					} else {
+						if (parsedModel.theta.$ === 'Just') {
+							var _v9 = parsedModel.a;
+							var b = parsedModel.b.a;
+							var _v10 = parsedModel.c;
+							var theta_d = parsedModel.theta.a;
+							var theta = $gren_lang$core$Math$degrees(theta_d);
+							var c = b / $gren_lang$core$Math$tan(theta);
+							var a = b * $gren_lang$core$Math$tan(theta);
+							return _Utils_update(
+								emptyResult,
+								{
+									a: formatF(a),
+									c: formatF(c)
+								});
+						} else {
+							break _v0$6;
+						}
+					}
+				} else {
+					if ((parsedModel.c.$ === 'Just') && (parsedModel.theta.$ === 'Just')) {
+						var _v11 = parsedModel.a;
+						var _v12 = parsedModel.b;
+						var c = parsedModel.c.a;
+						var theta_d = parsedModel.theta.a;
+						var theta = $gren_lang$core$Math$degrees(theta_d);
+						var b = c * $gren_lang$core$Math$cos(theta);
+						var a = c * $gren_lang$core$Math$sin(theta);
+						return _Utils_update(
+							emptyResult,
+							{
+								a: formatF(a),
+								b: formatF(b)
+							});
+					} else {
+						break _v0$6;
+					}
+				}
+			}
+		}
+		return emptyResult;
+	}();
+	return {
+		body: [
+			A2(
+			$gren_lang$browser$Html$button,
+			[
+				$gren_lang$browser$Html$Attributes$class('left'),
+				$gren_lang$browser$Html$Events$onClick($author$project$Page$Triangle$HomePage)
+			],
+			[
+				$gren_lang$browser$Html$text('Home')
+			]),
+			A2(
+			$gren_lang$browser$Html$div,
+			[
+				$gren_lang$browser$Html$Attributes$id('triangle'),
+				$gren_lang$browser$Html$Attributes$class('center')
+			],
+			[
+				$gren_lang$browser$Html$text('Triangles'),
+				A6(makeInputDiv, 'A:', 'a', '0.1', res.a, model.a, $author$project$Page$Triangle$UpdateA),
+				A6(makeInputDiv, 'B:', 'b', '0.1', res.b, model.b, $author$project$Page$Triangle$UpdateB),
+				A6(makeInputDiv, 'C:', 'c', '0.1', res.c, model.c, $author$project$Page$Triangle$UpdateC),
+				A6(makeInputDiv, 'Theta:', 'theta', '0.1', res.theta, model.theta, $author$project$Page$Triangle$UpdateTheta)
+			])
+		],
+		title: 'Triangles'
+	};
+};
 var $author$project$Main$view = function (model) {
-	if (model.$ === 'HomeModel') {
-		var m = model.a;
-		return A2(
-			$author$project$Main$mapDocument,
-			$author$project$Main$HomeMsg,
-			$author$project$Page$Home$view(m));
-	} else {
-		var m = model.a;
-		return A2(
-			$author$project$Main$mapDocument,
-			$author$project$Main$KFactorMsg,
-			$author$project$Page$KFactor$view(m));
+	switch (model.$) {
+		case 'HomeModel':
+			var m = model.a;
+			return A2(
+				$author$project$Main$mapDocument,
+				$author$project$Main$HomeMsg,
+				$author$project$Page$Home$view(m));
+		case 'KFactorModel':
+			var m = model.a;
+			return A2(
+				$author$project$Main$mapDocument,
+				$author$project$Main$KFactorMsg,
+				$author$project$Page$KFactor$view(m));
+		default:
+			var m = model.a;
+			return A2(
+				$author$project$Main$mapDocument,
+				$author$project$Main$TriangleMsg,
+				$author$project$Page$Triangle$view(m));
 	}
 };
 var $author$project$Main$main = $gren_lang$browser$Browser$document(

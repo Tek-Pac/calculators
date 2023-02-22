@@ -1,0 +1,304 @@
+module Page.Triangle exposing ( Model, Msg(..), init, update, view )
+
+{-| The triangle calculator page
+-}
+
+import Browser
+import Browser.Dom as Dom
+import Html exposing ( button, Html, text, input, div, br )
+import Html.Attributes exposing ( class, step, type_, id, value, readonly )
+import Html.Events exposing ( onClick, onInput )
+import Math
+import PageId
+import SpaCmd exposing ( SpaCmd(..) )
+import Svg exposing ( Svg, svg, polygon )
+import Task
+
+
+type alias Model =
+    { a : String
+    , b : String
+    , c : String
+    , theta : String
+    }
+
+
+type alias Updated =
+    { model : Model
+    , command : SpaCmd Msg
+    }
+
+
+init : Model
+init =
+    { a = ""
+    , b = ""
+    , c = ""
+    , theta = ""
+    }
+
+
+type Msg
+    = HomePage
+    | UpdateA String
+    | UpdateB String
+    | UpdateC String
+    | UpdateTheta String
+        -- id
+    | DoCopy String
+    | NoOp
+
+
+attemptFocus : String -> SpaCmd Msg
+attemptFocus id =
+    BaseCmd (Task.attempt (\_ -> NoOp) (Dom.focus id))
+
+
+update : Msg -> Model -> Updated
+update msg model =
+    case msg of
+        NoOp ->
+            { model = model
+            , command = SpaCmd.none
+            }
+
+        HomePage ->
+            { model = model
+            , command = ChangePage PageId.Home
+            }
+
+        UpdateA s ->
+            { model = { model | a = s }
+            , command = attemptFocus "a"
+            }
+
+        UpdateB s ->
+            { model = { model | b = s }
+            , command = attemptFocus "b"
+            }
+
+        UpdateC s ->
+            { model = { model | c = s }
+            , command = attemptFocus "c"
+            }
+
+        UpdateTheta s ->
+            { model = { model | theta = s }
+            , command = attemptFocus "theta"
+            }
+
+        DoCopy id ->
+            { model = model
+            , command = CopyId id
+            }
+
+
+
+{- Triangle formulae
+
+a = opposite
+b = adjacent
+c = hypotenuse
+theta = angle
+
+sin(theta) = a/c
+
+cos(theta) = b/c
+
+tan(theta) = a/b
+
+
+a = c * sin(theta) = b * tan(theta)
+
+b = c * cos(theta) = a / tan(theta)
+
+c = a / sin(theta) = b / cos(theta)
+
+theta = asin(a/c) = acos(b/c) = atan(a/b)
+ -}
+
+
+undegrees : Float -> Float
+undegrees rad =
+    rad * 180 / Math.pi
+
+
+view : Model -> Browser.Document Msg
+view model =
+    let
+        parsedModel =
+            { b = String.toFloat model.b
+            , a = String.toFloat model.a
+            , c = String.toFloat model.c
+            , theta = String.toFloat model.theta
+            }
+
+        emptyResult =
+            { b = Nothing
+            , a = Nothing
+            , c = Nothing
+            , theta = Nothing
+            }
+
+        -- 6 dp
+        formatF : Float -> Maybe Float
+        formatF value =
+            Just (toFloat (Math.round (value * 1000000)) / 1000000)
+
+        res =
+            case parsedModel of
+                { a = Just a, b = Just b, c = Nothing, theta = Nothing } ->
+                    let
+                        theta =
+                            Math.atan (a / b)
+
+                        c =
+                            Math.sqrt (a * a + b * b)
+                    in
+                    { emptyResult
+                        | c = formatF c
+                        , theta = formatF (undegrees theta)
+                    }
+
+                { a = Just a, b = Nothing, c = Just c, theta = Nothing } ->
+                    let
+                        theta =
+                            Math.asin (a / c)
+
+                        b =
+                            c * Math.cos theta
+                    in
+                    { emptyResult
+                        | b = formatF b
+                        , theta = formatF (undegrees theta)
+                    }
+
+                { a = Just a, b = Nothing, c = Nothing, theta = Just theta_d } ->
+                    let
+                        theta =
+                            Math.degrees theta_d
+
+                        b =
+                            a / Math.tan theta
+
+                        c =
+                            a / Math.sin theta
+                    in
+                    { emptyResult
+                        | b = formatF b
+                        , c = formatF c
+                    }
+
+                { a = Nothing, b = Just b, c = Just c, theta = Nothing } ->
+                    let
+                        theta =
+                            Math.acos (b / c)
+
+                        a =
+                            c * Math.sin theta
+                    in
+                    { emptyResult
+                        | a = formatF a
+                        , theta = formatF (undegrees theta)
+                    }
+
+                { a = Nothing, b = Just b, c = Nothing, theta = Just theta_d } ->
+                    let
+                        theta =
+                            Math.degrees theta_d
+
+                        a =
+                            b * Math.tan theta
+
+                        c =
+                            b / Math.tan theta
+                    in
+                    { emptyResult
+                        | a = formatF a
+                        , c = formatF c
+                    }
+
+                { a = Nothing, b = Nothing, c = Just c, theta = Just theta_d } ->
+                    let
+                        theta =
+                            Math.degrees theta_d
+
+                        a =
+                            c * Math.sin theta
+
+                        b =
+                            c * Math.cos theta
+                    in
+                    { emptyResult
+                        | a = formatF a
+                        , b = formatF b
+                    }
+
+                _ ->
+                    emptyResult
+
+        makeInputDiv : String -> String -> String -> Maybe Float -> String -> (String -> Msg) -> Html Msg
+        makeInputDiv txt idTxt stepV calcF modelT msgF =
+            div
+                []
+                [ text txt
+                , br [] []
+                , case calcF of
+                    Just t ->
+                        input
+                            [ value (String.fromFloat t)
+                            , readonly True
+                            , id idTxt
+                            , type_ "number"
+                            , step stepV
+                            ]
+                            []
+
+                    Nothing ->
+                        input
+                            [ value modelT
+                            , onInput msgF
+                            , id idTxt
+                            , type_ "number"
+                            , step stepV
+                            ]
+                            []
+                , case calcF of
+                    Just t ->
+                        button
+                            [ onClick (DoCopy idTxt)
+                            ]
+                            [ text "📋"
+                            ]
+
+                    Nothing ->
+                        if String.isEmpty modelT then
+                            text ""
+                        else
+                            button
+                                [ onClick (msgF "")
+                                ]
+                                [ text "❌"
+                                ]
+                ]
+    in
+    { title = "Triangles"
+    , body =
+        [ button
+            [ class "left"
+            , onClick HomePage
+            ]
+            [ text "Home"
+            ]
+        , div
+            [ id "triangle"
+            , class "center"
+            ]
+            [ text "Triangles"
+            , makeInputDiv "A:" "a" "0.1" res.a model.a UpdateA
+            , makeInputDiv "B:" "b" "0.1" res.b model.b UpdateB
+            , makeInputDiv "C:" "c" "0.1" res.c model.c UpdateC
+            , makeInputDiv "Theta:" "theta" "0.1" res.theta model.theta UpdateTheta
+            ]
+        ]
+    }
