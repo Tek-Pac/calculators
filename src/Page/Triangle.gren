@@ -299,7 +299,7 @@ view model =
                     ]
                     [ feOffset
                         [ dx "0"
-                        , dy "0.666"
+                        , dy "1"
                         ]
                         []
                     , feGaussianBlur
@@ -316,7 +316,7 @@ view model =
                         []
                     , feFlood
                         [ floodColor "black"
-                        , floodOpacity "0.5"
+                        , floodOpacity "0.4"
                         , result "color"
                         ]
                         []
@@ -337,7 +337,12 @@ view model =
                 , polygon
                     [ fill "white"
                     , stroke "white"
-                    , points "150,50 590,340 150,340 150,230 197,230 200,227 200,188 197,185 150,185"
+                    , points
+                        (if getButtonExists res.a model.a then
+                            "150,50 590,335 150,335 150,230 197,230 200,227 200,188 197,185 150,185"
+                         else
+                            "150,50 590,335 150,335 150,230 162,230 165,227 165,188 162,185 150,185"
+                        )
                     , style "filter" "url(#inset-shadow)"
                     , strokeLinejoin "round"
                     , strokeWidth "5"
@@ -434,13 +439,8 @@ makeInput { label, idTxt, stepV, calcVal, currTxt, updateMsg, xI, yI, w } =
         ]
         [ div
             []
-            -- [ style "box-shadow" "0 1pt 3pt var(--t-shadow)"
-            -- , style "margin" "3pt"
-            -- , style "background" "var(--background)"
-            -- , style "border-radius" "2.5pt"
-            -- ]
             [ text label
-            , text "\u{00A0}\u{00A0}"
+            , text "         "
             , br [] []
             , case calcVal of
                 Just t ->

@@ -5404,14 +5404,6 @@ var $gren_lang$browser$Svg$filter = $gren_lang$browser$Svg$trustedNode('filter')
 var $gren_lang$browser$Svg$Attributes$floodColor = $gren_lang$browser$VirtualDom$attribute('flood-color');
 var $gren_lang$browser$Svg$Attributes$floodOpacity = $gren_lang$browser$VirtualDom$attribute('flood-opacity');
 var $gren_lang$core$Basics$ge = _Utils_ge;
-var $gren_lang$core$Basics$gt = _Utils_gt;
-var $gren_lang$browser$Svg$Attributes$height = $gren_lang$browser$VirtualDom$attribute('height');
-var $gren_lang$browser$Svg$Attributes$in2 = $gren_lang$browser$VirtualDom$attribute('in2');
-var $gren_lang$browser$Svg$Attributes$in_ = $gren_lang$browser$VirtualDom$attribute('in');
-var $author$project$Page$Triangle$DoCopy = function (a) {
-	return {$: 'DoCopy', a: a};
-};
-var $gren_lang$browser$Svg$foreignObject = $gren_lang$browser$Svg$trustedNode('foreignObject');
 var $gren_lang$core$Basics$isInfinite = _Basics_isInfinite;
 var $gren_lang$core$Basics$isNaN = _Basics_isNaN;
 var $author$project$Page$Triangle$getButtonExists = F2(
@@ -5423,6 +5415,14 @@ var $author$project$Page$Triangle$getButtonExists = F2(
 			return $gren_lang$core$String$isEmpty(currTxt) ? false : true;
 		}
 	});
+var $gren_lang$core$Basics$gt = _Utils_gt;
+var $gren_lang$browser$Svg$Attributes$height = $gren_lang$browser$VirtualDom$attribute('height');
+var $gren_lang$browser$Svg$Attributes$in2 = $gren_lang$browser$VirtualDom$attribute('in2');
+var $gren_lang$browser$Svg$Attributes$in_ = $gren_lang$browser$VirtualDom$attribute('in');
+var $author$project$Page$Triangle$DoCopy = function (a) {
+	return {$: 'DoCopy', a: a};
+};
+var $gren_lang$browser$Svg$foreignObject = $gren_lang$browser$Svg$trustedNode('foreignObject');
 var $gren_lang$core$Basics$idiv = _Basics_idiv;
 var $gren_lang$browser$VirtualDom$style = _VirtualDom_style;
 var $gren_lang$browser$Html$Attributes$style = $gren_lang$browser$VirtualDom$style;
@@ -5466,7 +5466,7 @@ var $author$project$Page$Triangle$makeInput = function (_v0) {
 			[],
 			[
 				$gren_lang$browser$Html$text(label),
-				$gren_lang$browser$Html$text('\u00A0\u00A0'),
+				$gren_lang$browser$Html$text('         '),
 				A2(
 				$gren_lang$browser$Html$br,
 				[],
@@ -5781,7 +5781,7 @@ var $author$project$Page$Triangle$view = function (model) {
 						$gren_lang$browser$Svg$feOffset,
 						[
 							$gren_lang$browser$Svg$Attributes$dx('0'),
-							$gren_lang$browser$Svg$Attributes$dy('0.666')
+							$gren_lang$browser$Svg$Attributes$dy('1')
 						],
 						[]),
 						A2(
@@ -5804,7 +5804,7 @@ var $author$project$Page$Triangle$view = function (model) {
 						$gren_lang$browser$Svg$feFlood,
 						[
 							$gren_lang$browser$Svg$Attributes$floodColor('black'),
-							$gren_lang$browser$Svg$Attributes$floodOpacity('0.5'),
+							$gren_lang$browser$Svg$Attributes$floodOpacity('0.4'),
 							$gren_lang$browser$Svg$Attributes$result('color')
 						],
 						[]),
@@ -5831,7 +5831,8 @@ var $author$project$Page$Triangle$view = function (model) {
 					[
 						$gren_lang$browser$Svg$Attributes$fill('white'),
 						$gren_lang$browser$Svg$Attributes$stroke('white'),
-						$gren_lang$browser$Svg$Attributes$points('150,50 590,340 150,340 150,230 197,230 200,227 200,188 197,185 150,185'),
+						$gren_lang$browser$Svg$Attributes$points(
+						A2($author$project$Page$Triangle$getButtonExists, res.a, model.a) ? '150,50 590,335 150,335 150,230 197,230 200,227 200,188 197,185 150,185' : '150,50 590,335 150,335 150,230 162,230 165,227 165,188 162,185 150,185'),
 						A2($gren_lang$browser$Html$Attributes$style, 'filter', 'url(#inset-shadow)'),
 						$gren_lang$browser$Svg$Attributes$strokeLinejoin('round'),
 						$gren_lang$browser$Svg$Attributes$strokeWidth('5')
