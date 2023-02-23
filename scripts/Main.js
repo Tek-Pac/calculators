@@ -5706,7 +5706,7 @@ var $author$project$Page$Triangle$view = function (model) {
 							var _v11 = parsedModel.c;
 							var theta_d = parsedModel.theta.a;
 							var theta = $gren_lang$core$Math$degrees(theta_d);
-							var c = b / $gren_lang$core$Math$tan(theta);
+							var c = b / $gren_lang$core$Math$cos(theta);
 							var a = b * $gren_lang$core$Math$tan(theta);
 							return _Utils_update(
 								emptyResult,
@@ -5843,7 +5843,7 @@ var $author$project$Page$Triangle$view = function (model) {
 					$author$project$Page$Triangle$makeInput(
 					{calcVal: res.b, currTxt: model.b, idTxt: 'b', label: 'B', stepV: 0.1, updateMsg: $author$project$Page$Triangle$UpdateB, w: 200, xI: 370, yI: 400 - 30}),
 					$author$project$Page$Triangle$makeInput(
-					{calcVal: res.c, currTxt: model.c, idTxt: 'c', label: 'C', stepV: 0.1, updateMsg: $author$project$Page$Triangle$UpdateC, w: 200, xI: 400, yI: 120}),
+					{calcVal: res.c, currTxt: model.c, idTxt: 'c', label: 'C', stepV: 0.1, updateMsg: $author$project$Page$Triangle$UpdateC, w: 200, xI: 450, yI: 150}),
 					$author$project$Page$Triangle$makeInput(
 					{calcVal: res.theta, currTxt: model.theta, idTxt: 'theta', label: 'θ', stepV: 0.1, updateMsg: $author$project$Page$Triangle$UpdateTheta, w: 150, xI: 475, yI: 310})
 				]),

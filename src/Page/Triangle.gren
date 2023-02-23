@@ -250,7 +250,7 @@ view model =
                             b * Math.tan theta
 
                         c =
-                            b / Math.tan theta
+                            b / Math.cos theta
                     in
                     { emptyResult
                         | a = formatF a
@@ -377,8 +377,8 @@ view model =
                     , calcVal = res.c
                     , currTxt = model.c
                     , updateMsg = UpdateC
-                    , xI = 400
-                    , yI = 120
+                    , xI = 450
+                    , yI = 150
                     , w = 200
                     }
                 , makeInput
