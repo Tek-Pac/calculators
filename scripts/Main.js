@@ -5351,9 +5351,6 @@ var $author$project$Page$KFactor$view = function (model) {
 		title: 'K Factors'
 	};
 };
-var $author$project$Page$Triangle$DoCopy = function (a) {
-	return {$: 'DoCopy', a: a};
-};
 var $author$project$Page$Triangle$HomePage = {$: 'HomePage'};
 var $author$project$Page$Triangle$UpdateA = function (a) {
 	return {$: 'UpdateA', a: a};
@@ -5368,14 +5365,202 @@ var $author$project$Page$Triangle$UpdateTheta = function (a) {
 	return {$: 'UpdateTheta', a: a};
 };
 var $gren_lang$core$Math$acos = _Math_acos;
+var $gren_lang$core$Result$andThen = F2(
+	function (callback, result) {
+		if (result.$ === 'Ok') {
+			var value = result.a;
+			return callback(value);
+		} else {
+			var msg = result.a;
+			return $gren_lang$core$Result$Err(msg);
+		}
+	});
 var $gren_lang$core$Math$asin = _Math_asin;
 var $gren_lang$core$Math$atan = _Math_atan;
 var $gren_lang$core$Math$cos = _Math_cos;
 var $gren_lang$core$Math$degrees = function (angleInDegrees) {
 	return (angleInDegrees * $gren_lang$core$Math$pi) / 180;
 };
+var $gren_lang$browser$VirtualDom$attribute = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var $gren_lang$browser$Svg$Attributes$dx = $gren_lang$browser$VirtualDom$attribute('dx');
+var $gren_lang$browser$Svg$Attributes$dy = $gren_lang$browser$VirtualDom$attribute('dy');
+var $gren_lang$browser$VirtualDom$nodeNS = function (tag) {
+	return _VirtualDom_nodeNS(
+		_VirtualDom_noScript(tag));
+};
+var $gren_lang$browser$Svg$trustedNode = $gren_lang$browser$VirtualDom$nodeNS('http://www.w3.org/2000/svg');
+var $gren_lang$browser$Svg$feComposite = $gren_lang$browser$Svg$trustedNode('feComposite');
+var $gren_lang$browser$Svg$feFlood = $gren_lang$browser$Svg$trustedNode('feFlood');
+var $gren_lang$browser$Svg$feGaussianBlur = $gren_lang$browser$Svg$trustedNode('feGaussianBlur');
+var $gren_lang$browser$Svg$feOffset = $gren_lang$browser$Svg$trustedNode('feOffset');
+var $gren_lang$browser$Svg$Attributes$fill = $gren_lang$browser$VirtualDom$attribute('fill');
+var $gren_lang$browser$Svg$filter = $gren_lang$browser$Svg$trustedNode('filter');
+var $gren_lang$browser$Svg$Attributes$floodColor = $gren_lang$browser$VirtualDom$attribute('flood-color');
+var $gren_lang$browser$Svg$Attributes$floodOpacity = $gren_lang$browser$VirtualDom$attribute('flood-opacity');
+var $gren_lang$core$Basics$ge = _Utils_ge;
+var $gren_lang$core$Basics$gt = _Utils_gt;
+var $gren_lang$browser$Svg$Attributes$height = $gren_lang$browser$VirtualDom$attribute('height');
+var $gren_lang$browser$Svg$Attributes$in2 = $gren_lang$browser$VirtualDom$attribute('in2');
+var $gren_lang$browser$Svg$Attributes$in_ = $gren_lang$browser$VirtualDom$attribute('in');
+var $author$project$Page$Triangle$DoCopy = function (a) {
+	return {$: 'DoCopy', a: a};
+};
+var $gren_lang$browser$Svg$foreignObject = $gren_lang$browser$Svg$trustedNode('foreignObject');
+var $gren_lang$core$Basics$isInfinite = _Basics_isInfinite;
+var $gren_lang$core$Basics$isNaN = _Basics_isNaN;
+var $author$project$Page$Triangle$getButtonExists = F2(
+	function (calcVal, currTxt) {
+		if (calcVal.$ === 'Just') {
+			var t = calcVal.a;
+			return ($gren_lang$core$Basics$isNaN(t) || $gren_lang$core$Basics$isInfinite(t)) ? false : true;
+		} else {
+			return $gren_lang$core$String$isEmpty(currTxt) ? false : true;
+		}
+	});
+var $gren_lang$core$Basics$idiv = _Basics_idiv;
+var $gren_lang$browser$VirtualDom$style = _VirtualDom_style;
+var $gren_lang$browser$Html$Attributes$style = $gren_lang$browser$VirtualDom$style;
+var $gren_lang$browser$Svg$Attributes$width = $gren_lang$browser$VirtualDom$attribute('width');
+var $gren_lang$browser$Svg$Attributes$x = $gren_lang$browser$VirtualDom$attribute('x');
+var $gren_lang$browser$Svg$Attributes$y = $gren_lang$browser$VirtualDom$attribute('y');
+var $author$project$Page$Triangle$makeInput = function (_v0) {
+	var label = _v0.label;
+	var idTxt = _v0.idTxt;
+	var stepV = _v0.stepV;
+	var calcVal = _v0.calcVal;
+	var currTxt = _v0.currTxt;
+	var updateMsg = _v0.updateMsg;
+	var xI = _v0.xI;
+	var yI = _v0.yI;
+	var w = _v0.w;
+	var inputAttArr = [
+		$gren_lang$browser$Html$Attributes$id(idTxt),
+		$gren_lang$browser$Html$Attributes$type_('number'),
+		$gren_lang$browser$Html$Attributes$step(
+		$gren_lang$core$String$fromFloat(stepV)),
+		A2(
+		$gren_lang$browser$Html$Attributes$style,
+		'width',
+		$gren_lang$core$String$fromInt(w - 55) + 'px')
+	];
+	return A2(
+		$gren_lang$browser$Svg$foreignObject,
+		[
+			$gren_lang$browser$Svg$Attributes$width(
+			$gren_lang$core$String$fromInt(w)),
+			$gren_lang$browser$Svg$Attributes$height('60'),
+			$gren_lang$browser$Svg$Attributes$x(
+			$gren_lang$core$String$fromInt(xI - ((w / 2) | 0))),
+			$gren_lang$browser$Svg$Attributes$y(
+			$gren_lang$core$String$fromInt(yI - 30))
+		],
+		[
+			A2(
+			$gren_lang$browser$Html$div,
+			[],
+			[
+				$gren_lang$browser$Html$text(label),
+				$gren_lang$browser$Html$text('\u00A0\u00A0'),
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
+				function () {
+				if (calcVal.$ === 'Just') {
+					var t = calcVal.a;
+					return A2(
+						$gren_lang$browser$Html$input,
+						_Utils_ap(
+							[
+								$gren_lang$browser$Html$Attributes$value(
+								$gren_lang$core$String$fromFloat(t)),
+								$gren_lang$browser$Html$Attributes$readonly(true)
+							],
+							inputAttArr),
+						[]);
+				} else {
+					return A2(
+						$gren_lang$browser$Html$input,
+						_Utils_ap(
+							[
+								$gren_lang$browser$Html$Attributes$value(currTxt),
+								$gren_lang$browser$Html$Events$onInput(updateMsg)
+							],
+							inputAttArr),
+						[]);
+				}
+			}(),
+				function () {
+				if (A2($author$project$Page$Triangle$getButtonExists, calcVal, currTxt)) {
+					if (calcVal.$ === 'Just') {
+						var t = calcVal.a;
+						return A2(
+							$gren_lang$browser$Html$button,
+							[
+								$gren_lang$browser$Html$Events$onClick(
+								$author$project$Page$Triangle$DoCopy(idTxt))
+							],
+							[
+								$gren_lang$browser$Html$text('📋')
+							]);
+					} else {
+						return A2(
+							$gren_lang$browser$Html$button,
+							[
+								$gren_lang$browser$Html$Events$onClick(
+								updateMsg(''))
+							],
+							[
+								$gren_lang$browser$Html$text('❌')
+							]);
+					}
+				} else {
+					return A2(
+						$gren_lang$browser$Html$button,
+						[
+							A2($gren_lang$browser$Html$Attributes$style, 'pointer-events', 'none'),
+							A2($gren_lang$browser$Html$Attributes$style, 'visibility', 'hidden')
+						],
+						[
+							$gren_lang$browser$Html$text('🔄️')
+						]);
+				}
+			}()
+			])
+		]);
+};
+var $gren_lang$core$Maybe$map2 = F3(
+	function (func, ma, mb) {
+		if (ma.$ === 'Nothing') {
+			return $gren_lang$core$Maybe$Nothing;
+		} else {
+			var a = ma.a;
+			if (mb.$ === 'Nothing') {
+				return $gren_lang$core$Maybe$Nothing;
+			} else {
+				var b = mb.a;
+				return $gren_lang$core$Maybe$Just(
+					A2(func, a, b));
+			}
+		}
+	});
+var $gren_lang$browser$Svg$Attributes$operator = $gren_lang$browser$VirtualDom$attribute('operator');
+var $gren_lang$browser$Svg$Attributes$points = $gren_lang$browser$VirtualDom$attribute('points');
+var $gren_lang$browser$Svg$polygon = $gren_lang$browser$Svg$trustedNode('polygon');
+var $gren_lang$browser$Svg$Attributes$result = $gren_lang$browser$VirtualDom$attribute('result');
 var $gren_lang$core$Math$sin = _Math_sin;
 var $gren_lang$core$Math$sqrt = _Math_sqrt;
+var $gren_lang$browser$Svg$Attributes$stdDeviation = $gren_lang$browser$VirtualDom$attribute('stdDeviation');
+var $gren_lang$browser$Svg$Attributes$stroke = $gren_lang$browser$VirtualDom$attribute('stroke');
+var $gren_lang$browser$Svg$Attributes$strokeLinejoin = $gren_lang$browser$VirtualDom$attribute('stroke-linejoin');
+var $gren_lang$browser$Svg$Attributes$strokeWidth = $gren_lang$browser$VirtualDom$attribute('stroke-width');
+var $gren_lang$browser$Svg$svg = $gren_lang$browser$Svg$trustedNode('svg');
 var $gren_lang$core$Math$tan = _Math_tan;
 var $author$project$Page$Triangle$undegrees = function (rad) {
 	return (rad * 180) / $gren_lang$core$Math$pi;
@@ -5387,85 +5572,62 @@ var $author$project$Page$Triangle$view = function (model) {
 		c: $gren_lang$core$String$toFloat(model.c),
 		theta: $gren_lang$core$String$toFloat(model.theta)
 	};
-	var makeInputDiv = F6(
-		function (txt, idTxt, stepV, calcF, modelT, msgF) {
-			return A2(
-				$gren_lang$browser$Html$div,
-				[],
-				[
-					$gren_lang$browser$Html$text(txt),
-					A2(
-					$gren_lang$browser$Html$br,
-					[],
-					[]),
-					function () {
-					if (calcF.$ === 'Just') {
-						var t = calcF.a;
-						return A2(
-							$gren_lang$browser$Html$input,
-							[
-								$gren_lang$browser$Html$Attributes$value(
-								$gren_lang$core$String$fromFloat(t)),
-								$gren_lang$browser$Html$Attributes$readonly(true),
-								$gren_lang$browser$Html$Attributes$id(idTxt),
-								$gren_lang$browser$Html$Attributes$type_('number'),
-								$gren_lang$browser$Html$Attributes$step(stepV)
-							],
-							[]);
+	var error = A2(
+		$gren_lang$core$Result$andThen,
+		function (_v19) {
+			var _v20 = A3($gren_lang$core$Maybe$map2, $gren_lang$core$Basics$gt, parsedModel.b, parsedModel.c);
+			if ((_v20.$ === 'Just') && _v20.a) {
+				return $gren_lang$core$Result$Err('error: B should be less than C');
+			} else {
+				return $gren_lang$core$Result$Ok(
+					{});
+			}
+		},
+		A2(
+			$gren_lang$core$Result$andThen,
+			function (_v17) {
+				var _v18 = A3($gren_lang$core$Maybe$map2, $gren_lang$core$Basics$gt, parsedModel.a, parsedModel.c);
+				if ((_v18.$ === 'Just') && _v18.a) {
+					return $gren_lang$core$Result$Err('error: A should be less than C');
+				} else {
+					return $gren_lang$core$Result$Ok(
+						{});
+				}
+			},
+			A2(
+				$gren_lang$core$Result$andThen,
+				function (_v15) {
+					var _v16 = parsedModel.theta;
+					if (_v16.$ === 'Just') {
+						var theta = _v16.a;
+						return ((theta <= 0) || (theta >= 90)) ? $gren_lang$core$Result$Err('error: θ should be between 0 and 90 degrees') : $gren_lang$core$Result$Ok(
+							{});
 					} else {
-						return A2(
-							$gren_lang$browser$Html$input,
-							[
-								$gren_lang$browser$Html$Attributes$value(modelT),
-								$gren_lang$browser$Html$Events$onInput(msgF),
-								$gren_lang$browser$Html$Attributes$id(idTxt),
-								$gren_lang$browser$Html$Attributes$type_('number'),
-								$gren_lang$browser$Html$Attributes$step(stepV)
-							],
-							[]);
+						return $gren_lang$core$Result$Ok(
+							{});
 					}
-				}(),
-					function () {
-					if (calcF.$ === 'Just') {
-						var t = calcF.a;
-						return A2(
-							$gren_lang$browser$Html$button,
-							[
-								$gren_lang$browser$Html$Events$onClick(
-								$author$project$Page$Triangle$DoCopy(idTxt))
-							],
-							[
-								$gren_lang$browser$Html$text('📋')
-							]);
-					} else {
-						return $gren_lang$core$String$isEmpty(modelT) ? $gren_lang$browser$Html$text('') : A2(
-							$gren_lang$browser$Html$button,
-							[
-								$gren_lang$browser$Html$Events$onClick(
-								msgF(''))
-							],
-							[
-								$gren_lang$browser$Html$text('❌')
-							]);
-					}
-				}()
-				]);
-		});
+				},
+				$gren_lang$core$Result$Ok(
+					{}))));
 	var formatF = function (value) {
-		return $gren_lang$core$Maybe$Just(
-			$gren_lang$core$Math$round(value * 1000000) / 1000000);
+		if (error.$ === 'Err') {
+			return $gren_lang$core$Maybe$Just(0 / 0);
+		} else {
+			return $gren_lang$core$Maybe$Just(
+				$gren_lang$core$Math$round(value * 1000000) / 1000000);
+		}
 	};
 	var emptyResult = {a: $gren_lang$core$Maybe$Nothing, b: $gren_lang$core$Maybe$Nothing, c: $gren_lang$core$Maybe$Nothing, theta: $gren_lang$core$Maybe$Nothing};
 	var res = function () {
-		_v0$6:
+		_v1$6:
 		while (true) {
 			if (parsedModel.a.$ === 'Just') {
 				if (parsedModel.b.$ === 'Just') {
 					if ((parsedModel.c.$ === 'Nothing') && (parsedModel.theta.$ === 'Nothing')) {
 						var a = parsedModel.a.a;
 						var b = parsedModel.b.a;
-						var _v1 = parsedModel.c;
-						var _v2 = parsedModel.theta;
+						var _v2 = parsedModel.c;
+						var _v3 = parsedModel.theta;
 						var theta = $gren_lang$core$Math$atan(a / b);
 						var c = $gren_lang$core$Math$sqrt((a * a) + (b * b));
 						return _Utils_update(
@@ -5476,15 +5638,15 @@ var $author$project$Page$Triangle$view = function (model) {
 									$author$project$Page$Triangle$undegrees(theta))
 							});
 					} else {
-						break _v0$6;
+						break _v1$6;
 					}
 				} else {
 					if (parsedModel.c.$ === 'Just') {
 						if (parsedModel.theta.$ === 'Nothing') {
 							var a = parsedModel.a.a;
-							var _v3 = parsedModel.b;
+							var _v4 = parsedModel.b;
 							var c = parsedModel.c.a;
-							var _v4 = parsedModel.theta;
+							var _v5 = parsedModel.theta;
 							var theta = $gren_lang$core$Math$asin(a / c);
 							var b = c * $gren_lang$core$Math$cos(theta);
 							return _Utils_update(
@@ -5495,13 +5657,13 @@ var $author$project$Page$Triangle$view = function (model) {
 										$author$project$Page$Triangle$undegrees(theta))
 								});
 						} else {
-							break _v0$6;
+							break _v1$6;
 						}
 					} else {
 						if (parsedModel.theta.$ === 'Just') {
 							var a = parsedModel.a.a;
-							var _v5 = parsedModel.b;
-							var _v6 = parsedModel.c;
+							var _v6 = parsedModel.b;
+							var _v7 = parsedModel.c;
 							var theta_d = parsedModel.theta.a;
 							var theta = $gren_lang$core$Math$degrees(theta_d);
 							var c = a / $gren_lang$core$Math$sin(theta);
@@ -5513,7 +5675,7 @@ var $author$project$Page$Triangle$view = function (model) {
 									c: formatF(c)
 								});
 						} else {
-							break _v0$6;
+							break _v1$6;
 						}
 					}
 				}
@@ -5521,10 +5683,10 @@ var $author$project$Page$Triangle$view = function (model) {
 				if (parsedModel.b.$ === 'Just') {
 					if (parsedModel.c.$ === 'Just') {
 						if (parsedModel.theta.$ === 'Nothing') {
-							var _v7 = parsedModel.a;
+							var _v8 = parsedModel.a;
 							var b = parsedModel.b.a;
 							var c = parsedModel.c.a;
-							var _v8 = parsedModel.theta;
+							var _v9 = parsedModel.theta;
 							var theta = $gren_lang$core$Math$acos(b / c);
 							var a = c * $gren_lang$core$Math$sin(theta);
 							return _Utils_update(
@@ -5535,13 +5697,13 @@ var $author$project$Page$Triangle$view = function (model) {
 										$author$project$Page$Triangle$undegrees(theta))
 								});
 						} else {
-							break _v0$6;
+							break _v1$6;
 						}
 					} else {
 						if (parsedModel.theta.$ === 'Just') {
-							var _v9 = parsedModel.a;
+							var _v10 = parsedModel.a;
 							var b = parsedModel.b.a;
-							var _v10 = parsedModel.c;
+							var _v11 = parsedModel.c;
 							var theta_d = parsedModel.theta.a;
 							var theta = $gren_lang$core$Math$degrees(theta_d);
 							var c = b / $gren_lang$core$Math$tan(theta);
@@ -5553,13 +5715,13 @@ var $author$project$Page$Triangle$view = function (model) {
 									c: formatF(c)
 								});
 						} else {
-							break _v0$6;
+							break _v1$6;
 						}
 					}
 				} else {
 					if ((parsedModel.c.$ === 'Just') && (parsedModel.theta.$ === 'Just')) {
-						var _v11 = parsedModel.a;
-						var _v12 = parsedModel.b;
+						var _v12 = parsedModel.a;
+						var _v13 = parsedModel.b;
 						var c = parsedModel.c.a;
 						var theta_d = parsedModel.theta.a;
 						var theta = $gren_lang$core$Math$degrees(theta_d);
@@ -5572,7 +5734,7 @@ var $author$project$Page$Triangle$view = function (model) {
 								b: formatF(b)
 							});
 					} else {
-						break _v0$6;
+						break _v1$6;
 					}
 				}
 			}
@@ -5598,10 +5760,107 @@ var $author$project$Page$Triangle$view = function (model) {
 			],
 			[
 				$gren_lang$browser$Html$text('Triangles'),
-				A6(makeInputDiv, 'A:', 'a', '0.1', res.a, model.a, $author$project$Page$Triangle$UpdateA),
-				A6(makeInputDiv, 'B:', 'b', '0.1', res.b, model.b, $author$project$Page$Triangle$UpdateB),
-				A6(makeInputDiv, 'C:', 'c', '0.1', res.c, model.c, $author$project$Page$Triangle$UpdateC),
-				A6(makeInputDiv, 'Theta:', 'theta', '0.1', res.theta, model.theta, $author$project$Page$Triangle$UpdateTheta)
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
+				A2(
+				$gren_lang$browser$Svg$svg,
+				[
+					$gren_lang$browser$Svg$Attributes$width('600'),
+					$gren_lang$browser$Svg$Attributes$height('400')
+				],
+				[
+					A2(
+					$gren_lang$browser$Svg$filter,
+					[
+						$gren_lang$browser$Html$Attributes$id('inset-shadow')
+					],
+					[
+						A2(
+						$gren_lang$browser$Svg$feOffset,
+						[
+							$gren_lang$browser$Svg$Attributes$dx('0'),
+							$gren_lang$browser$Svg$Attributes$dy('0.666')
+						],
+						[]),
+						A2(
+						$gren_lang$browser$Svg$feGaussianBlur,
+						[
+							$gren_lang$browser$Svg$Attributes$stdDeviation('2'),
+							$gren_lang$browser$Svg$Attributes$result('offset-blur')
+						],
+						[]),
+						A2(
+						$gren_lang$browser$Svg$feComposite,
+						[
+							$gren_lang$browser$Svg$Attributes$operator('out'),
+							$gren_lang$browser$Svg$Attributes$in_('SourceGraphic'),
+							$gren_lang$browser$Svg$Attributes$in2('offset-blur'),
+							$gren_lang$browser$Svg$Attributes$result('inverse')
+						],
+						[]),
+						A2(
+						$gren_lang$browser$Svg$feFlood,
+						[
+							$gren_lang$browser$Svg$Attributes$floodColor('black'),
+							$gren_lang$browser$Svg$Attributes$floodOpacity('0.5'),
+							$gren_lang$browser$Svg$Attributes$result('color')
+						],
+						[]),
+						A2(
+						$gren_lang$browser$Svg$feComposite,
+						[
+							$gren_lang$browser$Svg$Attributes$operator('in'),
+							$gren_lang$browser$Svg$Attributes$in_('color'),
+							$gren_lang$browser$Svg$Attributes$in2('inverse'),
+							$gren_lang$browser$Svg$Attributes$result('shadow')
+						],
+						[]),
+						A2(
+						$gren_lang$browser$Svg$feComposite,
+						[
+							$gren_lang$browser$Svg$Attributes$operator('over'),
+							$gren_lang$browser$Svg$Attributes$in_('shadow'),
+							$gren_lang$browser$Svg$Attributes$in2('SourceGraphic')
+						],
+						[])
+					]),
+					A2(
+					$gren_lang$browser$Svg$polygon,
+					[
+						$gren_lang$browser$Svg$Attributes$fill('white'),
+						$gren_lang$browser$Svg$Attributes$stroke('white'),
+						$gren_lang$browser$Svg$Attributes$points('150,50 590,340 150,340 150,230 197,230 200,227 200,188 197,185 150,185'),
+						A2($gren_lang$browser$Html$Attributes$style, 'filter', 'url(#inset-shadow)'),
+						$gren_lang$browser$Svg$Attributes$strokeLinejoin('round'),
+						$gren_lang$browser$Svg$Attributes$strokeWidth('5')
+					],
+					[]),
+					$author$project$Page$Triangle$makeInput(
+					{calcVal: res.a, currTxt: model.a, idTxt: 'a', label: 'A', stepV: 0.1, updateMsg: $author$project$Page$Triangle$UpdateA, w: 200, xI: 100, yI: 200}),
+					$author$project$Page$Triangle$makeInput(
+					{calcVal: res.b, currTxt: model.b, idTxt: 'b', label: 'B', stepV: 0.1, updateMsg: $author$project$Page$Triangle$UpdateB, w: 200, xI: 370, yI: 400 - 30}),
+					$author$project$Page$Triangle$makeInput(
+					{calcVal: res.c, currTxt: model.c, idTxt: 'c', label: 'C', stepV: 0.1, updateMsg: $author$project$Page$Triangle$UpdateC, w: 200, xI: 400, yI: 120}),
+					$author$project$Page$Triangle$makeInput(
+					{calcVal: res.theta, currTxt: model.theta, idTxt: 'theta', label: 'θ', stepV: 0.1, updateMsg: $author$project$Page$Triangle$UpdateTheta, w: 150, xI: 475, yI: 310})
+				]),
+				function () {
+				if (error.$ === 'Err') {
+					var e = error.a;
+					return A2(
+						$gren_lang$browser$Html$div,
+						[
+							$gren_lang$browser$Html$Attributes$class('center')
+						],
+						[
+							$gren_lang$browser$Html$text(e)
+						]);
+				} else {
+					return $gren_lang$browser$Html$text('');
+				}
+			}()
 			])
 		],
 		title: 'Triangles'
