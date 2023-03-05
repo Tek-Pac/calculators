@@ -4520,7 +4520,6 @@ var $author$project$Main$hashToUrl = function (str) {
 		$gren_lang$url$Url$fromString(trimmedStr));
 };
 var $author$project$Page$Home$init = {};
-var $author$project$Page$Triangle$init = {a: '', b: '', c: '', theta: ''};
 var $gren_lang$url$Url$Parser$Parser = function (a) {
 	return {$: 'Parser', a: a};
 };
@@ -5337,6 +5336,38 @@ var $author$project$Page$KFactor$queryParser = A8(
 				{key: 'ba', value: $author$project$Page$KFactor$BendAllowance},
 				{key: 'xa', value: $author$project$Page$KFactor$ExtraAllowance}
 			])));
+var $author$project$Page$Triangle$finishParse = F4(
+	function (a, b, c, theta) {
+		return {
+			a: A2($gren_lang$core$Maybe$withDefault, '', a),
+			b: A2($gren_lang$core$Maybe$withDefault, '', b),
+			c: A2($gren_lang$core$Maybe$withDefault, '', c),
+			theta: A2($gren_lang$core$Maybe$withDefault, '', theta)
+		};
+	});
+var $gren_lang$url$Url$Parser$Query$map4 = F5(
+	function (func, _v0, _v1, _v2, _v3) {
+		var a = _v0.a;
+		var b = _v1.a;
+		var c = _v2.a;
+		var d = _v3.a;
+		return $gren_lang$url$Url$Parser$Internal$Parser(
+			function (dict) {
+				return A4(
+					func,
+					a(dict),
+					b(dict),
+					c(dict),
+					d(dict));
+			});
+	});
+var $author$project$Page$Triangle$queryParser = A5(
+	$gren_lang$url$Url$Parser$Query$map4,
+	$author$project$Page$Triangle$finishParse,
+	$gren_lang$url$Url$Parser$Query$string('a'),
+	$gren_lang$url$Url$Parser$Query$string('b'),
+	$gren_lang$url$Url$Parser$Query$string('c'),
+	$gren_lang$url$Url$Parser$Query$string('theta'));
 var $gren_lang$url$Url$Parser$query = function (_v0) {
 	var queryParser = _v0.a;
 	return $gren_lang$url$Url$Parser$Parser(
@@ -5430,8 +5461,11 @@ var $author$project$Main$urlToModel = function (path) {
 						$author$project$Page$KFactor$queryParser)),
 					A2(
 					$gren_lang$url$Url$Parser$map,
-					$author$project$Main$TriangleModel($author$project$Page$Triangle$init),
-					$gren_lang$url$Url$Parser$s('triangle'))
+					$author$project$Main$TriangleModel,
+					A2(
+						$gren_lang$url$Url$Parser$questionMark,
+						$gren_lang$url$Url$Parser$s('triangle'),
+						$author$project$Page$Triangle$queryParser))
 				]),
 			url));
 };
@@ -5532,6 +5566,14 @@ var $author$project$Page$KFactor$queryBuilder = function (model) {
 		}())
 	];
 };
+var $author$project$Page$Triangle$queryBuilder = function (model) {
+	return [
+		A2($gren_lang$url$Url$Builder$string, 'a', model.a),
+		A2($gren_lang$url$Url$Builder$string, 'b', model.b),
+		A2($gren_lang$url$Url$Builder$string, 'c', model.c),
+		A2($gren_lang$url$Url$Builder$string, 'theta', model.theta)
+	];
+};
 var $author$project$Main$modelToUrl = function (model) {
 	return '#' + A2(
 		$gren_lang$url$Url$Builder$absolute,
@@ -5550,7 +5592,8 @@ var $author$project$Main$modelToUrl = function (model) {
 				case 'HomeModel':
 					return [];
 				case 'TriangleModel':
-					return [];
+					var t = model.a;
+					return $author$project$Page$Triangle$queryBuilder(t);
 				default:
 					var k = model.a;
 					return $author$project$Page$KFactor$queryBuilder(k);

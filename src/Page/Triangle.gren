@@ -1,4 +1,4 @@
-module Page.Triangle exposing ( Model, Msg(..), init, update, view )
+module Page.Triangle exposing ( Model, Msg(..), update, view, queryParser, queryBuilder )
 
 {-| The triangle calculator page
 -}
@@ -13,6 +13,31 @@ import SpaCmd exposing ( SpaCmd(..) )
 import Svg exposing ( Svg, foreignObject, polygon, svg, filter, feGaussianBlur, feComposite, feFlood, feOffset )
 import Svg.Attributes exposing ( fill, height, points, stroke, viewBox, width, x, y, in_, in2, operator, result, strokeWidth, strokeLinejoin, floodOpacity, floodColor, stdDeviation, dx, dy )
 import Task
+import Url.Builder as Builder
+import Url.Parser.Query as Query
+
+
+queryParser : Query.Parser Model
+queryParser =
+    Query.map4 finishParse (Query.string "a") (Query.string "b") (Query.string "c") (Query.string "theta")
+
+
+finishParse : Maybe String -> Maybe String -> Maybe String -> Maybe String -> Model
+finishParse a b c theta =
+    { a = Maybe.withDefault "" a
+    , b = Maybe.withDefault "" b
+    , c = Maybe.withDefault "" c
+    , theta = Maybe.withDefault "" theta
+    }
+
+
+queryBuilder : Model -> Array Builder.QueryParameter
+queryBuilder model =
+    [ Builder.string "a" model.a
+    , Builder.string "b" model.b
+    , Builder.string "c" model.c
+    , Builder.string "theta" model.theta
+    ]
 
 
 type alias Model =
@@ -26,15 +51,6 @@ type alias Model =
 type alias Updated =
     { model : Model
     , command : SpaCmd Msg
-    }
-
-
-init : Model
-init =
-    { a = ""
-    , b = ""
-    , c = ""
-    , theta = ""
     }
 
 

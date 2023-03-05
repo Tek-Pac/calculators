@@ -217,7 +217,7 @@ urlToModel path =
         (Parser.oneOf
             [ Parser.map (HomeModel Home.init) Parser.top
             , Parser.map KFactorModel (Parser.s "k-factor" <?> KFactor.queryParser)
-            , Parser.map (TriangleModel Triangle.init) (Parser.s "triangle")
+            , Parser.map TriangleModel (Parser.s "triangle" <?> Triangle.queryParser)
             ]
         )
         url
@@ -244,8 +244,8 @@ modelToUrl model =
                     HomeModel _ ->
                         []
 
-                    TriangleModel _ ->
-                        []
+                    TriangleModel t ->
+                        Triangle.queryBuilder t
 
                     KFactorModel k ->
                         KFactor.queryBuilder k
