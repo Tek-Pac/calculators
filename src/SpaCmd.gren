@@ -1,11 +1,10 @@
 module SpaCmd exposing (..)
 
-import PageId exposing ( PageId )
 
 
 type SpaCmd msg
     = BaseCmd (Cmd msg)
-    | ChangePage PageId
+    | ChangePage String
     | CopyId String
 
 
@@ -17,8 +16,8 @@ none =
 map : (a -> msg) -> SpaCmd a -> SpaCmd msg
 map f msg =
     case msg of
-        ChangePage id ->
-            ChangePage id
+        ChangePage url ->
+            ChangePage url
 
         CopyId id ->
             CopyId id

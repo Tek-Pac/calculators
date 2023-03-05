@@ -7,7 +7,6 @@ import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import PageId
 import SpaCmd exposing ( SpaCmd(..) )
 
 
@@ -61,10 +60,10 @@ update msg model =
     case msg of
         GoToKFactor ->
             { model = model
-            , command = ChangePage PageId.KFactor
+            , command = ChangePage "#/k-factor"
             }
 
         GoToTriangle ->
             { model = model
-            , command = ChangePage PageId.Triangle
+            , command = ChangePage "#/triangle"
             }

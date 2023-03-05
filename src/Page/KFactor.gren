@@ -1,17 +1,75 @@
-module Page.KFactor exposing ( Model, Msg(..), init, update, view )
+module Page.KFactor exposing ( Model, Msg(..), init, update, view, queryParser, queryBuilder )
 
 {-| The k factor page
 -}
 
 import Browser
 import Browser.Dom as Dom
+import Dict
 import Html exposing ( button, Html, text, input, div, br )
 import Html.Attributes exposing ( class, step, type_, id, value, readonly )
 import Html.Events exposing ( onClick, onInput )
 import Math
-import PageId
 import SpaCmd exposing ( SpaCmd(..) )
 import Task
+import Url.Builder as Builder
+import Url.Parser.Query as Query
+
+
+queryParser : Query.Parser Model
+queryParser =
+    Query.map7
+        finishParse
+        (Query.string "t")
+        (Query.string "r")
+        (Query.string "ba")
+        (Query.string "a")
+        (Query.string "k")
+        (Query.string "xa")
+        (Query.enum
+            "ty"
+            (Dict.fromArray
+                [ { key = "ba"
+                  , value = BendAllowance
+                  }
+                , { key = "xa"
+                  , value = ExtraAllowance
+                  }
+                ]
+            )
+        )
+
+
+finishParse : Maybe String -> Maybe String -> Maybe String -> Maybe String -> Maybe String -> Maybe String -> Maybe Ty -> Model
+finishParse t r ba a k xa ty =
+    { t = Maybe.withDefault init.t t
+    , r = Maybe.withDefault init.r r
+    , ba = Maybe.withDefault init.ba ba
+    , a = Maybe.withDefault init.a a
+    , k = Maybe.withDefault init.k k
+    , xa = Maybe.withDefault init.xa xa
+    , ty = Maybe.withDefault init.ty ty
+    }
+
+
+queryBuilder : Model -> Array Builder.QueryParameter
+queryBuilder model =
+    [ Builder.string "t" model.t
+    , Builder.string "r" model.r
+    , Builder.string "ba" model.ba
+    , Builder.string "a" model.a
+    , Builder.string "k" model.k
+    , Builder.string "xa" model.xa
+    , Builder.string
+        "ty"
+        (case model.ty of
+            BendAllowance ->
+                "ba"
+
+            ExtraAllowance ->
+                "xa"
+        )
+    ]
 
 
 type alias Model =
@@ -77,7 +135,7 @@ update msg model =
 
         HomePage ->
             { model = model
-            , command = ChangePage PageId.Home
+            , command = ChangePage "#/"
             }
 
         UpdateThickness s ->

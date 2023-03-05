@@ -3943,6 +3943,23 @@ function _Browser_load(url) {
 }
 
 
+function _Url_percentEncode(string)
+{
+	return encodeURIComponent(string);
+}
+
+function _Url_percentDecode(string)
+{
+	try
+	{
+		return $gren_lang$core$Maybe$Just(decodeURIComponent(string));
+	}
+	catch (e)
+	{
+		return $gren_lang$core$Maybe$Nothing;
+	}
+}
+
 // MATH
 
 var _Math_remainderBy = F2(function (b, a) {
@@ -4474,7 +4491,9 @@ var $gren_lang$core$Task$perform = F2(
 				A2($gren_lang$core$Task$map, toMessage, task)));
 	});
 var $gren_lang$browser$Browser$document = _Browser_document;
-var $author$project$PageId$Home = {$: 'Home'};
+var $gren_lang$core$Platform$Cmd$batch = _Platform_batch;
+var $gren_lang$core$Platform$Cmd$none = $gren_lang$core$Platform$Cmd$batch(
+	[]);
 var $author$project$Main$HomeModel = function (a) {
 	return {$: 'HomeModel', a: a};
 };
@@ -4483,39 +4502,6 @@ var $author$project$Main$KFactorModel = function (a) {
 };
 var $author$project$Main$TriangleModel = function (a) {
 	return {$: 'TriangleModel', a: a};
-};
-var $author$project$Page$Home$init = {};
-var $author$project$Page$KFactor$ExtraAllowance = {$: 'ExtraAllowance'};
-var $author$project$Page$KFactor$init = {a: '90', ba: '', k: '', r: '', t: '', ty: $author$project$Page$KFactor$ExtraAllowance, xa: ''};
-var $author$project$Page$Triangle$init = {a: '', b: '', c: '', theta: ''};
-var $author$project$Main$modelForPageId = function (id) {
-	switch (id.$) {
-		case 'Home':
-			return $author$project$Main$HomeModel($author$project$Page$Home$init);
-		case 'KFactor':
-			return $author$project$Main$KFactorModel($author$project$Page$KFactor$init);
-		default:
-			return $author$project$Main$TriangleModel($author$project$Page$Triangle$init);
-	}
-};
-var $gren_lang$core$Platform$Cmd$batch = _Platform_batch;
-var $gren_lang$core$Platform$Cmd$none = $gren_lang$core$Platform$Cmd$batch(
-	[]);
-var $author$project$PageId$KFactor = {$: 'KFactor'};
-var $author$project$PageId$Triangle = {$: 'Triangle'};
-var $author$project$PageId$stringToPageId = function (str) {
-	switch (str) {
-		case '':
-			return $gren_lang$core$Maybe$Just($author$project$PageId$Home);
-		case '#/':
-			return $gren_lang$core$Maybe$Just($author$project$PageId$Home);
-		case '#/k-factor':
-			return $gren_lang$core$Maybe$Just($author$project$PageId$KFactor);
-		case '#/triangle':
-			return $gren_lang$core$Maybe$Just($author$project$PageId$Triangle);
-		default:
-			return $gren_lang$core$Maybe$Nothing;
-	}
 };
 var $gren_lang$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
@@ -4526,14 +4512,933 @@ var $gren_lang$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
+var $author$project$Main$hashToUrl = function (str) {
+	var trimmedStr = 'http://localhost' + (A2($gren_lang$core$String$startsWith, '#/', str) ? A2($gren_lang$core$String$dropLeft, 1, str) : '/');
+	return A2(
+		$gren_lang$core$Maybe$withDefault,
+		{fragment: $gren_lang$core$Maybe$Nothing, host: '', path: '/', port_: $gren_lang$core$Maybe$Nothing, protocol: $gren_lang$url$Url$Http, query: $gren_lang$core$Maybe$Nothing},
+		$gren_lang$url$Url$fromString(trimmedStr));
+};
+var $author$project$Page$Home$init = {};
+var $author$project$Page$Triangle$init = {a: '', b: '', c: '', theta: ''};
+var $gren_lang$url$Url$Parser$Parser = function (a) {
+	return {$: 'Parser', a: a};
+};
+var $gren_lang$url$Url$Parser$mapState = F2(
+	function (func, _v0) {
+		var visited = _v0.visited;
+		var unvisited = _v0.unvisited;
+		var params = _v0.params;
+		var frag = _v0.frag;
+		var value = _v0.value;
+		return {
+			frag: frag,
+			params: params,
+			unvisited: unvisited,
+			value: func(value),
+			visited: visited
+		};
+	});
+var $gren_lang$url$Url$Parser$map = F2(
+	function (subValue, _v0) {
+		var parseArg = _v0.a;
+		return $gren_lang$url$Url$Parser$Parser(
+			function (_v1) {
+				var visited = _v1.visited;
+				var unvisited = _v1.unvisited;
+				var params = _v1.params;
+				var frag = _v1.frag;
+				var value = _v1.value;
+				return A2(
+					$gren_lang$core$Array$map,
+					$gren_lang$url$Url$Parser$mapState(value),
+					parseArg(
+						{frag: frag, params: params, unvisited: unvisited, value: subValue, visited: visited}));
+			});
+	});
+var $gren_lang$core$Array$prefix = _Array_append;
+var $gren_lang$core$Array$flatMap = F2(
+	function (mapper, array) {
+		return A3(
+			$gren_lang$core$Array$foldl,
+			F2(
+				function (v, acc) {
+					return A2(
+						$gren_lang$core$Array$prefix,
+						acc,
+						mapper(v));
+				}),
+			[],
+			array);
+	});
+var $gren_lang$url$Url$Parser$oneOf = function (parsers) {
+	return $gren_lang$url$Url$Parser$Parser(
+		function (state) {
+			return A2(
+				$gren_lang$core$Array$flatMap,
+				function (_v0) {
+					var parser = _v0.a;
+					return parser(state);
+				},
+				parsers);
+		});
+};
+var $gren_lang$core$Array$slice = _Array_slice;
+var $gren_lang$core$Array$dropFirst = F2(
+	function (n, array) {
+		return A3(
+			$gren_lang$core$Array$slice,
+			n,
+			$gren_lang$core$Array$length(array),
+			array);
+	});
+var $gren_lang$url$Url$Parser$getFirstMatch = function (states) {
+	getFirstMatch:
+	while (true) {
+		var _v0 = A2($gren_lang$core$Array$get, 0, states);
+		if (_v0.$ === 'Nothing') {
+			return $gren_lang$core$Maybe$Nothing;
+		} else {
+			var state = _v0.a;
+			var _v1 = state.unvisited;
+			_v1$2:
+			while (true) {
+				switch (_v1.length) {
+					case 0:
+						return $gren_lang$core$Maybe$Just(state.value);
+					case 1:
+						if (_v1[0] === '') {
+							return $gren_lang$core$Maybe$Just(state.value);
+						} else {
+							break _v1$2;
+						}
+					default:
+						break _v1$2;
+				}
+			}
+			var $temp$states = A2($gren_lang$core$Array$dropFirst, 1, states);
+			states = $temp$states;
+			continue getFirstMatch;
+		}
+	}
+};
+var $gren_lang$url$Url$Parser$removeFinalEmpty = function (segments) {
+	var _v0 = A2($gren_lang$core$Array$get, 0, segments);
+	if (_v0.$ === 'Nothing') {
+		return [];
+	} else {
+		if (_v0.a === '') {
+			return [];
+		} else {
+			var segment = _v0.a;
+			return _Utils_ap(
+				[segment],
+				$gren_lang$url$Url$Parser$removeFinalEmpty(
+					A2($gren_lang$core$Array$dropFirst, 1, segments)));
+		}
+	}
+};
+var $gren_lang$url$Url$Parser$preparePath = function (path) {
+	var segments = A2($gren_lang$core$String$split, '/', path);
+	var _v0 = A2($gren_lang$core$Array$get, 0, segments);
+	if ((_v0.$ === 'Just') && (_v0.a === '')) {
+		return $gren_lang$url$Url$Parser$removeFinalEmpty(
+			A2($gren_lang$core$Array$dropFirst, 1, segments));
+	} else {
+		return $gren_lang$url$Url$Parser$removeFinalEmpty(segments);
+	}
+};
+var $gren_lang$url$Url$Parser$addToParametersHelp = F2(
+	function (value, maybeArray) {
+		if (maybeArray.$ === 'Nothing') {
+			return $gren_lang$core$Maybe$Just(
+				[value]);
+		} else {
+			var array = maybeArray.a;
+			return $gren_lang$core$Maybe$Just(
+				_Utils_ap(
+					[value],
+					array));
+		}
+	});
+var $gren_lang$url$Url$percentDecode = _Url_percentDecode;
+var $gren_lang$core$Basics$compare = _Utils_compare;
+var $gren_lang$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === 'RBEmpty_gren_builtin') {
+				return $gren_lang$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($gren_lang$core$Basics$compare, targetKey, key);
+				switch (_v1.$) {
+					case 'LT':
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 'EQ':
+						return $gren_lang$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
+var $gren_lang$core$Dict$Black = {$: 'Black'};
+var $gren_lang$core$Dict$RBNode_gren_builtin = F5(
+	function (a, b, c, d, e) {
+		return {$: 'RBNode_gren_builtin', a: a, b: b, c: c, d: d, e: e};
+	});
+var $gren_lang$core$Dict$RBEmpty_gren_builtin = {$: 'RBEmpty_gren_builtin'};
+var $gren_lang$core$Dict$Red = {$: 'Red'};
+var $gren_lang$core$Dict$balance = F5(
+	function (color, key, value, left, right) {
+		if ((right.$ === 'RBNode_gren_builtin') && (right.a.$ === 'Red')) {
+			var _v1 = right.a;
+			var rK = right.b;
+			var rV = right.c;
+			var rLeft = right.d;
+			var rRight = right.e;
+			if ((left.$ === 'RBNode_gren_builtin') && (left.a.$ === 'Red')) {
+				var _v3 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var lLeft = left.d;
+				var lRight = left.e;
+				return A5(
+					$gren_lang$core$Dict$RBNode_gren_builtin,
+					$gren_lang$core$Dict$Red,
+					key,
+					value,
+					A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Black, lK, lV, lLeft, lRight),
+					A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Black, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$gren_lang$core$Dict$RBNode_gren_builtin,
+					color,
+					rK,
+					rV,
+					A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Red, key, value, left, rLeft),
+					rRight);
+			}
+		} else {
+			if ((((left.$ === 'RBNode_gren_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_gren_builtin')) && (left.d.a.$ === 'Red')) {
+				var _v5 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var _v6 = left.d;
+				var _v7 = _v6.a;
+				var llK = _v6.b;
+				var llV = _v6.c;
+				var llLeft = _v6.d;
+				var llRight = _v6.e;
+				var lRight = left.e;
+				return A5(
+					$gren_lang$core$Dict$RBNode_gren_builtin,
+					$gren_lang$core$Dict$Red,
+					lK,
+					lV,
+					A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Black, llK, llV, llLeft, llRight),
+					A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Black, key, value, lRight, right));
+			} else {
+				return A5($gren_lang$core$Dict$RBNode_gren_builtin, color, key, value, left, right);
+			}
+		}
+	});
+var $gren_lang$core$Dict$insertHelp = F3(
+	function (key, value, dict) {
+		if (dict.$ === 'RBEmpty_gren_builtin') {
+			return A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Red, key, value, $gren_lang$core$Dict$RBEmpty_gren_builtin, $gren_lang$core$Dict$RBEmpty_gren_builtin);
+		} else {
+			var nColor = dict.a;
+			var nKey = dict.b;
+			var nValue = dict.c;
+			var nLeft = dict.d;
+			var nRight = dict.e;
+			var _v1 = A2($gren_lang$core$Basics$compare, key, nKey);
+			switch (_v1.$) {
+				case 'LT':
+					return A5(
+						$gren_lang$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						A3($gren_lang$core$Dict$insertHelp, key, value, nLeft),
+						nRight);
+				case 'EQ':
+					return A5($gren_lang$core$Dict$RBNode_gren_builtin, nColor, nKey, value, nLeft, nRight);
+				default:
+					return A5(
+						$gren_lang$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						nLeft,
+						A3($gren_lang$core$Dict$insertHelp, key, value, nRight));
+			}
+		}
+	});
+var $gren_lang$core$Dict$insert = F3(
+	function (key, value, dict) {
+		var _v0 = A3($gren_lang$core$Dict$insertHelp, key, value, dict);
+		if ((_v0.$ === 'RBNode_gren_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $gren_lang$core$Dict$getMin = function (dict) {
+	getMin:
+	while (true) {
+		if ((dict.$ === 'RBNode_gren_builtin') && (dict.d.$ === 'RBNode_gren_builtin')) {
+			var left = dict.d;
+			var $temp$dict = left;
+			dict = $temp$dict;
+			continue getMin;
+		} else {
+			return dict;
+		}
+	}
+};
+var $gren_lang$core$Dict$moveRedLeft = function (dict) {
+	if (((dict.$ === 'RBNode_gren_builtin') && (dict.d.$ === 'RBNode_gren_builtin')) && (dict.e.$ === 'RBNode_gren_builtin')) {
+		if ((dict.e.d.$ === 'RBNode_gren_builtin') && (dict.e.d.a.$ === 'Red')) {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v1 = dict.d;
+			var lClr = _v1.a;
+			var lK = _v1.b;
+			var lV = _v1.c;
+			var lLeft = _v1.d;
+			var lRight = _v1.e;
+			var _v2 = dict.e;
+			var rClr = _v2.a;
+			var rK = _v2.b;
+			var rV = _v2.c;
+			var rLeft = _v2.d;
+			var _v3 = rLeft.a;
+			var rlK = rLeft.b;
+			var rlV = rLeft.c;
+			var rlL = rLeft.d;
+			var rlR = rLeft.e;
+			var rRight = _v2.e;
+			return A5(
+				$gren_lang$core$Dict$RBNode_gren_builtin,
+				$gren_lang$core$Dict$Red,
+				rlK,
+				rlV,
+				A5(
+					$gren_lang$core$Dict$RBNode_gren_builtin,
+					$gren_lang$core$Dict$Black,
+					k,
+					v,
+					A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Red, lK, lV, lLeft, lRight),
+					rlL),
+				A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Black, rK, rV, rlR, rRight));
+		} else {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v4 = dict.d;
+			var lClr = _v4.a;
+			var lK = _v4.b;
+			var lV = _v4.c;
+			var lLeft = _v4.d;
+			var lRight = _v4.e;
+			var _v5 = dict.e;
+			var rClr = _v5.a;
+			var rK = _v5.b;
+			var rV = _v5.c;
+			var rLeft = _v5.d;
+			var rRight = _v5.e;
+			if (clr.$ === 'Black') {
+				return A5(
+					$gren_lang$core$Dict$RBNode_gren_builtin,
+					$gren_lang$core$Dict$Black,
+					k,
+					v,
+					A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Red, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$gren_lang$core$Dict$RBNode_gren_builtin,
+					$gren_lang$core$Dict$Black,
+					k,
+					v,
+					A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Red, rK, rV, rLeft, rRight));
+			}
+		}
+	} else {
+		return dict;
+	}
+};
+var $gren_lang$core$Dict$moveRedRight = function (dict) {
+	if (((dict.$ === 'RBNode_gren_builtin') && (dict.d.$ === 'RBNode_gren_builtin')) && (dict.e.$ === 'RBNode_gren_builtin')) {
+		if ((dict.d.d.$ === 'RBNode_gren_builtin') && (dict.d.d.a.$ === 'Red')) {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v1 = dict.d;
+			var lClr = _v1.a;
+			var lK = _v1.b;
+			var lV = _v1.c;
+			var _v2 = _v1.d;
+			var _v3 = _v2.a;
+			var llK = _v2.b;
+			var llV = _v2.c;
+			var llLeft = _v2.d;
+			var llRight = _v2.e;
+			var lRight = _v1.e;
+			var _v4 = dict.e;
+			var rClr = _v4.a;
+			var rK = _v4.b;
+			var rV = _v4.c;
+			var rLeft = _v4.d;
+			var rRight = _v4.e;
+			return A5(
+				$gren_lang$core$Dict$RBNode_gren_builtin,
+				$gren_lang$core$Dict$Red,
+				lK,
+				lV,
+				A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Black, llK, llV, llLeft, llRight),
+				A5(
+					$gren_lang$core$Dict$RBNode_gren_builtin,
+					$gren_lang$core$Dict$Black,
+					k,
+					v,
+					lRight,
+					A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Red, rK, rV, rLeft, rRight)));
+		} else {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v5 = dict.d;
+			var lClr = _v5.a;
+			var lK = _v5.b;
+			var lV = _v5.c;
+			var lLeft = _v5.d;
+			var lRight = _v5.e;
+			var _v6 = dict.e;
+			var rClr = _v6.a;
+			var rK = _v6.b;
+			var rV = _v6.c;
+			var rLeft = _v6.d;
+			var rRight = _v6.e;
+			if (clr.$ === 'Black') {
+				return A5(
+					$gren_lang$core$Dict$RBNode_gren_builtin,
+					$gren_lang$core$Dict$Black,
+					k,
+					v,
+					A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Red, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$gren_lang$core$Dict$RBNode_gren_builtin,
+					$gren_lang$core$Dict$Black,
+					k,
+					v,
+					A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Red, rK, rV, rLeft, rRight));
+			}
+		}
+	} else {
+		return dict;
+	}
+};
+var $gren_lang$core$Dict$removeHelpPrepEQGT = F7(
+	function (targetKey, dict, color, key, value, left, right) {
+		if ((left.$ === 'RBNode_gren_builtin') && (left.a.$ === 'Red')) {
+			var _v1 = left.a;
+			var lK = left.b;
+			var lV = left.c;
+			var lLeft = left.d;
+			var lRight = left.e;
+			return A5(
+				$gren_lang$core$Dict$RBNode_gren_builtin,
+				color,
+				lK,
+				lV,
+				lLeft,
+				A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Red, key, value, lRight, right));
+		} else {
+			_v2$2:
+			while (true) {
+				if ((right.$ === 'RBNode_gren_builtin') && (right.a.$ === 'Black')) {
+					if (right.d.$ === 'RBNode_gren_builtin') {
+						if (right.d.a.$ === 'Black') {
+							var _v3 = right.a;
+							var _v4 = right.d;
+							var _v5 = _v4.a;
+							return $gren_lang$core$Dict$moveRedRight(dict);
+						} else {
+							break _v2$2;
+						}
+					} else {
+						var _v6 = right.a;
+						var _v7 = right.d;
+						return $gren_lang$core$Dict$moveRedRight(dict);
+					}
+				} else {
+					break _v2$2;
+				}
+			}
+			return dict;
+		}
+	});
+var $gren_lang$core$Dict$removeMin = function (dict) {
+	if ((dict.$ === 'RBNode_gren_builtin') && (dict.d.$ === 'RBNode_gren_builtin')) {
+		var color = dict.a;
+		var key = dict.b;
+		var value = dict.c;
+		var left = dict.d;
+		var lColor = left.a;
+		var lLeft = left.d;
+		var right = dict.e;
+		if (lColor.$ === 'Black') {
+			if ((lLeft.$ === 'RBNode_gren_builtin') && (lLeft.a.$ === 'Red')) {
+				var _v3 = lLeft.a;
+				return A5(
+					$gren_lang$core$Dict$RBNode_gren_builtin,
+					color,
+					key,
+					value,
+					$gren_lang$core$Dict$removeMin(left),
+					right);
+			} else {
+				var _v4 = $gren_lang$core$Dict$moveRedLeft(dict);
+				if (_v4.$ === 'RBNode_gren_builtin') {
+					var nColor = _v4.a;
+					var nKey = _v4.b;
+					var nValue = _v4.c;
+					var nLeft = _v4.d;
+					var nRight = _v4.e;
+					return A5(
+						$gren_lang$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						$gren_lang$core$Dict$removeMin(nLeft),
+						nRight);
+				} else {
+					return $gren_lang$core$Dict$RBEmpty_gren_builtin;
+				}
+			}
+		} else {
+			return A5(
+				$gren_lang$core$Dict$RBNode_gren_builtin,
+				color,
+				key,
+				value,
+				$gren_lang$core$Dict$removeMin(left),
+				right);
+		}
+	} else {
+		return $gren_lang$core$Dict$RBEmpty_gren_builtin;
+	}
+};
+var $gren_lang$core$Dict$removeHelp = F2(
+	function (targetKey, dict) {
+		if (dict.$ === 'RBEmpty_gren_builtin') {
+			return $gren_lang$core$Dict$RBEmpty_gren_builtin;
+		} else {
+			var color = dict.a;
+			var key = dict.b;
+			var value = dict.c;
+			var left = dict.d;
+			var right = dict.e;
+			if (_Utils_cmp(targetKey, key) < 0) {
+				if ((left.$ === 'RBNode_gren_builtin') && (left.a.$ === 'Black')) {
+					var _v4 = left.a;
+					var lLeft = left.d;
+					if ((lLeft.$ === 'RBNode_gren_builtin') && (lLeft.a.$ === 'Red')) {
+						var _v6 = lLeft.a;
+						return A5(
+							$gren_lang$core$Dict$RBNode_gren_builtin,
+							color,
+							key,
+							value,
+							A2($gren_lang$core$Dict$removeHelp, targetKey, left),
+							right);
+					} else {
+						var _v7 = $gren_lang$core$Dict$moveRedLeft(dict);
+						if (_v7.$ === 'RBNode_gren_builtin') {
+							var nColor = _v7.a;
+							var nKey = _v7.b;
+							var nValue = _v7.c;
+							var nLeft = _v7.d;
+							var nRight = _v7.e;
+							return A5(
+								$gren_lang$core$Dict$balance,
+								nColor,
+								nKey,
+								nValue,
+								A2($gren_lang$core$Dict$removeHelp, targetKey, nLeft),
+								nRight);
+						} else {
+							return $gren_lang$core$Dict$RBEmpty_gren_builtin;
+						}
+					}
+				} else {
+					return A5(
+						$gren_lang$core$Dict$RBNode_gren_builtin,
+						color,
+						key,
+						value,
+						A2($gren_lang$core$Dict$removeHelp, targetKey, left),
+						right);
+				}
+			} else {
+				return A2(
+					$gren_lang$core$Dict$removeHelpEQGT,
+					targetKey,
+					A7($gren_lang$core$Dict$removeHelpPrepEQGT, targetKey, dict, color, key, value, left, right));
+			}
+		}
+	});
+var $gren_lang$core$Dict$removeHelpEQGT = F2(
+	function (targetKey, dict) {
+		if (dict.$ === 'RBNode_gren_builtin') {
+			var color = dict.a;
+			var key = dict.b;
+			var value = dict.c;
+			var left = dict.d;
+			var right = dict.e;
+			if (_Utils_eq(targetKey, key)) {
+				var _v1 = $gren_lang$core$Dict$getMin(right);
+				if (_v1.$ === 'RBNode_gren_builtin') {
+					var minKey = _v1.b;
+					var minValue = _v1.c;
+					return A5(
+						$gren_lang$core$Dict$balance,
+						color,
+						minKey,
+						minValue,
+						left,
+						$gren_lang$core$Dict$removeMin(right));
+				} else {
+					return $gren_lang$core$Dict$RBEmpty_gren_builtin;
+				}
+			} else {
+				return A5(
+					$gren_lang$core$Dict$balance,
+					color,
+					key,
+					value,
+					left,
+					A2($gren_lang$core$Dict$removeHelp, targetKey, right));
+			}
+		} else {
+			return $gren_lang$core$Dict$RBEmpty_gren_builtin;
+		}
+	});
+var $gren_lang$core$Dict$remove = F2(
+	function (key, dict) {
+		var _v0 = A2($gren_lang$core$Dict$removeHelp, key, dict);
+		if ((_v0.$ === 'RBNode_gren_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($gren_lang$core$Dict$RBNode_gren_builtin, $gren_lang$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $gren_lang$core$Dict$update = F3(
+	function (targetKey, alter, dictionary) {
+		var _v0 = alter(
+			A2($gren_lang$core$Dict$get, targetKey, dictionary));
+		if (_v0.$ === 'Just') {
+			var value = _v0.a;
+			return A3($gren_lang$core$Dict$insert, targetKey, value, dictionary);
+		} else {
+			return A2($gren_lang$core$Dict$remove, targetKey, dictionary);
+		}
+	});
+var $gren_lang$url$Url$Parser$addParam = F2(
+	function (segment, dict) {
+		var _v0 = A2($gren_lang$core$String$split, '=', segment);
+		if (_v0.length === 2) {
+			var rawKey = _v0[0];
+			var rawValue = _v0[1];
+			var _v1 = $gren_lang$url$Url$percentDecode(rawKey);
+			if (_v1.$ === 'Nothing') {
+				return dict;
+			} else {
+				var key = _v1.a;
+				var _v2 = $gren_lang$url$Url$percentDecode(rawValue);
+				if (_v2.$ === 'Nothing') {
+					return dict;
+				} else {
+					var value = _v2.a;
+					return A3(
+						$gren_lang$core$Dict$update,
+						key,
+						$gren_lang$url$Url$Parser$addToParametersHelp(value),
+						dict);
+				}
+			}
+		} else {
+			return dict;
+		}
+	});
+var $gren_lang$core$Dict$empty = $gren_lang$core$Dict$RBEmpty_gren_builtin;
+var $gren_lang$core$Array$foldr = _Array_foldr;
+var $gren_lang$url$Url$Parser$prepareQuery = function (maybeQuery) {
+	if (maybeQuery.$ === 'Nothing') {
+		return $gren_lang$core$Dict$empty;
+	} else {
+		var qry = maybeQuery.a;
+		return A3(
+			$gren_lang$core$Array$foldr,
+			$gren_lang$url$Url$Parser$addParam,
+			$gren_lang$core$Dict$empty,
+			A2($gren_lang$core$String$split, '&', qry));
+	}
+};
+var $gren_lang$url$Url$Parser$parse = F2(
+	function (_v0, url) {
+		var parser = _v0.a;
+		return $gren_lang$url$Url$Parser$getFirstMatch(
+			parser(
+				{
+					frag: url.fragment,
+					params: $gren_lang$url$Url$Parser$prepareQuery(url.query),
+					unvisited: $gren_lang$url$Url$Parser$preparePath(url.path),
+					value: $gren_lang$core$Basics$identity,
+					visited: []
+				}));
+	});
+var $author$project$Page$KFactor$BendAllowance = {$: 'BendAllowance'};
+var $author$project$Page$KFactor$ExtraAllowance = {$: 'ExtraAllowance'};
+var $gren_lang$url$Url$Parser$Internal$Parser = function (a) {
+	return {$: 'Parser', a: a};
+};
+var $gren_lang$url$Url$Parser$Query$custom = F2(
+	function (key, func) {
+		return $gren_lang$url$Url$Parser$Internal$Parser(
+			function (dict) {
+				return func(
+					A2(
+						$gren_lang$core$Maybe$withDefault,
+						[],
+						A2($gren_lang$core$Dict$get, key, dict)));
+			});
+	});
+var $gren_lang$url$Url$Parser$Query$enum = F2(
+	function (key, dict) {
+		return A2(
+			$gren_lang$url$Url$Parser$Query$custom,
+			key,
+			function (stringList) {
+				if (stringList.length === 1) {
+					var str = stringList[0];
+					return A2($gren_lang$core$Dict$get, str, dict);
+				} else {
+					return $gren_lang$core$Maybe$Nothing;
+				}
+			});
+	});
+var $author$project$Page$KFactor$init = {a: '90', ba: '', k: '', r: '', t: '', ty: $author$project$Page$KFactor$ExtraAllowance, xa: ''};
+var $author$project$Page$KFactor$finishParse = F7(
+	function (t, r, ba, a, k, xa, ty) {
+		return {
+			a: A2($gren_lang$core$Maybe$withDefault, $author$project$Page$KFactor$init.a, a),
+			ba: A2($gren_lang$core$Maybe$withDefault, $author$project$Page$KFactor$init.ba, ba),
+			k: A2($gren_lang$core$Maybe$withDefault, $author$project$Page$KFactor$init.k, k),
+			r: A2($gren_lang$core$Maybe$withDefault, $author$project$Page$KFactor$init.r, r),
+			t: A2($gren_lang$core$Maybe$withDefault, $author$project$Page$KFactor$init.t, t),
+			ty: A2($gren_lang$core$Maybe$withDefault, $author$project$Page$KFactor$init.ty, ty),
+			xa: A2($gren_lang$core$Maybe$withDefault, $author$project$Page$KFactor$init.xa, xa)
+		};
+	});
+var $gren_lang$core$Dict$fromArray = function (assocs) {
+	return A3(
+		$gren_lang$core$Array$foldl,
+		F2(
+			function (_v0, dict) {
+				var key = _v0.key;
+				var value = _v0.value;
+				return A3($gren_lang$core$Dict$insert, key, value, dict);
+			}),
+		$gren_lang$core$Dict$empty,
+		assocs);
+};
+var $gren_lang$url$Url$Parser$Query$map7 = F8(
+	function (func, _v0, _v1, _v2, _v3, _v4, _v5, _v6) {
+		var a = _v0.a;
+		var b = _v1.a;
+		var c = _v2.a;
+		var d = _v3.a;
+		var e = _v4.a;
+		var f = _v5.a;
+		var g = _v6.a;
+		return $gren_lang$url$Url$Parser$Internal$Parser(
+			function (dict) {
+				return A7(
+					func,
+					a(dict),
+					b(dict),
+					c(dict),
+					d(dict),
+					e(dict),
+					f(dict),
+					g(dict));
+			});
+	});
+var $gren_lang$url$Url$Parser$Query$string = function (key) {
+	return A2(
+		$gren_lang$url$Url$Parser$Query$custom,
+		key,
+		function (stringList) {
+			if (stringList.length === 1) {
+				var str = stringList[0];
+				return $gren_lang$core$Maybe$Just(str);
+			} else {
+				return $gren_lang$core$Maybe$Nothing;
+			}
+		});
+};
+var $author$project$Page$KFactor$queryParser = A8(
+	$gren_lang$url$Url$Parser$Query$map7,
+	$author$project$Page$KFactor$finishParse,
+	$gren_lang$url$Url$Parser$Query$string('t'),
+	$gren_lang$url$Url$Parser$Query$string('r'),
+	$gren_lang$url$Url$Parser$Query$string('ba'),
+	$gren_lang$url$Url$Parser$Query$string('a'),
+	$gren_lang$url$Url$Parser$Query$string('k'),
+	$gren_lang$url$Url$Parser$Query$string('xa'),
+	A2(
+		$gren_lang$url$Url$Parser$Query$enum,
+		'ty',
+		$gren_lang$core$Dict$fromArray(
+			[
+				{key: 'ba', value: $author$project$Page$KFactor$BendAllowance},
+				{key: 'xa', value: $author$project$Page$KFactor$ExtraAllowance}
+			])));
+var $gren_lang$url$Url$Parser$query = function (_v0) {
+	var queryParser = _v0.a;
+	return $gren_lang$url$Url$Parser$Parser(
+		function (_v1) {
+			var visited = _v1.visited;
+			var unvisited = _v1.unvisited;
+			var params = _v1.params;
+			var frag = _v1.frag;
+			var value = _v1.value;
+			return [
+				{
+				frag: frag,
+				params: params,
+				unvisited: unvisited,
+				value: value(
+					queryParser(params)),
+				visited: visited
+			}
+			];
+		});
+};
+var $gren_lang$url$Url$Parser$slash = F2(
+	function (_v0, _v1) {
+		var parseBefore = _v0.a;
+		var parseAfter = _v1.a;
+		return $gren_lang$url$Url$Parser$Parser(
+			function (state) {
+				return A2(
+					$gren_lang$core$Array$flatMap,
+					parseAfter,
+					parseBefore(state));
+			});
+	});
+var $gren_lang$url$Url$Parser$questionMark = F2(
+	function (parser, queryParser) {
+		return A2(
+			$gren_lang$url$Url$Parser$slash,
+			parser,
+			$gren_lang$url$Url$Parser$query(queryParser));
+	});
+var $gren_lang$url$Url$Parser$s = function (str) {
+	return $gren_lang$url$Url$Parser$Parser(
+		function (_v0) {
+			var visited = _v0.visited;
+			var unvisited = _v0.unvisited;
+			var params = _v0.params;
+			var frag = _v0.frag;
+			var value = _v0.value;
+			var _v1 = A2($gren_lang$core$Array$get, 0, unvisited);
+			if (_v1.$ === 'Nothing') {
+				return [];
+			} else {
+				var next = _v1.a;
+				return _Utils_eq(next, str) ? [
+					{
+					frag: frag,
+					params: params,
+					unvisited: A2($gren_lang$core$Array$dropFirst, 1, unvisited),
+					value: value,
+					visited: _Utils_ap(
+						[next],
+						visited)
+				}
+				] : [];
+			}
+		});
+};
+var $gren_lang$url$Url$Parser$top = $gren_lang$url$Url$Parser$Parser(
+	function (state) {
+		return [state];
+	});
+var $author$project$Main$urlToModel = function (path) {
+	var url = $author$project$Main$hashToUrl(path);
+	return A2(
+		$gren_lang$core$Maybe$withDefault,
+		$author$project$Main$HomeModel($author$project$Page$Home$init),
+		A2(
+			$gren_lang$url$Url$Parser$parse,
+			$gren_lang$url$Url$Parser$oneOf(
+				[
+					A2(
+					$gren_lang$url$Url$Parser$map,
+					$author$project$Main$HomeModel($author$project$Page$Home$init),
+					$gren_lang$url$Url$Parser$top),
+					A2(
+					$gren_lang$url$Url$Parser$map,
+					$author$project$Main$KFactorModel,
+					A2(
+						$gren_lang$url$Url$Parser$questionMark,
+						$gren_lang$url$Url$Parser$s('k-factor'),
+						$author$project$Page$KFactor$queryParser)),
+					A2(
+					$gren_lang$url$Url$Parser$map,
+					$author$project$Main$TriangleModel($author$project$Page$Triangle$init),
+					$gren_lang$url$Url$Parser$s('triangle'))
+				]),
+			url));
+};
 var $author$project$Main$init = function (path) {
 	return {
 		command: $gren_lang$core$Platform$Cmd$none,
-		model: $author$project$Main$modelForPageId(
-			A2(
-				$gren_lang$core$Maybe$withDefault,
-				$author$project$PageId$Home,
-				$author$project$PageId$stringToPageId(path)))
+		model: $author$project$Main$urlToModel(path)
 	};
 };
 var $author$project$Main$PageChanged = function (a) {
@@ -4541,14 +5446,7 @@ var $author$project$Main$PageChanged = function (a) {
 };
 var $gren_lang$core$Json$Decode$string = _Json_decodeString;
 var $author$project$Main$pageChanged = _Platform_incomingPort('pageChanged', $gren_lang$core$Json$Decode$string);
-var $author$project$Main$pageChangedSubscription = $author$project$Main$pageChanged(
-	function (path) {
-		return $author$project$Main$PageChanged(
-			A2(
-				$gren_lang$core$Maybe$withDefault,
-				$author$project$PageId$Home,
-				$author$project$PageId$stringToPageId(path)));
-	});
+var $author$project$Main$pageChangedSubscription = $author$project$Main$pageChanged($author$project$Main$PageChanged);
 var $author$project$Main$HomeMsg = function (a) {
 	return {$: 'HomeMsg', a: a};
 };
@@ -4561,16 +5459,6 @@ var $author$project$Main$TriangleMsg = function (a) {
 var $gren_lang$core$Json$Encode$string = _Json_wrap;
 var $author$project$Main$changePage = _Platform_outgoingPort('changePage', $gren_lang$core$Json$Encode$string);
 var $author$project$Main$copyId = _Platform_outgoingPort('copyId', $gren_lang$core$Json$Encode$string);
-var $author$project$PageId$pageIdToString = function (id) {
-	switch (id.$) {
-		case 'Home':
-			return '#/';
-		case 'KFactor':
-			return '#/k-factor';
-		default:
-			return '#/triangle';
-	}
-};
 var $author$project$Main$handleSpaCmd = function (_v0) {
 	var model = _v0.model;
 	var command = _v0.command;
@@ -4579,11 +5467,10 @@ var $author$project$Main$handleSpaCmd = function (_v0) {
 			var c = command.a;
 			return {command: c, model: model};
 		case 'ChangePage':
-			var id = command.a;
+			var url = command.a;
 			return {
-				command: $author$project$Main$changePage(
-					$author$project$PageId$pageIdToString(id)),
-				model: $author$project$Main$modelForPageId(id)
+				command: $author$project$Main$changePage(url),
+				model: $author$project$Main$urlToModel(url)
 			};
 		default:
 			var id = command.a;
@@ -4593,6 +5480,96 @@ var $author$project$Main$handleSpaCmd = function (_v0) {
 			};
 	}
 };
+var $gren_lang$url$Url$Builder$toQueryPair = function (_v0) {
+	var key = _v0.a;
+	var value = _v0.b;
+	return key + ('=' + value);
+};
+var $gren_lang$url$Url$Builder$toQuery = function (parameters) {
+	if (parameters.length === 0) {
+		return '';
+	} else {
+		return '?' + A2(
+			$gren_lang$core$String$join,
+			'&',
+			A2($gren_lang$core$Array$map, $gren_lang$url$Url$Builder$toQueryPair, parameters));
+	}
+};
+var $gren_lang$url$Url$Builder$absolute = F2(
+	function (pathSegments, parameters) {
+		return '/' + (A2($gren_lang$core$String$join, '/', pathSegments) + $gren_lang$url$Url$Builder$toQuery(parameters));
+	});
+var $gren_lang$url$Url$Builder$QueryParameter = F2(
+	function (a, b) {
+		return {$: 'QueryParameter', a: a, b: b};
+	});
+var $gren_lang$url$Url$percentEncode = _Url_percentEncode;
+var $gren_lang$url$Url$Builder$string = F2(
+	function (key, value) {
+		return A2(
+			$gren_lang$url$Url$Builder$QueryParameter,
+			$gren_lang$url$Url$percentEncode(key),
+			$gren_lang$url$Url$percentEncode(value));
+	});
+var $author$project$Page$KFactor$queryBuilder = function (model) {
+	return [
+		A2($gren_lang$url$Url$Builder$string, 't', model.t),
+		A2($gren_lang$url$Url$Builder$string, 'r', model.r),
+		A2($gren_lang$url$Url$Builder$string, 'ba', model.ba),
+		A2($gren_lang$url$Url$Builder$string, 'a', model.a),
+		A2($gren_lang$url$Url$Builder$string, 'k', model.k),
+		A2($gren_lang$url$Url$Builder$string, 'xa', model.xa),
+		A2(
+		$gren_lang$url$Url$Builder$string,
+		'ty',
+		function () {
+			var _v0 = model.ty;
+			if (_v0.$ === 'BendAllowance') {
+				return 'ba';
+			} else {
+				return 'xa';
+			}
+		}())
+	];
+};
+var $author$project$Main$modelToUrl = function (model) {
+	return '#' + A2(
+		$gren_lang$url$Url$Builder$absolute,
+		function () {
+			switch (model.$) {
+				case 'HomeModel':
+					return [];
+				case 'TriangleModel':
+					return ['triangle'];
+				default:
+					return ['k-factor'];
+			}
+		}(),
+		function () {
+			switch (model.$) {
+				case 'HomeModel':
+					return [];
+				case 'TriangleModel':
+					return [];
+				default:
+					var k = model.a;
+					return $author$project$Page$KFactor$queryBuilder(k);
+			}
+		}());
+};
+var $author$project$Main$updatePage = _Platform_outgoingPort('updatePage', $gren_lang$core$Json$Encode$string);
+var $author$project$Main$handleUrlUpdate = F2(
+	function (orig, dat) {
+		return _Utils_eq(orig, dat.model) ? dat : {
+			command: $gren_lang$core$Platform$Cmd$batch(
+				[
+					$author$project$Main$updatePage(
+					$author$project$Main$modelToUrl(dat.model)),
+					dat.command
+				]),
+			model: dat.model
+		};
+	});
 var $author$project$SpaCmd$BaseCmd = function (a) {
 	return {$: 'BaseCmd', a: a};
 };
@@ -4607,8 +5584,8 @@ var $author$project$SpaCmd$map = F2(
 	function (f, msg) {
 		switch (msg.$) {
 			case 'ChangePage':
-				var id = msg.a;
-				return $author$project$SpaCmd$ChangePage(id);
+				var url = msg.a;
+				return $author$project$SpaCmd$ChangePage(url);
 			case 'CopyId':
 				var id = msg.a;
 				return $author$project$SpaCmd$CopyId(id);
@@ -4631,12 +5608,12 @@ var $author$project$Page$Home$update = F2(
 	function (msg, model) {
 		if (msg.$ === 'GoToKFactor') {
 			return {
-				command: $author$project$SpaCmd$ChangePage($author$project$PageId$KFactor),
+				command: $author$project$SpaCmd$ChangePage('#/k-factor'),
 				model: model
 			};
 		} else {
 			return {
-				command: $author$project$SpaCmd$ChangePage($author$project$PageId$Triangle),
+				command: $author$project$SpaCmd$ChangePage('#/triangle'),
 				model: model
 			};
 		}
@@ -4684,7 +5661,7 @@ var $author$project$Page$KFactor$update = F2(
 				return {command: $author$project$SpaCmd$none, model: model};
 			case 'HomePage':
 				return {
-					command: $author$project$SpaCmd$ChangePage($author$project$PageId$Home),
+					command: $author$project$SpaCmd$ChangePage('#/'),
 					model: model
 				};
 			case 'UpdateThickness':
@@ -4768,7 +5745,7 @@ var $author$project$Page$Triangle$update = F2(
 				return {command: $author$project$SpaCmd$none, model: model};
 			case 'HomePage':
 				return {
-					command: $author$project$SpaCmd$ChangePage($author$project$PageId$Home),
+					command: $author$project$SpaCmd$ChangePage('#/'),
 					model: model
 				};
 			case 'UpdateA':
@@ -4818,21 +5795,24 @@ var $author$project$Main$update = F2(
 		while (true) {
 			switch (_v0.v.$) {
 				case 'PageChanged':
-					var id = _v0.v.a;
+					var str = _v0.v.a;
 					return {
 						command: $gren_lang$core$Platform$Cmd$none,
-						model: $author$project$Main$modelForPageId(id)
+						model: $author$project$Main$urlToModel(str)
 					};
 				case 'HomeMsg':
 					if (_v0.m.$ === 'HomeModel') {
 						var m = _v0.m.a;
 						var v = _v0.v.a;
-						return $author$project$Main$handleSpaCmd(
-							A3(
-								$author$project$Main$mapPage,
-								$author$project$Main$HomeModel,
-								$author$project$Main$HomeMsg,
-								A2($author$project$Page$Home$update, v, m)));
+						return A2(
+							$author$project$Main$handleUrlUpdate,
+							model,
+							$author$project$Main$handleSpaCmd(
+								A3(
+									$author$project$Main$mapPage,
+									$author$project$Main$HomeModel,
+									$author$project$Main$HomeMsg,
+									A2($author$project$Page$Home$update, v, m))));
 					} else {
 						break _v0$4;
 					}
@@ -4840,12 +5820,15 @@ var $author$project$Main$update = F2(
 					if (_v0.m.$ === 'KFactorModel') {
 						var m = _v0.m.a;
 						var v = _v0.v.a;
-						return $author$project$Main$handleSpaCmd(
-							A3(
-								$author$project$Main$mapPage,
-								$author$project$Main$KFactorModel,
-								$author$project$Main$KFactorMsg,
-								A2($author$project$Page$KFactor$update, v, m)));
+						return A2(
+							$author$project$Main$handleUrlUpdate,
+							model,
+							$author$project$Main$handleSpaCmd(
+								A3(
+									$author$project$Main$mapPage,
+									$author$project$Main$KFactorModel,
+									$author$project$Main$KFactorMsg,
+									A2($author$project$Page$KFactor$update, v, m))));
 					} else {
 						break _v0$4;
 					}
@@ -4853,12 +5836,15 @@ var $author$project$Main$update = F2(
 					if (_v0.m.$ === 'TriangleModel') {
 						var m = _v0.m.a;
 						var v = _v0.v.a;
-						return $author$project$Main$handleSpaCmd(
-							A3(
-								$author$project$Main$mapPage,
-								$author$project$Main$TriangleModel,
-								$author$project$Main$TriangleMsg,
-								A2($author$project$Page$Triangle$update, v, m)));
+						return A2(
+							$author$project$Main$handleUrlUpdate,
+							model,
+							$author$project$Main$handleSpaCmd(
+								A3(
+									$author$project$Main$mapPage,
+									$author$project$Main$TriangleModel,
+									$author$project$Main$TriangleMsg,
+									A2($author$project$Page$Triangle$update, v, m))));
 					} else {
 						break _v0$4;
 					}
@@ -4941,7 +5927,6 @@ var $author$project$Page$Home$view = function (model) {
 		title: 'Calculators'
 	};
 };
-var $author$project$Page$KFactor$BendAllowance = {$: 'BendAllowance'};
 var $author$project$Page$KFactor$DoCopy = function (a) {
 	return {$: 'DoCopy', a: a};
 };
@@ -5007,7 +5992,6 @@ var $gren_lang$browser$Html$Events$stopPropagationOn = F2(
 			$gren_lang$browser$VirtualDom$MayStopPropagation(decoder));
 	});
 var $gren_lang$core$Json$Decode$field = _Json_decodeField;
-var $gren_lang$core$Array$foldr = _Array_foldr;
 var $gren_lang$core$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3($gren_lang$core$Array$foldr, $gren_lang$core$Json$Decode$field, decoder, fields);

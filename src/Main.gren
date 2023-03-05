@@ -5,11 +5,16 @@ import Html exposing (..)
 import Page.Home as Home
 import Page.KFactor as KFactor
 import Page.Triangle as Triangle
-import PageId exposing ( PageId(..), stringToPageId, pageIdToString )
 import SpaCmd exposing ( SpaCmd(..) )
+import Url exposing ( Url )
+import Url.Builder as Builder
+import Url.Parser as Parser exposing ( (<?>), Parser )
 
 
 port changePage : String -> Cmd msg
+
+
+port updatePage : String -> Cmd msg
 
 
 port copyId : String -> Cmd msg
@@ -28,7 +33,7 @@ type Msg
     = HomeMsg Home.Msg
     | KFactorMsg KFactor.Msg
     | TriangleMsg Triangle.Msg
-    | PageChanged PageId
+    | PageChanged String
 
 
 main : Program String Model Msg
@@ -42,12 +47,7 @@ main =
 
 
 pageChangedSubscription =
-    pageChanged
-        (\path ->
-            stringToPageId path
-                |> Maybe.withDefault Home
-                |> PageChanged
-        )
+    pageChanged PageChanged
 
 
 init :
@@ -56,10 +56,7 @@ init :
        , command : Cmd Msg
        }
 init path =
-    { model =
-        stringToPageId path
-            |> Maybe.withDefault Home
-            |> modelForPageId
+    { model = urlToModel path
     , command = Cmd.none
     }
 
@@ -101,24 +98,51 @@ update msg model =
         , v = msg
         }
     of
-        { v = PageChanged id } ->
-            { model = modelForPageId id
+        { v = PageChanged str } ->
+            { model = urlToModel str
             , command = Cmd.none
             }
 
         { m = HomeModel m, v = HomeMsg v } ->
-            handleSpaCmd (mapPage HomeModel HomeMsg (Home.update v m))
+            mapPage HomeModel HomeMsg (Home.update v m)
+                |> handleSpaCmd
+                |> handleUrlUpdate model
 
         { m = KFactorModel m, v = KFactorMsg v } ->
-            handleSpaCmd (mapPage KFactorModel KFactorMsg (KFactor.update v m))
+            mapPage KFactorModel KFactorMsg (KFactor.update v m)
+                |> handleSpaCmd
+                |> handleUrlUpdate model
 
         { m = TriangleModel m, v = TriangleMsg v } ->
-            handleSpaCmd (mapPage TriangleModel TriangleMsg (Triangle.update v m))
+            mapPage TriangleModel TriangleMsg (Triangle.update v m)
+                |> handleSpaCmd
+                |> handleUrlUpdate model
 
         _ ->
             { model = model
             , command = Cmd.none
             }
+
+
+handleUrlUpdate :
+    Model
+    -> { model : Model
+       , command : Cmd Msg
+       }
+    -> { model : Model
+       , command : Cmd Msg
+       }
+handleUrlUpdate orig dat =
+    if orig == dat.model then
+        dat
+    else
+        { model = dat.model
+        , command =
+            Cmd.batch
+                [ updatePage (modelToUrl dat.model)
+                , dat.command
+                ]
+        }
 
 
 mapPage :
@@ -150,9 +174,9 @@ handleSpaCmd { model, command } =
             , command = c
             }
 
-        ChangePage id ->
-            { model = modelForPageId id
-            , command = changePage (pageIdToString id)
+        ChangePage url ->
+            { model = urlToModel url
+            , command = changePage url
             }
 
         CopyId id ->
@@ -161,14 +185,68 @@ handleSpaCmd { model, command } =
             }
 
 
-modelForPageId : PageId -> Model
-modelForPageId id =
-    case id of
-        Home ->
-            HomeModel Home.init
+hashToUrl : String -> Url
+hashToUrl str =
+    let
+        trimmedStr =
+            "http://localhost"
+                ++ (if String.startsWith "#/" str then
+                        String.dropLeft 1 str
+                     else
+                        "/"
+                    )
+    in
+    Url.fromString trimmedStr
+        |> Maybe.withDefault
+                { protocol = Url.Http
+                , host = ""
+                , port_ = Nothing
+                , path = "/"
+                , query = Nothing
+                , fragment = Nothing
+                }
 
-        KFactor ->
-            KFactorModel KFactor.init
 
-        Triangle ->
-            TriangleModel Triangle.init
+urlToModel : String -> Model
+urlToModel path =
+    let
+        url =
+            hashToUrl path
+    in
+    Parser.parse
+        (Parser.oneOf
+            [ Parser.map (HomeModel Home.init) Parser.top
+            , Parser.map KFactorModel (Parser.s "k-factor" <?> KFactor.queryParser)
+            , Parser.map (TriangleModel Triangle.init) (Parser.s "triangle")
+            ]
+        )
+        url
+        |> Maybe.withDefault (HomeModel Home.init)
+
+
+modelToUrl : Model -> String
+modelToUrl model =
+    "#"
+        ++ Builder.absolute
+                (case model of
+                    HomeModel _ ->
+                        []
+
+                    TriangleModel _ ->
+                        [ "triangle"
+                        ]
+
+                    KFactorModel _ ->
+                        [ "k-factor"
+                        ]
+                )
+                (case model of
+                    HomeModel _ ->
+                        []
+
+                    TriangleModel _ ->
+                        []
+
+                    KFactorModel k ->
+                        KFactor.queryBuilder k
+                )

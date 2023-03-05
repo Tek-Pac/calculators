@@ -18,8 +18,23 @@
 try {
   var app = Gren.Main.init({ node: document.getElementById("gren"), flags: document.location.hash });
 
+  var timeoutId = undefined;
+
+  function replaceState(hash) {
+    window.history.replaceState({}, "", hash);
+    timeoutId = undefined;
+  }
+
   app.ports.changePage.subscribe(function(hash) {
     window.history.pushState({}, "", hash);
+  });
+
+  app.ports.updatePage.subscribe(function(hash) {
+    if (timeoutId != undefined)
+      window.clearTimeout(timeoutId);
+
+    // Only update in 250ms
+    timeoutId = window.setTimeout(replaceState, 250, hash);
   });
 
   app.ports.copyId.subscribe(function(id) {

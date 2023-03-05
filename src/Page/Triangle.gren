@@ -9,7 +9,6 @@ import Html exposing ( Html, br, button, div, input, text )
 import Html.Attributes exposing ( class, id, readonly, step, style, type_, value )
 import Html.Events exposing ( onClick, onInput )
 import Math
-import PageId
 import SpaCmd exposing ( SpaCmd(..) )
 import Svg exposing ( Svg, foreignObject, polygon, svg, filter, feGaussianBlur, feComposite, feFlood, feOffset )
 import Svg.Attributes exposing ( fill, height, points, stroke, viewBox, width, x, y, in_, in2, operator, result, strokeWidth, strokeLinejoin, floodOpacity, floodColor, stdDeviation, dx, dy )
@@ -65,7 +64,7 @@ update msg model =
 
         HomePage ->
             { model = model
-            , command = ChangePage PageId.Home
+            , command = ChangePage "#/"
             }
 
         UpdateA s ->
