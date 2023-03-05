@@ -1,0 +1,279 @@
+module Page.Truss exposing ( Model, Msg(..), update, view, queryParser, queryBuilder )
+
+{-| The truss calculator page
+-}
+
+import Browser
+import Browser.Dom as Dom
+import Html exposing ( Html, br, button, div, input, text )
+import Html.Attributes exposing ( class, id, readonly, step, style, type_, value )
+import Html.Events exposing ( onClick, onInput )
+import Math
+import SpaCmd exposing ( SpaCmd(..) )
+import Svg exposing ( Svg, foreignObject, polygon, svg, filter, feGaussianBlur, feComposite, feFlood, feOffset )
+import Svg.Attributes exposing ( fill, height, points, stroke, viewBox, width, x, y, in_, in2, operator, result, strokeWidth, strokeLinejoin, floodOpacity, floodColor, stdDeviation, dx, dy )
+import Task
+import Url.Builder as Builder
+import Url.Parser.Query as Query
+
+
+queryParser : Query.Parser Model
+queryParser =
+    Query.map8
+        (\chordLen chordGap web startWeb startCount roof webAngle webStart ->
+            { chordLen = Maybe.withDefault "" chordLen
+            , chordGap = Maybe.withDefault "" chordGap
+            , web = Maybe.withDefault "" web
+            , startWeb = Maybe.withDefault "" startWeb
+            , startCount = Maybe.withDefault "" startCount
+            , roof = Maybe.withDefault "7.5" roof
+            , webAngle = Maybe.withDefault "45" webAngle
+            , webStart = Maybe.withDefault "125" webStart
+            }
+        )
+        (Query.string "chordLen")
+        (Query.string "chordGap")
+        (Query.string "web")
+        (Query.string "startWeb")
+        (Query.string "startCount")
+        (Query.string "roof")
+        (Query.string "webAngle")
+        (Query.string "webStart")
+
+
+queryBuilder : Model -> Array Builder.QueryParameter
+queryBuilder model =
+    [ Builder.string "chordLen" model.chordLen
+    , Builder.string "chordGap" model.chordGap
+    , Builder.string "web" model.web
+    , Builder.string "startWeb" model.startWeb
+    , Builder.string "startCount" model.startCount
+    , Builder.string "roof" model.roof
+    , Builder.string "webAngle" model.webAngle
+    , Builder.string "webStart" model.webStart
+    ]
+
+
+type alias Model =
+    { chordLen : String
+    , chordGap : String
+    , web : String
+    , startWeb : String
+    , startCount : String
+    , roof : String
+    , webAngle : String
+    , webStart : String
+    }
+
+
+type alias ModelCalc =
+    { chordLen : Float
+    , chordGap : Float
+    , web : Float
+    , startWeb :
+        Maybe
+            { web : Float
+            , count : Int
+            }
+    , roof : Float
+    , webAngle : Float
+    , webStart : Float
+    }
+
+
+type alias Updated =
+    { model : Model
+    , command : SpaCmd Msg
+    }
+
+
+type Msg
+    = HomePage
+    | UpdateChordLen String
+    | UpdateChordGap String
+    | UpdateWeb String
+    | UpdateStartWeb String
+    | UpdateStartCount String
+    | UpdateRoof String
+    | UpdateWebAngle String
+    | UpdateWebStart String
+    | NoOp
+
+
+attemptFocus : String -> SpaCmd Msg
+attemptFocus id =
+    BaseCmd (Task.attempt (\_ -> NoOp) (Dom.focus id))
+
+
+justModel : Model -> Updated
+justModel model =
+    { model = model
+    , command = SpaCmd.none
+    }
+
+
+update : Msg -> Model -> Updated
+update msg model =
+    case msg of
+        NoOp ->
+            justModel model
+
+        HomePage ->
+            { model = model
+            , command = ChangePage "#/"
+            }
+
+        UpdateChordLen c ->
+            justModel { model | chordLen = c }
+
+        UpdateChordGap c ->
+            justModel { model | chordGap = c }
+
+        UpdateWeb w ->
+            justModel { model | web = w }
+
+        UpdateStartWeb s ->
+            justModel { model | startWeb = s }
+
+        UpdateStartCount s ->
+            justModel { model | startCount = s }
+
+        UpdateRoof r ->
+            justModel { model | roof = r }
+
+        UpdateWebAngle w ->
+            justModel { model | webAngle = w }
+
+        UpdateWebStart w ->
+            justModel { model | webStart = w }
+
+
+undegrees : Float -> Float
+undegrees rad =
+    rad * 180 / Math.pi
+
+
+view : Model -> Browser.Document Msg
+view model =
+    let
+        parsedModel =
+            { chordLen = String.toFloat model.chordLen
+            , chordGap = String.toFloat model.chordGap
+            , web = String.toFloat model.web
+            , startWeb = String.toFloat model.startWeb
+            , startCount = String.toFloat model.startCount
+            , roof = String.toFloat model.roof
+            , webAngle = String.toFloat model.webAngle
+            , webStart = String.toFloat model.webStart
+            }
+
+        error =
+            Ok {}
+                |> Result.andThen
+                        (\_ ->
+                            case parsedModel.chordLen of
+                                Just chordLen ->
+                                    if chordLen <= 100 then
+                                        Err "error: chord length should be > 100 mm"
+                                    else
+                                        Ok {}
+
+                                _ ->
+                                    Ok {}
+                        )
+
+        -- 6 dp
+        formatF : Float -> Maybe Float
+        formatF value =
+            case error of
+                Err _ ->
+                    Just (0 / 0)
+
+                _ ->
+                    Just (toFloat (Math.round (value * 1000000)) / 1000000)
+
+        res =
+            case parsedModel of
+                { chordLen = Just chordLen, chordGap = Just chordGap, web = Just web, startWeb = Just startWeb, startCount = Just startCount, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
+                    Just
+                        { endDistance = 59999.0
+                        }
+
+                _ ->
+                    Nothing
+    in
+    { title = "Truss"
+    , body =
+        [ button
+            [ class "left"
+            , onClick HomePage
+            ]
+            [ text "Home"
+            ]
+        , div
+            [ id "truss"
+            , class "center"
+            ]
+            [ text "Truss"
+            , br [] []
+            , makeInput "Chord length" "chord-len" 0.5 model.chordLen UpdateChordLen
+            , makeInput "Gap between chords" "chord-gap" 0.5 model.chordGap UpdateChordGap
+            , makeInput "Web profile width" "web" 0.5 model.web UpdateWeb
+            , makeInput "Initial web profile width" "start-web" 0.5 model.startWeb UpdateStartWeb
+            , makeInput "Initial web count" "start-count" 1 model.startCount UpdateStartCount
+            , makeInput "Roof angle" "roof" 0.5 model.roof UpdateRoof
+            , makeInput "Web angle" "web-angle" 0.5 model.webAngle UpdateWebAngle
+            , makeInput "Web start distance" "web-start" 0.5 model.webStart UpdateWebStart
+            , case error of
+                Err e ->
+                    div
+                        [ class "center"
+                        ]
+                        [ text e
+                        ]
+
+                _ ->
+                    text ""
+            ]
+        ]
+    }
+
+
+type alias InputData =
+    { label : String
+    , idTxt : String
+    , stepV : Float
+    , currTxt : String
+    , updateMsg : String -> Msg
+    }
+
+
+makeInput : String -> String -> Float -> String -> (String -> Msg) -> Html Msg
+makeInput label idTxt stepV currTxt updateMsg =
+    div
+        []
+        [ text label
+        , text "         "
+        , br [] []
+        , input
+            [ value currTxt
+            , onInput updateMsg
+            , id idTxt
+            , type_ "number"
+            , step (String.fromFloat stepV)
+            ]
+            []
+        , if String.isEmpty currTxt then
+            button
+                [ style "pointer-events" "none"
+                , style "opacity" "0"
+                ]
+                [ text "❌"
+                ]
+          else
+            button
+                [ onClick (updateMsg "")
+                ]
+                [ text "❌"
+                ]
+        ]

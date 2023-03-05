@@ -5,6 +5,7 @@ import Html exposing (..)
 import Page.Home as Home
 import Page.KFactor as KFactor
 import Page.Triangle as Triangle
+import Page.Truss as Truss
 import SpaCmd exposing ( SpaCmd(..) )
 import Url exposing ( Url )
 import Url.Builder as Builder
@@ -27,12 +28,14 @@ type Model
     = HomeModel Home.Model
     | KFactorModel KFactor.Model
     | TriangleModel Triangle.Model
+    | TrussModel Truss.Model
 
 
 type Msg
     = HomeMsg Home.Msg
     | KFactorMsg KFactor.Msg
     | TriangleMsg Triangle.Msg
+    | TrussMsg Truss.Msg
     | PageChanged String
 
 
@@ -76,6 +79,10 @@ view model =
             Triangle.view m
                 |> mapDocument TriangleMsg
 
+        TrussModel m ->
+            Truss.view m
+                |> mapDocument TrussMsg
+
 
 mapDocument : (a -> Msg) -> Browser.Document a -> Browser.Document Msg
 mapDocument map doc =
@@ -115,6 +122,11 @@ update msg model =
 
         { m = TriangleModel m, v = TriangleMsg v } ->
             mapPage TriangleModel TriangleMsg (Triangle.update v m)
+                |> handleSpaCmd
+                |> handleUrlUpdate model
+
+        { m = TrussModel m, v = TrussMsg v } ->
+            mapPage TrussModel TrussMsg (Truss.update v m)
                 |> handleSpaCmd
                 |> handleUrlUpdate model
 
@@ -218,6 +230,7 @@ urlToModel path =
             [ Parser.map (HomeModel Home.init) Parser.top
             , Parser.map KFactorModel (Parser.s "k-factor" <?> KFactor.queryParser)
             , Parser.map TriangleModel (Parser.s "triangle" <?> Triangle.queryParser)
+            , Parser.map TrussModel (Parser.s "truss" <?> Truss.queryParser)
             ]
         )
         url
@@ -232,21 +245,28 @@ modelToUrl model =
                     HomeModel _ ->
                         []
 
+                    KFactorModel _ ->
+                        [ "k-factor"
+                        ]
+
                     TriangleModel _ ->
                         [ "triangle"
                         ]
 
-                    KFactorModel _ ->
-                        [ "k-factor"
+                    TrussModel _ ->
+                        [ "truss"
                         ]
                 )
                 (case model of
                     HomeModel _ ->
                         []
 
+                    KFactorModel k ->
+                        KFactor.queryBuilder k
+
                     TriangleModel t ->
                         Triangle.queryBuilder t
 
-                    KFactorModel k ->
-                        KFactor.queryBuilder k
+                    TrussModel t ->
+                        Truss.queryBuilder t
                 )

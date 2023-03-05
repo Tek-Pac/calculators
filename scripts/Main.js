@@ -4503,6 +4503,9 @@ var $author$project$Main$KFactorModel = function (a) {
 var $author$project$Main$TriangleModel = function (a) {
 	return {$: 'TriangleModel', a: a};
 };
+var $author$project$Main$TrussModel = function (a) {
+	return {$: 'TrussModel', a: a};
+};
 var $gren_lang$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
 		if (maybe.$ === 'Just') {
@@ -5367,6 +5370,53 @@ var $author$project$Page$Triangle$queryParser = A5(
 	$gren_lang$url$Url$Parser$Query$string('b'),
 	$gren_lang$url$Url$Parser$Query$string('c'),
 	$gren_lang$url$Url$Parser$Query$string('theta'));
+var $gren_lang$url$Url$Parser$Query$map8 = F9(
+	function (func, _v0, _v1, _v2, _v3, _v4, _v5, _v6, _v7) {
+		var a = _v0.a;
+		var b = _v1.a;
+		var c = _v2.a;
+		var d = _v3.a;
+		var e = _v4.a;
+		var f = _v5.a;
+		var g = _v6.a;
+		var h = _v7.a;
+		return $gren_lang$url$Url$Parser$Internal$Parser(
+			function (dict) {
+				return A8(
+					func,
+					a(dict),
+					b(dict),
+					c(dict),
+					d(dict),
+					e(dict),
+					f(dict),
+					g(dict),
+					h(dict));
+			});
+	});
+var $author$project$Page$Truss$queryParser = A9(
+	$gren_lang$url$Url$Parser$Query$map8,
+	F8(
+		function (chordLen, chordGap, web, startWeb, startCount, roof, webAngle, webStart) {
+			return {
+				chordGap: A2($gren_lang$core$Maybe$withDefault, '', chordGap),
+				chordLen: A2($gren_lang$core$Maybe$withDefault, '', chordLen),
+				roof: A2($gren_lang$core$Maybe$withDefault, '7.5', roof),
+				startCount: A2($gren_lang$core$Maybe$withDefault, '', startCount),
+				startWeb: A2($gren_lang$core$Maybe$withDefault, '', startWeb),
+				web: A2($gren_lang$core$Maybe$withDefault, '', web),
+				webAngle: A2($gren_lang$core$Maybe$withDefault, '45', webAngle),
+				webStart: A2($gren_lang$core$Maybe$withDefault, '125', webStart)
+			};
+		}),
+	$gren_lang$url$Url$Parser$Query$string('chordLen'),
+	$gren_lang$url$Url$Parser$Query$string('chordGap'),
+	$gren_lang$url$Url$Parser$Query$string('web'),
+	$gren_lang$url$Url$Parser$Query$string('startWeb'),
+	$gren_lang$url$Url$Parser$Query$string('startCount'),
+	$gren_lang$url$Url$Parser$Query$string('roof'),
+	$gren_lang$url$Url$Parser$Query$string('webAngle'),
+	$gren_lang$url$Url$Parser$Query$string('webStart'));
 var $gren_lang$url$Url$Parser$query = function (_v0) {
 	var queryParser = _v0.a;
 	return $gren_lang$url$Url$Parser$Parser(
@@ -5464,7 +5514,14 @@ var $author$project$Main$urlToModel = function (path) {
 					A2(
 						$gren_lang$url$Url$Parser$questionMark,
 						$gren_lang$url$Url$Parser$s('triangle'),
-						$author$project$Page$Triangle$queryParser))
+						$author$project$Page$Triangle$queryParser)),
+					A2(
+					$gren_lang$url$Url$Parser$map,
+					$author$project$Main$TrussModel,
+					A2(
+						$gren_lang$url$Url$Parser$questionMark,
+						$gren_lang$url$Url$Parser$s('truss'),
+						$author$project$Page$Truss$queryParser))
 				]),
 			url));
 };
@@ -5488,6 +5545,9 @@ var $author$project$Main$KFactorMsg = function (a) {
 };
 var $author$project$Main$TriangleMsg = function (a) {
 	return {$: 'TriangleMsg', a: a};
+};
+var $author$project$Main$TrussMsg = function (a) {
+	return {$: 'TrussMsg', a: a};
 };
 var $gren_lang$core$Json$Encode$string = _Json_wrap;
 var $author$project$Main$changePage = _Platform_outgoingPort('changePage', $gren_lang$core$Json$Encode$string);
@@ -5573,6 +5633,18 @@ var $author$project$Page$Triangle$queryBuilder = function (model) {
 		A2($gren_lang$url$Url$Builder$string, 'theta', model.theta)
 	];
 };
+var $author$project$Page$Truss$queryBuilder = function (model) {
+	return [
+		A2($gren_lang$url$Url$Builder$string, 'chordLen', model.chordLen),
+		A2($gren_lang$url$Url$Builder$string, 'chordGap', model.chordGap),
+		A2($gren_lang$url$Url$Builder$string, 'web', model.web),
+		A2($gren_lang$url$Url$Builder$string, 'startWeb', model.startWeb),
+		A2($gren_lang$url$Url$Builder$string, 'startCount', model.startCount),
+		A2($gren_lang$url$Url$Builder$string, 'roof', model.roof),
+		A2($gren_lang$url$Url$Builder$string, 'webAngle', model.webAngle),
+		A2($gren_lang$url$Url$Builder$string, 'webStart', model.webStart)
+	];
+};
 var $author$project$Main$modelToUrl = function (model) {
 	return '#' + A2(
 		$gren_lang$url$Url$Builder$absolute,
@@ -5580,22 +5652,27 @@ var $author$project$Main$modelToUrl = function (model) {
 			switch (model.$) {
 				case 'HomeModel':
 					return [];
+				case 'KFactorModel':
+					return ['k-factor'];
 				case 'TriangleModel':
 					return ['triangle'];
 				default:
-					return ['k-factor'];
+					return ['truss'];
 			}
 		}(),
 		function () {
 			switch (model.$) {
 				case 'HomeModel':
 					return [];
+				case 'KFactorModel':
+					var k = model.a;
+					return $author$project$Page$KFactor$queryBuilder(k);
 				case 'TriangleModel':
 					var t = model.a;
 					return $author$project$Page$Triangle$queryBuilder(t);
 				default:
-					var k = model.a;
-					return $author$project$Page$KFactor$queryBuilder(k);
+					var t = model.a;
+					return $author$project$Page$Truss$queryBuilder(t);
 			}
 		}());
 };
@@ -5830,10 +5907,73 @@ var $author$project$Page$Triangle$update = F2(
 				};
 		}
 	});
+var $author$project$Page$Truss$justModel = function (model) {
+	return {command: $author$project$SpaCmd$none, model: model};
+};
+var $author$project$Page$Truss$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'NoOp':
+				return $author$project$Page$Truss$justModel(model);
+			case 'HomePage':
+				return {
+					command: $author$project$SpaCmd$ChangePage('#/'),
+					model: model
+				};
+			case 'UpdateChordLen':
+				var c = msg.a;
+				return $author$project$Page$Truss$justModel(
+					_Utils_update(
+						model,
+						{chordLen: c}));
+			case 'UpdateChordGap':
+				var c = msg.a;
+				return $author$project$Page$Truss$justModel(
+					_Utils_update(
+						model,
+						{chordGap: c}));
+			case 'UpdateWeb':
+				var w = msg.a;
+				return $author$project$Page$Truss$justModel(
+					_Utils_update(
+						model,
+						{web: w}));
+			case 'UpdateStartWeb':
+				var s = msg.a;
+				return $author$project$Page$Truss$justModel(
+					_Utils_update(
+						model,
+						{startWeb: s}));
+			case 'UpdateStartCount':
+				var s = msg.a;
+				return $author$project$Page$Truss$justModel(
+					_Utils_update(
+						model,
+						{startCount: s}));
+			case 'UpdateRoof':
+				var r = msg.a;
+				return $author$project$Page$Truss$justModel(
+					_Utils_update(
+						model,
+						{roof: r}));
+			case 'UpdateWebAngle':
+				var w = msg.a;
+				return $author$project$Page$Truss$justModel(
+					_Utils_update(
+						model,
+						{webAngle: w}));
+			default:
+				var w = msg.a;
+				return $author$project$Page$Truss$justModel(
+					_Utils_update(
+						model,
+						{webStart: w}));
+		}
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		var _v0 = {m: model, v: msg};
-		_v0$4:
+		_v0$5:
 		while (true) {
 			switch (_v0.v.$) {
 				case 'PageChanged':
@@ -5856,7 +5996,7 @@ var $author$project$Main$update = F2(
 									$author$project$Main$HomeMsg,
 									A2($author$project$Page$Home$update, v, m))));
 					} else {
-						break _v0$4;
+						break _v0$5;
 					}
 				case 'KFactorMsg':
 					if (_v0.m.$ === 'KFactorModel') {
@@ -5872,9 +6012,9 @@ var $author$project$Main$update = F2(
 									$author$project$Main$KFactorMsg,
 									A2($author$project$Page$KFactor$update, v, m))));
 					} else {
-						break _v0$4;
+						break _v0$5;
 					}
-				default:
+				case 'TriangleMsg':
 					if (_v0.m.$ === 'TriangleModel') {
 						var m = _v0.m.a;
 						var v = _v0.v.a;
@@ -5888,7 +6028,23 @@ var $author$project$Main$update = F2(
 									$author$project$Main$TriangleMsg,
 									A2($author$project$Page$Triangle$update, v, m))));
 					} else {
-						break _v0$4;
+						break _v0$5;
+					}
+				default:
+					if (_v0.m.$ === 'TrussModel') {
+						var m = _v0.m.a;
+						var v = _v0.v.a;
+						return A2(
+							$author$project$Main$handleUrlUpdate,
+							model,
+							$author$project$Main$handleSpaCmd(
+								A3(
+									$author$project$Main$mapPage,
+									$author$project$Main$TrussModel,
+									$author$project$Main$TrussMsg,
+									A2($author$project$Page$Truss$update, v, m))));
+					} else {
+						break _v0$5;
 					}
 			}
 		}
@@ -6893,6 +7049,174 @@ var $author$project$Page$Triangle$view = function (model) {
 		title: 'Triangles'
 	};
 };
+var $author$project$Page$Truss$HomePage = {$: 'HomePage'};
+var $author$project$Page$Truss$UpdateChordGap = function (a) {
+	return {$: 'UpdateChordGap', a: a};
+};
+var $author$project$Page$Truss$UpdateChordLen = function (a) {
+	return {$: 'UpdateChordLen', a: a};
+};
+var $author$project$Page$Truss$UpdateRoof = function (a) {
+	return {$: 'UpdateRoof', a: a};
+};
+var $author$project$Page$Truss$UpdateStartCount = function (a) {
+	return {$: 'UpdateStartCount', a: a};
+};
+var $author$project$Page$Truss$UpdateStartWeb = function (a) {
+	return {$: 'UpdateStartWeb', a: a};
+};
+var $author$project$Page$Truss$UpdateWeb = function (a) {
+	return {$: 'UpdateWeb', a: a};
+};
+var $author$project$Page$Truss$UpdateWebAngle = function (a) {
+	return {$: 'UpdateWebAngle', a: a};
+};
+var $author$project$Page$Truss$UpdateWebStart = function (a) {
+	return {$: 'UpdateWebStart', a: a};
+};
+var $author$project$Page$Truss$makeInput = F5(
+	function (label, idTxt, stepV, currTxt, updateMsg) {
+		return A2(
+			$gren_lang$browser$Html$div,
+			[],
+			[
+				$gren_lang$browser$Html$text(label),
+				$gren_lang$browser$Html$text('         '),
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
+				A2(
+				$gren_lang$browser$Html$input,
+				[
+					$gren_lang$browser$Html$Attributes$value(currTxt),
+					$gren_lang$browser$Html$Events$onInput(updateMsg),
+					$gren_lang$browser$Html$Attributes$id(idTxt),
+					$gren_lang$browser$Html$Attributes$type_('number'),
+					$gren_lang$browser$Html$Attributes$step(
+					$gren_lang$core$String$fromFloat(stepV))
+				],
+				[]),
+				$gren_lang$core$String$isEmpty(currTxt) ? A2(
+				$gren_lang$browser$Html$button,
+				[
+					A2($gren_lang$browser$Html$Attributes$style, 'pointer-events', 'none'),
+					A2($gren_lang$browser$Html$Attributes$style, 'opacity', '0')
+				],
+				[
+					$gren_lang$browser$Html$text('❌')
+				]) : A2(
+				$gren_lang$browser$Html$button,
+				[
+					$gren_lang$browser$Html$Events$onClick(
+					updateMsg(''))
+				],
+				[
+					$gren_lang$browser$Html$text('❌')
+				])
+			]);
+	});
+var $author$project$Page$Truss$view = function (model) {
+	var parsedModel = {
+		chordGap: $gren_lang$core$String$toFloat(model.chordGap),
+		chordLen: $gren_lang$core$String$toFloat(model.chordLen),
+		roof: $gren_lang$core$String$toFloat(model.roof),
+		startCount: $gren_lang$core$String$toFloat(model.startCount),
+		startWeb: $gren_lang$core$String$toFloat(model.startWeb),
+		web: $gren_lang$core$String$toFloat(model.web),
+		webAngle: $gren_lang$core$String$toFloat(model.webAngle),
+		webStart: $gren_lang$core$String$toFloat(model.webStart)
+	};
+	var res = function () {
+		if ((((((((parsedModel.chordLen.$ === 'Just') && (parsedModel.chordGap.$ === 'Just')) && (parsedModel.web.$ === 'Just')) && (parsedModel.startWeb.$ === 'Just')) && (parsedModel.startCount.$ === 'Just')) && (parsedModel.roof.$ === 'Just')) && (parsedModel.webAngle.$ === 'Just')) && (parsedModel.webStart.$ === 'Just')) {
+			var chordLen = parsedModel.chordLen.a;
+			var chordGap = parsedModel.chordGap.a;
+			var web = parsedModel.web.a;
+			var startWeb = parsedModel.startWeb.a;
+			var startCount = parsedModel.startCount.a;
+			var roof = parsedModel.roof.a;
+			var webAngle = parsedModel.webAngle.a;
+			var webStart = parsedModel.webStart.a;
+			return $gren_lang$core$Maybe$Just(
+				{endDistance: 59999.0});
+		} else {
+			return $gren_lang$core$Maybe$Nothing;
+		}
+	}();
+	var error = A2(
+		$gren_lang$core$Result$andThen,
+		function (_v2) {
+			var _v3 = parsedModel.chordLen;
+			if (_v3.$ === 'Just') {
+				var chordLen = _v3.a;
+				return (chordLen <= 100) ? $gren_lang$core$Result$Err('error: chord length should be > 100 mm') : $gren_lang$core$Result$Ok(
+					{});
+			} else {
+				return $gren_lang$core$Result$Ok(
+					{});
+			}
+		},
+		$gren_lang$core$Result$Ok(
+			{}));
+	var formatF = function (value) {
+		if (error.$ === 'Err') {
+			return $gren_lang$core$Maybe$Just(0 / 0);
+		} else {
+			return $gren_lang$core$Maybe$Just(
+				$gren_lang$core$Math$round(value * 1000000) / 1000000);
+		}
+	};
+	return {
+		body: [
+			A2(
+			$gren_lang$browser$Html$button,
+			[
+				$gren_lang$browser$Html$Attributes$class('left'),
+				$gren_lang$browser$Html$Events$onClick($author$project$Page$Truss$HomePage)
+			],
+			[
+				$gren_lang$browser$Html$text('Home')
+			]),
+			A2(
+			$gren_lang$browser$Html$div,
+			[
+				$gren_lang$browser$Html$Attributes$id('truss'),
+				$gren_lang$browser$Html$Attributes$class('center')
+			],
+			[
+				$gren_lang$browser$Html$text('Truss'),
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
+				A5($author$project$Page$Truss$makeInput, 'Chord length', 'chord-len', 0.5, model.chordLen, $author$project$Page$Truss$UpdateChordLen),
+				A5($author$project$Page$Truss$makeInput, 'Gap between chords', 'chord-gap', 0.5, model.chordGap, $author$project$Page$Truss$UpdateChordGap),
+				A5($author$project$Page$Truss$makeInput, 'Web profile width', 'web', 0.5, model.web, $author$project$Page$Truss$UpdateWeb),
+				A5($author$project$Page$Truss$makeInput, 'Initial web profile width', 'start-web', 0.5, model.startWeb, $author$project$Page$Truss$UpdateStartWeb),
+				A5($author$project$Page$Truss$makeInput, 'Initial web count', 'start-count', 1, model.startCount, $author$project$Page$Truss$UpdateStartCount),
+				A5($author$project$Page$Truss$makeInput, 'Roof angle', 'roof', 0.5, model.roof, $author$project$Page$Truss$UpdateRoof),
+				A5($author$project$Page$Truss$makeInput, 'Web angle', 'web-angle', 0.5, model.webAngle, $author$project$Page$Truss$UpdateWebAngle),
+				A5($author$project$Page$Truss$makeInput, 'Web start distance', 'web-start', 0.5, model.webStart, $author$project$Page$Truss$UpdateWebStart),
+				function () {
+				if (error.$ === 'Err') {
+					var e = error.a;
+					return A2(
+						$gren_lang$browser$Html$div,
+						[
+							$gren_lang$browser$Html$Attributes$class('center')
+						],
+						[
+							$gren_lang$browser$Html$text(e)
+						]);
+				} else {
+					return $gren_lang$browser$Html$text('');
+				}
+			}()
+			])
+		],
+		title: 'Truss'
+	};
+};
 var $author$project$Main$view = function (model) {
 	switch (model.$) {
 		case 'HomeModel':
@@ -6907,12 +7231,18 @@ var $author$project$Main$view = function (model) {
 				$author$project$Main$mapDocument,
 				$author$project$Main$KFactorMsg,
 				$author$project$Page$KFactor$view(m));
-		default:
+		case 'TriangleModel':
 			var m = model.a;
 			return A2(
 				$author$project$Main$mapDocument,
 				$author$project$Main$TriangleMsg,
 				$author$project$Page$Triangle$view(m));
+		default:
+			var m = model.a;
+			return A2(
+				$author$project$Main$mapDocument,
+				$author$project$Main$TrussMsg,
+				$author$project$Page$Truss$view(m));
 	}
 };
 var $author$project$Main$main = $gren_lang$browser$Browser$document(
