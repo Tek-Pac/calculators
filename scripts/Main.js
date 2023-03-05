@@ -5259,17 +5259,16 @@ var $gren_lang$url$Url$Parser$Query$enum = F2(
 				}
 			});
 	});
-var $author$project$Page$KFactor$init = {a: '90', ba: '', k: '', r: '', t: '', ty: $author$project$Page$KFactor$ExtraAllowance, xa: ''};
 var $author$project$Page$KFactor$finishParse = F7(
 	function (t, r, ba, a, k, xa, ty) {
 		return {
-			a: A2($gren_lang$core$Maybe$withDefault, $author$project$Page$KFactor$init.a, a),
-			ba: A2($gren_lang$core$Maybe$withDefault, $author$project$Page$KFactor$init.ba, ba),
-			k: A2($gren_lang$core$Maybe$withDefault, $author$project$Page$KFactor$init.k, k),
-			r: A2($gren_lang$core$Maybe$withDefault, $author$project$Page$KFactor$init.r, r),
-			t: A2($gren_lang$core$Maybe$withDefault, $author$project$Page$KFactor$init.t, t),
-			ty: A2($gren_lang$core$Maybe$withDefault, $author$project$Page$KFactor$init.ty, ty),
-			xa: A2($gren_lang$core$Maybe$withDefault, $author$project$Page$KFactor$init.xa, xa)
+			a: A2($gren_lang$core$Maybe$withDefault, '90', a),
+			ba: A2($gren_lang$core$Maybe$withDefault, '', ba),
+			k: A2($gren_lang$core$Maybe$withDefault, '', k),
+			r: A2($gren_lang$core$Maybe$withDefault, '', r),
+			t: A2($gren_lang$core$Maybe$withDefault, '', t),
+			ty: A2($gren_lang$core$Maybe$withDefault, $author$project$Page$KFactor$ExtraAllowance, ty),
+			xa: A2($gren_lang$core$Maybe$withDefault, '', xa)
 		};
 	});
 var $gren_lang$core$Dict$fromArray = function (assocs) {

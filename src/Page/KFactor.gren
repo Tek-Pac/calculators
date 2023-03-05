@@ -1,4 +1,4 @@
-module Page.KFactor exposing ( Model, Msg(..), init, update, view, queryParser, queryBuilder )
+module Page.KFactor exposing ( Model, Msg(..), update, view, queryParser, queryBuilder )
 
 {-| The k factor page
 -}
@@ -42,13 +42,13 @@ queryParser =
 
 finishParse : Maybe String -> Maybe String -> Maybe String -> Maybe String -> Maybe String -> Maybe String -> Maybe Ty -> Model
 finishParse t r ba a k xa ty =
-    { t = Maybe.withDefault init.t t
-    , r = Maybe.withDefault init.r r
-    , ba = Maybe.withDefault init.ba ba
-    , a = Maybe.withDefault init.a a
-    , k = Maybe.withDefault init.k k
-    , xa = Maybe.withDefault init.xa xa
-    , ty = Maybe.withDefault init.ty ty
+    { t = Maybe.withDefault "" t
+    , r = Maybe.withDefault "" r
+    , ba = Maybe.withDefault "" ba
+    , a = Maybe.withDefault "90" a
+    , k = Maybe.withDefault "" k
+    , xa = Maybe.withDefault "" xa
+    , ty = Maybe.withDefault ExtraAllowance ty
     }
 
 
@@ -91,18 +91,6 @@ type Ty
 type alias Updated =
     { model : Model
     , command : SpaCmd Msg
-    }
-
-
-init : Model
-init =
-    { t = ""
-    , r = ""
-    , ba = ""
-    , a = "90"
-    , k = ""
-    , xa = ""
-    , ty = ExtraAllowance
     }
 
 
