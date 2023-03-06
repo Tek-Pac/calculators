@@ -26,6 +26,9 @@ try {
   }
 
   app.ports.changePage.subscribe(function(hash) {
+    if (timeoutId != undefined)
+      window.clearTimeout(timeoutId);
+
     window.history.pushState({}, "", hash);
   });
 
@@ -53,6 +56,9 @@ try {
   });
 
   window.addEventListener("hashchange", function(event) {
+    if (timeoutId != undefined)
+      window.clearTimeout(timeoutId);
+
     app.ports.pageChanged.send(document.location.hash);
   })
 }
