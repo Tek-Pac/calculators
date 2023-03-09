@@ -5924,14 +5924,11 @@ var $author$project$Page$Truss$doFocus = F2(
 			model: model
 		};
 	});
-var $author$project$Page$Truss$justModel = function (model) {
-	return {command: $author$project$SpaCmd$none, model: model};
-};
 var $author$project$Page$Truss$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'NoOp':
-				return $author$project$Page$Truss$justModel(model);
+				return {command: $author$project$SpaCmd$none, model: model};
 			case 'HomePage':
 				return {
 					command: $author$project$SpaCmd$ChangePage('#/'),
@@ -5993,7 +5990,7 @@ var $author$project$Page$Truss$update = F2(
 						model,
 						{webAngle: w}),
 					'web-angle');
-			default:
+			case 'UpdateWebStart':
 				var w = msg.a;
 				return A2(
 					$author$project$Page$Truss$doFocus,
@@ -6001,6 +5998,12 @@ var $author$project$Page$Truss$update = F2(
 						model,
 						{webStart: w}),
 					'web-start');
+			default:
+				var id = msg.a;
+				return {
+					command: $author$project$SpaCmd$CopyId(id),
+					model: model
+				};
 		}
 	});
 var $author$project$Main$update = F2(
@@ -7107,6 +7110,228 @@ var $author$project$Page$Truss$UpdateWebAngle = function (a) {
 var $author$project$Page$Truss$UpdateWebStart = function (a) {
 	return {$: 'UpdateWebStart', a: a};
 };
+var $author$project$Vector2$add = F2(
+	function (_v0, _v1) {
+		var x1 = _v0.x;
+		var y1 = _v0.y;
+		var x2 = _v1.x;
+		var y2 = _v1.y;
+		return {x: x1 + x2, y: y1 + y2};
+	});
+var $gren_lang$core$Math$modBy = _Math_modBy;
+var $gren_lang$core$Array$pushFirst = F2(
+	function (value, array) {
+		return A2(
+			$gren_lang$core$Array$prefix,
+			[value],
+			array);
+	});
+var $author$project$Page$Truss$calcWebPoints = F3(
+	function (dat, currWeb, index) {
+		var _v0 = dat;
+		var endPointX = _v0.endPointX;
+		var webOffsetUp = _v0.webOffsetUp;
+		var webOffsetDn = _v0.webOffsetDn;
+		var webWidthOffset = _v0.webWidthOffset;
+		var startWebWidthOffset = _v0.startWebWidthOffset;
+		var startCount = _v0.startCount;
+		if (_Utils_cmp(currWeb.x, endPointX) > 0) {
+			return [];
+		} else {
+			var webOffset = (_Utils_cmp(index, startCount) < 0) ? startWebWidthOffset : webWidthOffset;
+			var isTop = A2($gren_lang$core$Math$modBy, 2, index) === 1;
+			var nextCurrWeb = A2(
+				$author$project$Vector2$add,
+				webOffset,
+				A2(
+					$author$project$Vector2$add,
+					currWeb,
+					isTop ? webOffsetDn : webOffsetUp));
+			return A2(
+				$gren_lang$core$Array$pushFirst,
+				currWeb,
+				A3($author$project$Page$Truss$calcWebPoints, dat, nextCurrWeb, index + 1));
+		}
+	});
+var $author$project$Vector2$dot = F2(
+	function (_v0, _v1) {
+		var x1 = _v0.x;
+		var y1 = _v0.y;
+		var x2 = _v1.x;
+		var y2 = _v1.y;
+		return (x1 * x2) + (y1 * y2);
+	});
+var $author$project$Vector2$length = function (v) {
+	return $gren_lang$core$Math$sqrt(
+		A2($author$project$Vector2$dot, v, v));
+};
+var $author$project$Vector2$sub = F2(
+	function (_v0, _v1) {
+		var x1 = _v0.x;
+		var y1 = _v0.y;
+		var x2 = _v1.x;
+		var y2 = _v1.y;
+		return {x: x1 - x2, y: y1 - y2};
+	});
+var $author$project$Vector2$distance = F2(
+	function (v, w) {
+		return $author$project$Vector2$length(
+			A2($author$project$Vector2$sub, v, w));
+	});
+var $author$project$Vector2$divideBy = F2(
+	function (a, _v0) {
+		var x = _v0.x;
+		var y = _v0.y;
+		return {x: x / a, y: y / a};
+	});
+var $author$project$Vector2$div = F2(
+	function (v, a) {
+		return A2($author$project$Vector2$divideBy, a, v);
+	});
+var $gren_lang$core$Array$last = function (array) {
+	return A2(
+		$gren_lang$core$Array$get,
+		$gren_lang$core$Array$length(array) - 1,
+		array);
+};
+var $author$project$Vector2$scale = F2(
+	function (a, _v0) {
+		var x = _v0.x;
+		var y = _v0.y;
+		return {x: a * x, y: a * y};
+	});
+var $author$project$Vector2$mul = F2(
+	function (v, a) {
+		return A2($author$project$Vector2$scale, a, v);
+	});
+var $author$project$Vector2$v2 = F2(
+	function (x, y) {
+		return {x: x, y: y};
+	});
+var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
+	var chordLen = _v0.chordLen;
+	var chordGap = _v0.chordGap;
+	var web = _v0.web;
+	var startWeb = _v0.startWeb;
+	var startCount = _v0.startCount;
+	var roof = _v0.roof;
+	var webAngle = _v0.webAngle;
+	var webDist = _v0.webStart;
+	var webRad = $gren_lang$core$Math$degrees(webAngle);
+	var roofRad = $gren_lang$core$Math$degrees(roof);
+	var trussAlong = A2(
+		$author$project$Vector2$v2,
+		$gren_lang$core$Math$cos(roofRad),
+		$gren_lang$core$Math$sin(roofRad));
+	var startWebWidthOffset = A2(
+		$author$project$Vector2$mul,
+		trussAlong,
+		startWeb / $gren_lang$core$Math$sin(webRad));
+	var webStart = A2($author$project$Vector2$mul, trussAlong, webDist);
+	var webWidthOffset = A2(
+		$author$project$Vector2$mul,
+		trussAlong,
+		web / $gren_lang$core$Math$sin(webRad));
+	var vertGapDist = A2(
+		$author$project$Vector2$v2,
+		0,
+		chordGap / $gren_lang$core$Math$cos(roofRad));
+	var webAlongDn = A2(
+		$author$project$Vector2$v2,
+		$gren_lang$core$Math$cos(roofRad - webRad),
+		$gren_lang$core$Math$sin(roofRad - webRad));
+	var webOffsetDn = A2(
+		$author$project$Vector2$div,
+		A2($author$project$Vector2$mul, webAlongDn, chordGap),
+		$gren_lang$core$Math$sin(webRad));
+	var webAlongUp = A2(
+		$author$project$Vector2$v2,
+		$gren_lang$core$Math$cos(roofRad + webRad),
+		$gren_lang$core$Math$sin(roofRad + webRad));
+	var webOffsetUp = A2(
+		$author$project$Vector2$div,
+		A2($author$project$Vector2$mul, webAlongUp, chordGap),
+		$gren_lang$core$Math$sin(webRad));
+	var formatF = function (value) {
+		return $gren_lang$core$Math$round(value * 1000000) / 1000000;
+	};
+	var endPointLower = A2($author$project$Vector2$mul, trussAlong, chordLen);
+	var endPointUpper = A2($author$project$Vector2$add, endPointLower, vertGapDist);
+	var webPoints = A3(
+		$author$project$Page$Truss$calcWebPoints,
+		{endPointX: endPointLower.x, startCount: startCount, startWebWidthOffset: startWebWidthOffset, webOffsetDn: webOffsetDn, webOffsetUp: webOffsetUp, webWidthOffset: webWidthOffset},
+		webStart,
+		0);
+	var endDistance = ((A2(
+		$gren_lang$core$Math$modBy,
+		2,
+		$gren_lang$core$Array$length(webPoints)) === 1) ? $author$project$Vector2$distance(endPointLower) : $author$project$Vector2$distance(endPointUpper))(
+		A2(
+			$gren_lang$core$Maybe$withDefault,
+			A2($author$project$Vector2$v2, 0, 9999),
+			$gren_lang$core$Array$last(webPoints)));
+	return $gren_lang$core$Result$Ok(
+		{
+			endDistance: formatF(endDistance)
+		});
+};
+var $author$project$Page$Truss$calculateTruss = function (model) {
+	var parsedModel = {
+		chordGap: $gren_lang$core$String$toFloat(model.chordGap),
+		chordLen: $gren_lang$core$String$toFloat(model.chordLen),
+		roof: $gren_lang$core$String$toFloat(model.roof),
+		startCount: $gren_lang$core$String$toInt(model.startCount),
+		startWeb: $gren_lang$core$String$toFloat(model.startWeb),
+		web: $gren_lang$core$String$toFloat(model.web),
+		webAngle: $gren_lang$core$String$toFloat(model.webAngle),
+		webStart: $gren_lang$core$String$toFloat(model.webStart)
+	};
+	_v0$4:
+	while (true) {
+		if (parsedModel.startWeb.$ === 'Nothing') {
+			if (parsedModel.startCount.$ === 'Nothing') {
+				if ((((((parsedModel.chordLen.$ === 'Just') && (parsedModel.chordGap.$ === 'Just')) && (parsedModel.web.$ === 'Just')) && (parsedModel.roof.$ === 'Just')) && (parsedModel.webAngle.$ === 'Just')) && (parsedModel.webStart.$ === 'Just')) {
+					var chordLen = parsedModel.chordLen.a;
+					var chordGap = parsedModel.chordGap.a;
+					var web = parsedModel.web.a;
+					var _v1 = parsedModel.startWeb;
+					var _v2 = parsedModel.startCount;
+					var roof = parsedModel.roof.a;
+					var webAngle = parsedModel.webAngle.a;
+					var webStart = parsedModel.webStart.a;
+					return $author$project$Page$Truss$finishTrussCalc(
+						{chordGap: chordGap, chordLen: chordLen, roof: roof, startCount: 0, startWeb: 0, web: web, webAngle: webAngle, webStart: webStart});
+				} else {
+					var _v3 = parsedModel.startWeb;
+					var _v4 = parsedModel.startCount;
+					return $gren_lang$core$Result$Err('please enter in all the values');
+				}
+			} else {
+				break _v0$4;
+			}
+		} else {
+			if (parsedModel.startCount.$ === 'Just') {
+				if ((((((parsedModel.chordLen.$ === 'Just') && (parsedModel.chordGap.$ === 'Just')) && (parsedModel.web.$ === 'Just')) && (parsedModel.roof.$ === 'Just')) && (parsedModel.webAngle.$ === 'Just')) && (parsedModel.webStart.$ === 'Just')) {
+					var chordLen = parsedModel.chordLen.a;
+					var chordGap = parsedModel.chordGap.a;
+					var web = parsedModel.web.a;
+					var startWeb = parsedModel.startWeb.a;
+					var startCount = parsedModel.startCount.a;
+					var roof = parsedModel.roof.a;
+					var webAngle = parsedModel.webAngle.a;
+					var webStart = parsedModel.webStart.a;
+					return $author$project$Page$Truss$finishTrussCalc(
+						{chordGap: chordGap, chordLen: chordLen, roof: roof, startCount: startCount, startWeb: startWeb, web: web, webAngle: webAngle, webStart: webStart});
+				} else {
+					return $gren_lang$core$Result$Err('please enter in all the values');
+				}
+			} else {
+				break _v0$4;
+			}
+		}
+	}
+	return $gren_lang$core$Result$Err('either fill in both of the initial web inputs or neither');
+};
 var $author$project$Page$Truss$makeInput = F5(
 	function (label, idTxt, stepV, currTxt, updateMsg) {
 		return A2(
@@ -7149,56 +7374,43 @@ var $author$project$Page$Truss$makeInput = F5(
 				])
 			]);
 	});
+var $author$project$Page$Truss$DoCopy = function (a) {
+	return {$: 'DoCopy', a: a};
+};
+var $author$project$Page$Truss$makeOutput = F3(
+	function (label, idTxt, calc) {
+		return A2(
+			$gren_lang$browser$Html$div,
+			[],
+			[
+				$gren_lang$browser$Html$text(label),
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
+				A2(
+				$gren_lang$browser$Html$input,
+				[
+					$gren_lang$browser$Html$Attributes$value(
+					$gren_lang$core$String$fromFloat(calc)),
+					$gren_lang$browser$Html$Attributes$readonly(true),
+					$gren_lang$browser$Html$Attributes$id(idTxt),
+					$gren_lang$browser$Html$Attributes$type_('number')
+				],
+				[]),
+				A2(
+				$gren_lang$browser$Html$button,
+				[
+					$gren_lang$browser$Html$Events$onClick(
+					$author$project$Page$Truss$DoCopy(idTxt))
+				],
+				[
+					$gren_lang$browser$Html$text('📋')
+				])
+			]);
+	});
 var $author$project$Page$Truss$view = function (model) {
-	var parsedModel = {
-		chordGap: $gren_lang$core$String$toFloat(model.chordGap),
-		chordLen: $gren_lang$core$String$toFloat(model.chordLen),
-		roof: $gren_lang$core$String$toFloat(model.roof),
-		startCount: $gren_lang$core$String$toFloat(model.startCount),
-		startWeb: $gren_lang$core$String$toFloat(model.startWeb),
-		web: $gren_lang$core$String$toFloat(model.web),
-		webAngle: $gren_lang$core$String$toFloat(model.webAngle),
-		webStart: $gren_lang$core$String$toFloat(model.webStart)
-	};
-	var res = function () {
-		if ((((((((parsedModel.chordLen.$ === 'Just') && (parsedModel.chordGap.$ === 'Just')) && (parsedModel.web.$ === 'Just')) && (parsedModel.startWeb.$ === 'Just')) && (parsedModel.startCount.$ === 'Just')) && (parsedModel.roof.$ === 'Just')) && (parsedModel.webAngle.$ === 'Just')) && (parsedModel.webStart.$ === 'Just')) {
-			var chordLen = parsedModel.chordLen.a;
-			var chordGap = parsedModel.chordGap.a;
-			var web = parsedModel.web.a;
-			var startWeb = parsedModel.startWeb.a;
-			var startCount = parsedModel.startCount.a;
-			var roof = parsedModel.roof.a;
-			var webAngle = parsedModel.webAngle.a;
-			var webStart = parsedModel.webStart.a;
-			return $gren_lang$core$Maybe$Just(
-				{endDistance: 59999.0});
-		} else {
-			return $gren_lang$core$Maybe$Nothing;
-		}
-	}();
-	var error = A2(
-		$gren_lang$core$Result$andThen,
-		function (_v2) {
-			var _v3 = parsedModel.chordLen;
-			if (_v3.$ === 'Just') {
-				var chordLen = _v3.a;
-				return (chordLen <= 100) ? $gren_lang$core$Result$Err('error: chord length should be > 100 mm') : $gren_lang$core$Result$Ok(
-					{});
-			} else {
-				return $gren_lang$core$Result$Ok(
-					{});
-			}
-		},
-		$gren_lang$core$Result$Ok(
-			{}));
-	var formatF = function (value) {
-		if (error.$ === 'Err') {
-			return $gren_lang$core$Maybe$Just(0 / 0);
-		} else {
-			return $gren_lang$core$Maybe$Just(
-				$gren_lang$core$Math$round(value * 1000000) / 1000000);
-		}
-	};
+	var result = $author$project$Page$Truss$calculateTruss(model);
 	return {
 		body: [
 			A2(
@@ -7231,8 +7443,8 @@ var $author$project$Page$Truss$view = function (model) {
 				A5($author$project$Page$Truss$makeInput, 'Web angle', 'web-angle', 0.5, model.webAngle, $author$project$Page$Truss$UpdateWebAngle),
 				A5($author$project$Page$Truss$makeInput, 'Web start distance', 'web-start', 0.5, model.webStart, $author$project$Page$Truss$UpdateWebStart),
 				function () {
-				if (error.$ === 'Err') {
-					var e = error.a;
+				if (result.$ === 'Err') {
+					var e = result.a;
 					return A2(
 						$gren_lang$browser$Html$div,
 						[
@@ -7242,7 +7454,8 @@ var $author$project$Page$Truss$view = function (model) {
 							$gren_lang$browser$Html$text(e)
 						]);
 				} else {
-					return $gren_lang$browser$Html$text('');
+					var endDistance = result.a.endDistance;
+					return A3($author$project$Page$Truss$makeOutput, 'End distance', 'end-distance', endDistance);
 				}
 			}()
 			])

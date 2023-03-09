@@ -67,21 +67,6 @@ type alias Model =
     }
 
 
-type alias ModelCalc =
-    { chordLen : Float
-    , chordGap : Float
-    , web : Float
-    , startWeb :
-        Maybe
-            { web : Float
-            , count : Int
-            }
-    , roof : Float
-    , webAngle : Float
-    , webStart : Float
-    }
-
-
 type alias Updated =
     { model : Model
     , command : SpaCmd Msg
@@ -98,19 +83,13 @@ type Msg
     | UpdateRoof String
     | UpdateWebAngle String
     | UpdateWebStart String
+    | DoCopy String
     | NoOp
 
 
 attemptFocus : String -> SpaCmd Msg
 attemptFocus id =
     BaseCmd (Task.attempt (\_ -> NoOp) (Dom.focus id))
-
-
-justModel : Model -> Updated
-justModel model =
-    { model = model
-    , command = SpaCmd.none
-    }
 
 
 doFocus : Model -> String -> Updated
@@ -124,7 +103,9 @@ update : Msg -> Model -> Updated
 update msg model =
     case msg of
         NoOp ->
-            justModel model
+            { model = model
+            , command = SpaCmd.none
+            }
 
         HomePage ->
             { model = model
@@ -155,60 +136,66 @@ update msg model =
         UpdateWebStart w ->
             doFocus { model | webStart = w } "web-start"
 
+        DoCopy id ->
+            { model = model
+            , command = CopyId id
+            }
 
-undegrees : Float -> Float
-undegrees rad =
-    rad * 180 / Math.pi
 
-
-view : Model -> Browser.Document Msg
-view model =
+calculateTruss : Model -> Result String TrussCalc
+calculateTruss model =
     let
         parsedModel =
             { chordLen = String.toFloat model.chordLen
             , chordGap = String.toFloat model.chordGap
             , web = String.toFloat model.web
             , startWeb = String.toFloat model.startWeb
-            , startCount = String.toFloat model.startCount
+            , startCount = String.toInt model.startCount
             , roof = String.toFloat model.roof
             , webAngle = String.toFloat model.webAngle
             , webStart = String.toFloat model.webStart
             }
+    in
+    case parsedModel of
+        { chordLen = Just chordLen, chordGap = Just chordGap, web = Just web, startWeb = Nothing, startCount = Nothing, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
+            finishTrussCalc
+                { chordLen = chordLen
+                , chordGap = chordGap
+                , web = web
+                , startWeb = 0
+                , startCount = 0
+                , roof = roof
+                , webAngle = webAngle
+                , webStart = webStart
+                }
 
-        error =
-            Ok {}
-                |> Result.andThen
-                        (\_ ->
-                            case parsedModel.chordLen of
-                                Just chordLen ->
-                                    if chordLen <= 100 then
-                                        Err "error: chord length should be > 100 mm"
-                                    else
-                                        Ok {}
+        { chordLen = Just chordLen, chordGap = Just chordGap, web = Just web, startWeb = Just startWeb, startCount = Just startCount, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
+            finishTrussCalc
+                { chordLen = chordLen
+                , chordGap = chordGap
+                , web = web
+                , startWeb = startWeb
+                , startCount = startCount
+                , roof = roof
+                , webAngle = webAngle
+                , webStart = webStart
+                }
 
-                                _ ->
-                                    Ok {}
-                        )
+        { startWeb = Nothing, startCount = Nothing } ->
+            Err "please enter in all the values"
 
-        -- 6 dp
-        formatF : Float -> Maybe Float
-        formatF value =
-            case error of
-                Err _ ->
-                    Just (0 / 0)
+        { startWeb = Just _, startCount = Just _ } ->
+            Err "please enter in all the values"
 
-                _ ->
-                    Just (toFloat (Math.round (value * 1000000)) / 1000000)
+        _ ->
+            Err "either fill in both of the initial web inputs or neither"
 
-        res =
-            case parsedModel of
-                { chordLen = Just chordLen, chordGap = Just chordGap, web = Just web, startWeb = Just startWeb, startCount = Just startCount, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
-                    Just
-                        { endDistance = 59999.0
-                        }
 
-                _ ->
-                    Nothing
+view : Model -> Browser.Document Msg
+view model =
+    let
+        result =
+            calculateTruss model
     in
     { title = "Truss"
     , body =
@@ -232,7 +219,7 @@ view model =
             , makeInput "Roof angle" "roof" 0.5 model.roof UpdateRoof
             , makeInput "Web angle" "web-angle" 0.5 model.webAngle UpdateWebAngle
             , makeInput "Web start distance" "web-start" 0.5 model.webStart UpdateWebStart
-            , case error of
+            , case result of
                 Err e ->
                     div
                         [ class "center"
@@ -240,8 +227,8 @@ view model =
                         [ text e
                         ]
 
-                _ ->
-                    text ""
+                Ok { endDistance } ->
+                    makeOutput "End distance" "end-distance" endDistance
             ]
         ]
     }
@@ -285,3 +272,156 @@ makeInput label idTxt stepV currTxt updateMsg =
                 [ text "❌"
                 ]
         ]
+
+
+makeOutput : String -> String -> Float -> Html Msg
+makeOutput label idTxt calc =
+    div
+        []
+        [ text label
+        , br [] []
+        , input
+            [ value (String.fromFloat calc)
+            , readonly True
+            , id idTxt
+            , type_ "number"
+            ]
+            []
+        , button
+            [ onClick (DoCopy idTxt)
+            ]
+            [ text "📋"
+            ]
+        ]
+
+
+type alias FilledModel =
+    { chordLen : Float
+    , chordGap : Float
+    , web : Float
+    , startWeb : Float
+    , startCount : Int
+    , roof : Float
+    , webAngle : Float
+    , webStart : Float
+    }
+
+
+type alias TrussCalc =
+    { endDistance : Float
+    }
+
+
+type alias WebData =
+    { endPointX : Float
+    , webOffsetUp : Float2
+    , webOffsetDn : Float2
+    , webWidthOffset : Float2
+    , startWebWidthOffset : Float2
+    , startCount : Int
+    }
+
+
+calcWebPoints : WebData -> Float2 -> Int -> Array Float2
+calcWebPoints dat currWeb index =
+    let
+        { endPointX, webOffsetUp, webOffsetDn, webWidthOffset, startWebWidthOffset, startCount } =
+            dat
+    in
+    if currWeb.x > endPointX then
+        []
+    else
+        let
+            isTop =
+                Math.modBy 2 index == 1
+
+            webOffset =
+                if index < startCount then
+                    startWebWidthOffset
+                else
+                    webWidthOffset
+
+            nextCurrWeb =
+                (if isTop then
+                    webOffsetDn
+                 else
+                    webOffsetUp
+                )
+                    |> V2.add currWeb
+                    |> V2.add webOffset
+        in
+        calcWebPoints dat nextCurrWeb (index + 1)
+            |> Array.pushFirst currWeb
+
+
+finishTrussCalc : FilledModel -> Result String TrussCalc
+finishTrussCalc { chordLen, chordGap, web, startWeb, startCount, roof, webAngle, webStart = webDist } =
+    let
+        roofRad =
+            Math.degrees roof
+
+        webRad =
+            Math.degrees webAngle
+
+        trussAlong =
+            v2 (Math.cos roofRad) (Math.sin roofRad)
+
+        webAlongUp =
+            v2 (Math.cos (roofRad + webRad)) (Math.sin (roofRad + webRad))
+
+        webAlongDn =
+            v2 (Math.cos (roofRad - webRad)) (Math.sin (roofRad - webRad))
+
+        vertGapDist =
+            v2 0 (chordGap / Math.cos roofRad)
+
+        endPointLower =
+            V2.mul trussAlong chordLen
+
+        endPointUpper =
+            V2.add endPointLower vertGapDist
+
+        webStart =
+            V2.mul trussAlong webDist
+
+        webOffsetUp =
+            V2.div (V2.mul webAlongUp chordGap) (Math.sin webRad)
+
+        webOffsetDn =
+            V2.div (V2.mul webAlongDn chordGap) (Math.sin webRad)
+
+        webWidthOffset =
+            V2.mul trussAlong (web / Math.sin webRad)
+
+        startWebWidthOffset =
+            V2.mul trussAlong (startWeb / Math.sin webRad)
+
+        webPoints =
+            calcWebPoints
+                { endPointX = endPointLower.x
+                , webOffsetUp = webOffsetUp
+                , webOffsetDn = webOffsetDn
+                , webWidthOffset = webWidthOffset
+                , startWebWidthOffset = startWebWidthOffset
+                , startCount = startCount
+                }
+                webStart
+                0
+
+        endDistance =
+            Array.last webPoints
+                |> Maybe.withDefault (v2 0 9999)
+                |> (if Math.modBy 2 (Array.length webPoints) == 1 then
+                        V2.distance endPointLower
+                     else
+                        V2.distance endPointUpper
+                    )
+
+        -- 6 dp
+        formatF : Float -> Float
+        formatF value =
+            toFloat (Math.round (value * 1000000)) / 1000000
+    in
+    Ok
+        { endDistance = formatF endDistance
+        }
