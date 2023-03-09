@@ -5725,16 +5725,22 @@ var $author$project$Main$mapPage = F3(
 	});
 var $author$project$Page$Home$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'GoToKFactor') {
-			return {
-				command: $author$project$SpaCmd$ChangePage('#/k-factor'),
-				model: model
-			};
-		} else {
-			return {
-				command: $author$project$SpaCmd$ChangePage('#/triangle'),
-				model: model
-			};
+		switch (msg.$) {
+			case 'GoToKFactor':
+				return {
+					command: $author$project$SpaCmd$ChangePage('#/k-factor'),
+					model: model
+				};
+			case 'GoToTriangle':
+				return {
+					command: $author$project$SpaCmd$ChangePage('#/triangle'),
+					model: model
+				};
+			default:
+				return {
+					command: $author$project$SpaCmd$ChangePage('#/truss'),
+					model: model
+				};
 		}
 	});
 var $author$project$Page$KFactor$NoOp = {$: 'NoOp'};
@@ -6100,6 +6106,7 @@ var $author$project$Main$mapDocument = F2(
 	});
 var $author$project$Page$Home$GoToKFactor = {$: 'GoToKFactor'};
 var $author$project$Page$Home$GoToTriangle = {$: 'GoToTriangle'};
+var $author$project$Page$Home$GoToTruss = {$: 'GoToTruss'};
 var $gren_lang$browser$VirtualDom$node = function (tag) {
 	return _VirtualDom_node(
 		_VirtualDom_noScript(tag));
@@ -6155,6 +6162,14 @@ var $author$project$Page$Home$view = function (model) {
 				],
 				[
 					$gren_lang$browser$Html$text('Triangles')
+				]),
+				A2(
+				$gren_lang$browser$Html$button,
+				[
+					$gren_lang$browser$Html$Events$onClick($author$project$Page$Home$GoToTruss)
+				],
+				[
+					$gren_lang$browser$Html$text('Trusses')
 				])
 			])
 		],

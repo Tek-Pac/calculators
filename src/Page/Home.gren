@@ -45,6 +45,11 @@ view model =
                 ]
                 [ text "Triangles"
                 ]
+            , button
+                [ onClick GoToTruss
+                ]
+                [ text "Trusses"
+                ]
             ]
         ]
     }
@@ -53,6 +58,7 @@ view model =
 type Msg
     = GoToKFactor
     | GoToTriangle
+    | GoToTruss
 
 
 update : Msg -> Model -> Updated
@@ -66,4 +72,9 @@ update msg model =
         GoToTriangle ->
             { model = model
             , command = ChangePage "#/triangle"
+            }
+
+        GoToTruss ->
+            { model = model
+            , command = ChangePage "#/truss"
             }
