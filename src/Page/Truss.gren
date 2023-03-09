@@ -112,6 +112,13 @@ justModel model =
     }
 
 
+doFocus : Model -> String -> Updated
+doFocus model id =
+    { model = model
+    , command = attemptFocus id
+    }
+
+
 update : Msg -> Model -> Updated
 update msg model =
     case msg of
@@ -124,28 +131,28 @@ update msg model =
             }
 
         UpdateChordLen c ->
-            justModel { model | chordLen = c }
+            doFocus { model | chordLen = c } "chord-len"
 
         UpdateChordGap c ->
-            justModel { model | chordGap = c }
+            doFocus { model | chordGap = c } "chord-gap"
 
         UpdateWeb w ->
-            justModel { model | web = w }
+            doFocus { model | web = w } "web"
 
         UpdateStartWeb s ->
-            justModel { model | startWeb = s }
+            doFocus { model | startWeb = s } "start-web"
 
         UpdateStartCount s ->
-            justModel { model | startCount = s }
+            doFocus { model | startCount = s } "start-count"
 
         UpdateRoof r ->
-            justModel { model | roof = r }
+            doFocus { model | roof = r } "roof"
 
         UpdateWebAngle w ->
-            justModel { model | webAngle = w }
+            doFocus { model | webAngle = w } "web-angle"
 
         UpdateWebStart w ->
-            justModel { model | webStart = w }
+            doFocus { model | webStart = w } "web-start"
 
 
 undegrees : Float -> Float

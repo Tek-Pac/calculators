@@ -5907,6 +5907,23 @@ var $author$project$Page$Triangle$update = F2(
 				};
 		}
 	});
+var $author$project$Page$Truss$NoOp = {$: 'NoOp'};
+var $author$project$Page$Truss$attemptFocus = function (id) {
+	return $author$project$SpaCmd$BaseCmd(
+		A2(
+			$gren_lang$core$Task$attempt,
+			function (_v0) {
+				return $author$project$Page$Truss$NoOp;
+			},
+			$gren_lang$browser$Browser$Dom$focus(id)));
+};
+var $author$project$Page$Truss$doFocus = F2(
+	function (model, id) {
+		return {
+			command: $author$project$Page$Truss$attemptFocus(id),
+			model: model
+		};
+	});
 var $author$project$Page$Truss$justModel = function (model) {
 	return {command: $author$project$SpaCmd$none, model: model};
 };
@@ -5922,52 +5939,68 @@ var $author$project$Page$Truss$update = F2(
 				};
 			case 'UpdateChordLen':
 				var c = msg.a;
-				return $author$project$Page$Truss$justModel(
+				return A2(
+					$author$project$Page$Truss$doFocus,
 					_Utils_update(
 						model,
-						{chordLen: c}));
+						{chordLen: c}),
+					'chord-len');
 			case 'UpdateChordGap':
 				var c = msg.a;
-				return $author$project$Page$Truss$justModel(
+				return A2(
+					$author$project$Page$Truss$doFocus,
 					_Utils_update(
 						model,
-						{chordGap: c}));
+						{chordGap: c}),
+					'chord-gap');
 			case 'UpdateWeb':
 				var w = msg.a;
-				return $author$project$Page$Truss$justModel(
+				return A2(
+					$author$project$Page$Truss$doFocus,
 					_Utils_update(
 						model,
-						{web: w}));
+						{web: w}),
+					'web');
 			case 'UpdateStartWeb':
 				var s = msg.a;
-				return $author$project$Page$Truss$justModel(
+				return A2(
+					$author$project$Page$Truss$doFocus,
 					_Utils_update(
 						model,
-						{startWeb: s}));
+						{startWeb: s}),
+					'start-web');
 			case 'UpdateStartCount':
 				var s = msg.a;
-				return $author$project$Page$Truss$justModel(
+				return A2(
+					$author$project$Page$Truss$doFocus,
 					_Utils_update(
 						model,
-						{startCount: s}));
+						{startCount: s}),
+					'start-count');
 			case 'UpdateRoof':
 				var r = msg.a;
-				return $author$project$Page$Truss$justModel(
+				return A2(
+					$author$project$Page$Truss$doFocus,
 					_Utils_update(
 						model,
-						{roof: r}));
+						{roof: r}),
+					'roof');
 			case 'UpdateWebAngle':
 				var w = msg.a;
-				return $author$project$Page$Truss$justModel(
+				return A2(
+					$author$project$Page$Truss$doFocus,
 					_Utils_update(
 						model,
-						{webAngle: w}));
+						{webAngle: w}),
+					'web-angle');
 			default:
 				var w = msg.a;
-				return $author$project$Page$Truss$justModel(
+				return A2(
+					$author$project$Page$Truss$doFocus,
 					_Utils_update(
 						model,
-						{webStart: w}));
+						{webStart: w}),
+					'web-start');
 		}
 	});
 var $author$project$Main$update = F2(
