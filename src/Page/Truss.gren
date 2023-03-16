@@ -181,14 +181,39 @@ calculateTruss model =
                 , webStart = webStart
                 }
 
-        { startWeb = Nothing, startCount = Nothing } ->
-            Err "please enter in all the values"
+        { chordLen = Nothing } ->
+            Err "please enter the chord length"
 
-        { startWeb = Just _, startCount = Just _ } ->
-            Err "please enter in all the values"
+        { chordGap = Nothing } ->
+            Err "please enter the gap between the chords"
 
-        _ ->
-            Err "either fill in both of the initial web inputs or neither"
+        { web = Nothing } ->
+            Err "please enter the width of the web profile"
+
+        { roof = Nothing } ->
+            Err "please enter in the angle of the roof"
+
+        { webAngle = Nothing } ->
+            Err "please enter the angle that you want the webs to be at"
+
+        { webStart = Nothing } ->
+            Err "please enter in the web start distance"
+
+        -- Check the initial webs
+        -- The user has entered an initial web width, but not a valid count
+        { startCount = Nothing } ->
+            case String.toFloat model.startCount of
+                Just _ ->
+                    -- the user has entered something like 3.5
+                    Err "please enter an integral number of initial webs"
+
+                Nothing ->
+                    -- the user hasn't entered anything
+                    Err "please enter in the number of initial webs too"
+
+        -- The user has entered an initial web count, but not a width
+        { startWeb = Nothing } ->
+            Err "please fill in the size of the initial webs"
 
 
 view : Model -> Browser.Document Msg
@@ -217,8 +242,8 @@ view model =
             , makeInput "Initial web profile width" "start-web" 0.5 model.startWeb UpdateStartWeb
             , makeInput "Initial web count" "start-count" 1 model.startCount UpdateStartCount
             , makeInput "Roof angle" "roof" 0.5 model.roof UpdateRoof
-            , makeInput "Web angle" "web-angle" 0.5 model.webAngle UpdateWebAngle
-            , makeInput "Web start distance" "web-start" 0.5 model.webStart UpdateWebStart
+            , makeInput "Web angle" "web-angle" 0.1 model.webAngle UpdateWebAngle
+            , makeInput "Web start distance" "web-start" 5 model.webStart UpdateWebStart
             , case result of
                 Err e ->
                     div

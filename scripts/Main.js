@@ -7301,51 +7301,122 @@ var $author$project$Page$Truss$calculateTruss = function (model) {
 		webAngle: $gren_lang$core$String$toFloat(model.webAngle),
 		webStart: $gren_lang$core$String$toFloat(model.webStart)
 	};
-	_v0$4:
+	_v0$5:
 	while (true) {
-		if (parsedModel.startWeb.$ === 'Nothing') {
-			if (parsedModel.startCount.$ === 'Nothing') {
-				if ((((((parsedModel.chordLen.$ === 'Just') && (parsedModel.chordGap.$ === 'Just')) && (parsedModel.web.$ === 'Just')) && (parsedModel.roof.$ === 'Just')) && (parsedModel.webAngle.$ === 'Just')) && (parsedModel.webStart.$ === 'Just')) {
-					var chordLen = parsedModel.chordLen.a;
-					var chordGap = parsedModel.chordGap.a;
-					var web = parsedModel.web.a;
-					var _v1 = parsedModel.startWeb;
-					var _v2 = parsedModel.startCount;
-					var roof = parsedModel.roof.a;
-					var webAngle = parsedModel.webAngle.a;
-					var webStart = parsedModel.webStart.a;
-					return $author$project$Page$Truss$finishTrussCalc(
-						{chordGap: chordGap, chordLen: chordLen, roof: roof, startCount: 0, startWeb: 0, web: web, webAngle: webAngle, webStart: webStart});
+		_v0$6:
+		while (true) {
+			_v0$7:
+			while (true) {
+				if (parsedModel.chordLen.$ === 'Just') {
+					if (parsedModel.chordGap.$ === 'Just') {
+						if (parsedModel.web.$ === 'Just') {
+							if (parsedModel.startWeb.$ === 'Just') {
+								if (parsedModel.startCount.$ === 'Just') {
+									if (parsedModel.roof.$ === 'Just') {
+										if (parsedModel.webAngle.$ === 'Just') {
+											if (parsedModel.webStart.$ === 'Just') {
+												var chordLen = parsedModel.chordLen.a;
+												var chordGap = parsedModel.chordGap.a;
+												var web = parsedModel.web.a;
+												var startWeb = parsedModel.startWeb.a;
+												var startCount = parsedModel.startCount.a;
+												var roof = parsedModel.roof.a;
+												var webAngle = parsedModel.webAngle.a;
+												var webStart = parsedModel.webStart.a;
+												return $author$project$Page$Truss$finishTrussCalc(
+													{chordGap: chordGap, chordLen: chordLen, roof: roof, startCount: startCount, startWeb: startWeb, web: web, webAngle: webAngle, webStart: webStart});
+											} else {
+												break _v0$7;
+											}
+										} else {
+											break _v0$6;
+										}
+									} else {
+										break _v0$5;
+									}
+								} else {
+									if (parsedModel.roof.$ === 'Nothing') {
+										break _v0$5;
+									} else {
+										if (parsedModel.webAngle.$ === 'Nothing') {
+											break _v0$6;
+										} else {
+											if (parsedModel.webStart.$ === 'Nothing') {
+												break _v0$7;
+											} else {
+												var _v9 = parsedModel.startCount;
+												var _v10 = $gren_lang$core$String$toFloat(model.startCount);
+												if (_v10.$ === 'Just') {
+													return $gren_lang$core$Result$Err('please enter an integral number of initial webs');
+												} else {
+													return $gren_lang$core$Result$Err('please enter in the number of initial webs too');
+												}
+											}
+										}
+									}
+								}
+							} else {
+								if (parsedModel.startCount.$ === 'Nothing') {
+									if (parsedModel.roof.$ === 'Just') {
+										if (parsedModel.webAngle.$ === 'Just') {
+											if (parsedModel.webStart.$ === 'Just') {
+												var chordLen = parsedModel.chordLen.a;
+												var chordGap = parsedModel.chordGap.a;
+												var web = parsedModel.web.a;
+												var _v1 = parsedModel.startWeb;
+												var _v2 = parsedModel.startCount;
+												var roof = parsedModel.roof.a;
+												var webAngle = parsedModel.webAngle.a;
+												var webStart = parsedModel.webStart.a;
+												return $author$project$Page$Truss$finishTrussCalc(
+													{chordGap: chordGap, chordLen: chordLen, roof: roof, startCount: 0, startWeb: 0, web: web, webAngle: webAngle, webStart: webStart});
+											} else {
+												break _v0$7;
+											}
+										} else {
+											break _v0$6;
+										}
+									} else {
+										break _v0$5;
+									}
+								} else {
+									if (parsedModel.roof.$ === 'Nothing') {
+										break _v0$5;
+									} else {
+										if (parsedModel.webAngle.$ === 'Nothing') {
+											break _v0$6;
+										} else {
+											if (parsedModel.webStart.$ === 'Nothing') {
+												break _v0$7;
+											} else {
+												var _v11 = parsedModel.startWeb;
+												return $gren_lang$core$Result$Err('please fill in the size of the initial webs');
+											}
+										}
+									}
+								}
+							}
+						} else {
+							var _v5 = parsedModel.web;
+							return $gren_lang$core$Result$Err('please enter the width of the web profile');
+						}
+					} else {
+						var _v4 = parsedModel.chordGap;
+						return $gren_lang$core$Result$Err('please enter the gap between the chords');
+					}
 				} else {
-					var _v3 = parsedModel.startWeb;
-					var _v4 = parsedModel.startCount;
-					return $gren_lang$core$Result$Err('please enter in all the values');
+					var _v3 = parsedModel.chordLen;
+					return $gren_lang$core$Result$Err('please enter the chord length');
 				}
-			} else {
-				break _v0$4;
 			}
-		} else {
-			if (parsedModel.startCount.$ === 'Just') {
-				if ((((((parsedModel.chordLen.$ === 'Just') && (parsedModel.chordGap.$ === 'Just')) && (parsedModel.web.$ === 'Just')) && (parsedModel.roof.$ === 'Just')) && (parsedModel.webAngle.$ === 'Just')) && (parsedModel.webStart.$ === 'Just')) {
-					var chordLen = parsedModel.chordLen.a;
-					var chordGap = parsedModel.chordGap.a;
-					var web = parsedModel.web.a;
-					var startWeb = parsedModel.startWeb.a;
-					var startCount = parsedModel.startCount.a;
-					var roof = parsedModel.roof.a;
-					var webAngle = parsedModel.webAngle.a;
-					var webStart = parsedModel.webStart.a;
-					return $author$project$Page$Truss$finishTrussCalc(
-						{chordGap: chordGap, chordLen: chordLen, roof: roof, startCount: startCount, startWeb: startWeb, web: web, webAngle: webAngle, webStart: webStart});
-				} else {
-					return $gren_lang$core$Result$Err('please enter in all the values');
-				}
-			} else {
-				break _v0$4;
-			}
+			var _v8 = parsedModel.webStart;
+			return $gren_lang$core$Result$Err('please enter in the web start distance');
 		}
+		var _v7 = parsedModel.webAngle;
+		return $gren_lang$core$Result$Err('please enter the angle that you want the webs to be at');
 	}
-	return $gren_lang$core$Result$Err('either fill in both of the initial web inputs or neither');
+	var _v6 = parsedModel.roof;
+	return $gren_lang$core$Result$Err('please enter in the angle of the roof');
 };
 var $author$project$Page$Truss$makeInput = F5(
 	function (label, idTxt, stepV, currTxt, updateMsg) {
@@ -7455,8 +7526,8 @@ var $author$project$Page$Truss$view = function (model) {
 				A5($author$project$Page$Truss$makeInput, 'Initial web profile width', 'start-web', 0.5, model.startWeb, $author$project$Page$Truss$UpdateStartWeb),
 				A5($author$project$Page$Truss$makeInput, 'Initial web count', 'start-count', 1, model.startCount, $author$project$Page$Truss$UpdateStartCount),
 				A5($author$project$Page$Truss$makeInput, 'Roof angle', 'roof', 0.5, model.roof, $author$project$Page$Truss$UpdateRoof),
-				A5($author$project$Page$Truss$makeInput, 'Web angle', 'web-angle', 0.5, model.webAngle, $author$project$Page$Truss$UpdateWebAngle),
-				A5($author$project$Page$Truss$makeInput, 'Web start distance', 'web-start', 0.5, model.webStart, $author$project$Page$Truss$UpdateWebStart),
+				A5($author$project$Page$Truss$makeInput, 'Web angle', 'web-angle', 0.1, model.webAngle, $author$project$Page$Truss$UpdateWebAngle),
+				A5($author$project$Page$Truss$makeInput, 'Web start distance', 'web-start', 5, model.webStart, $author$project$Page$Truss$UpdateWebStart),
 				function () {
 				if (result.$ === 'Err') {
 					var e = result.a;
