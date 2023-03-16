@@ -7347,9 +7347,9 @@ var $author$project$Page$Truss$calculateTruss = function (model) {
 												var _v9 = parsedModel.startCount;
 												var _v10 = $gren_lang$core$String$toFloat(model.startCount);
 												if (_v10.$ === 'Just') {
-													return $gren_lang$core$Result$Err('please enter an integral number of initial webs');
+													return $gren_lang$core$Result$Err('enter an integral number of initial webs');
 												} else {
-													return $gren_lang$core$Result$Err('please enter in the number of initial webs too');
+													return $gren_lang$core$Result$Err('enter the number of initial webs too');
 												}
 											}
 										}
@@ -7390,7 +7390,7 @@ var $author$project$Page$Truss$calculateTruss = function (model) {
 												break _v0$7;
 											} else {
 												var _v11 = parsedModel.startWeb;
-												return $gren_lang$core$Result$Err('please fill in the size of the initial webs');
+												return $gren_lang$core$Result$Err('enter the size of the initial webs');
 											}
 										}
 									}
@@ -7398,26 +7398,27 @@ var $author$project$Page$Truss$calculateTruss = function (model) {
 							}
 						} else {
 							var _v5 = parsedModel.web;
-							return $gren_lang$core$Result$Err('please enter the width of the web profile');
+							return $gren_lang$core$Result$Err('enter the width of the web profile');
 						}
 					} else {
 						var _v4 = parsedModel.chordGap;
-						return $gren_lang$core$Result$Err('please enter the gap between the chords');
+						return $gren_lang$core$Result$Err('enter the gap between the chords');
 					}
 				} else {
 					var _v3 = parsedModel.chordLen;
-					return $gren_lang$core$Result$Err('please enter the chord length');
+					return $gren_lang$core$Result$Err('enter the length of the chord');
 				}
 			}
 			var _v8 = parsedModel.webStart;
-			return $gren_lang$core$Result$Err('please enter in the web start distance');
+			return $gren_lang$core$Result$Err('enter the web start distance');
 		}
 		var _v7 = parsedModel.webAngle;
-		return $gren_lang$core$Result$Err('please enter the angle that you want the webs to be at');
+		return $gren_lang$core$Result$Err('enter the angle that you want the webs to be at');
 	}
 	var _v6 = parsedModel.roof;
-	return $gren_lang$core$Result$Err('please enter in the angle of the roof');
+	return $gren_lang$core$Result$Err('enter the angle of the roof');
 };
+var $gren_lang$browser$Html$hr = $gren_lang$browser$Html$node('hr');
 var $author$project$Page$Truss$makeInput = F5(
 	function (label, idTxt, stepV, currTxt, updateMsg) {
 		return A2(
@@ -7528,6 +7529,10 @@ var $author$project$Page$Truss$view = function (model) {
 				A5($author$project$Page$Truss$makeInput, 'Roof angle', 'roof', 0.5, model.roof, $author$project$Page$Truss$UpdateRoof),
 				A5($author$project$Page$Truss$makeInput, 'Web angle', 'web-angle', 0.1, model.webAngle, $author$project$Page$Truss$UpdateWebAngle),
 				A5($author$project$Page$Truss$makeInput, 'Web start distance', 'web-start', 5, model.webStart, $author$project$Page$Truss$UpdateWebStart),
+				A2(
+				$gren_lang$browser$Html$hr,
+				[],
+				[]),
 				function () {
 				if (result.$ === 'Err') {
 					var e = result.a;

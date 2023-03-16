@@ -5,7 +5,7 @@ module Page.Truss exposing ( Model, Msg(..), update, view, queryParser, queryBui
 
 import Browser
 import Browser.Dom as Dom
-import Html exposing ( Html, br, button, div, input, text )
+import Html exposing ( Html, br, button, div, hr, input, text )
 import Html.Attributes exposing ( class, id, readonly, step, style, type_, value )
 import Html.Events exposing ( onClick, onInput )
 import Math
@@ -182,22 +182,22 @@ calculateTruss model =
                 }
 
         { chordLen = Nothing } ->
-            Err "please enter the chord length"
+            Err "enter the length of the chord"
 
         { chordGap = Nothing } ->
-            Err "please enter the gap between the chords"
+            Err "enter the gap between the chords"
 
         { web = Nothing } ->
-            Err "please enter the width of the web profile"
+            Err "enter the width of the web profile"
 
         { roof = Nothing } ->
-            Err "please enter in the angle of the roof"
+            Err "enter the angle of the roof"
 
         { webAngle = Nothing } ->
-            Err "please enter the angle that you want the webs to be at"
+            Err "enter the angle that you want the webs to be at"
 
         { webStart = Nothing } ->
-            Err "please enter in the web start distance"
+            Err "enter the web start distance"
 
         -- Check the initial webs
         -- The user has entered an initial web width, but not a valid count
@@ -205,15 +205,15 @@ calculateTruss model =
             case String.toFloat model.startCount of
                 Just _ ->
                     -- the user has entered something like 3.5
-                    Err "please enter an integral number of initial webs"
+                    Err "enter an integral number of initial webs"
 
                 Nothing ->
                     -- the user hasn't entered anything
-                    Err "please enter in the number of initial webs too"
+                    Err "enter the number of initial webs too"
 
         -- The user has entered an initial web count, but not a width
         { startWeb = Nothing } ->
-            Err "please fill in the size of the initial webs"
+            Err "enter the size of the initial webs"
 
 
 view : Model -> Browser.Document Msg
@@ -244,6 +244,7 @@ view model =
             , makeInput "Roof angle" "roof" 0.5 model.roof UpdateRoof
             , makeInput "Web angle" "web-angle" 0.1 model.webAngle UpdateWebAngle
             , makeInput "Web start distance" "web-start" 5 model.webStart UpdateWebStart
+            , hr [] []
             , case result of
                 Err e ->
                     div
