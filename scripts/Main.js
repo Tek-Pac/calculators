@@ -7685,14 +7685,18 @@ var $author$project$Page$Truss$view = function (model) {
 					var lowerChordEnd = _v2.lowerChordEnd;
 					var upperChordEnd = _v2.upperChordEnd;
 					var trussWidth = upperChordEnd.x;
-					var trussHeight = upperChordEnd.y;
 					var sw = (trussWidth * 2.0) / 1000.0;
-					var vbHeight = trussHeight + (sw * 2);
 					var vbWidth = trussWidth + (sw * 2);
+					var isDown = _Utils_cmp(upperChordEnd.y, upperChordStart.y) < 0;
+					var trussHeight = isDown ? (upperChordStart.y - lowerChordEnd.y) : upperChordEnd.y;
+					var vbHeight = trussHeight + (sw * 2);
 					var changeCoords = function (_v4) {
 						var x = _v4.x;
 						var y = _v4.y;
-						return {x: x + sw, y: (trussHeight - y) + sw};
+						return {
+							x: x + sw,
+							y: isDown ? ((upperChordStart.y - y) + sw) : ((trussHeight - y) + sw)
+						};
 					};
 					var webLinesMap = A2(
 						$gren_lang$core$Array$map,
