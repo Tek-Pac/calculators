@@ -7133,6 +7133,9 @@ var $author$project$Vector2$add = F2(
 		var y2 = _v1.y;
 		return {x: x1 + x2, y: y1 + y2};
 	});
+var $gren_lang$core$Array$isEmpty = function (array) {
+	return !$gren_lang$core$Array$length(array);
+};
 var $gren_lang$core$Math$modBy = _Math_modBy;
 var $gren_lang$core$Array$pushFirst = F2(
 	function (value, array) {
@@ -7151,21 +7154,34 @@ var $author$project$Page$Truss$calcWebPoints = F3(
 		var startWebWidthOffset = _v0.startWebWidthOffset;
 		var startCount = _v0.startCount;
 		if (_Utils_cmp(currWeb.x, endPointX) > 0) {
-			return [];
+			return {
+				webLines: [],
+				webPoints: []
+			};
 		} else {
 			var webOffset = (_Utils_cmp(index, startCount) < 0) ? startWebWidthOffset : webWidthOffset;
 			var isTop = A2($gren_lang$core$Math$modBy, 2, index) === 1;
+			var webOffsetDir = isTop ? webOffsetDn : webOffsetUp;
 			var nextCurrWeb = A2(
 				$author$project$Vector2$add,
 				webOffset,
-				A2(
-					$author$project$Vector2$add,
-					currWeb,
-					isTop ? webOffsetDn : webOffsetUp));
-			return A2(
+				A2($author$project$Vector2$add, currWeb, webOffsetDir));
+			var nextDat = A3($author$project$Page$Truss$calcWebPoints, dat, nextCurrWeb, index + 1);
+			var webPoints = A2($gren_lang$core$Array$pushFirst, currWeb, nextDat.webPoints);
+			var webLines = $gren_lang$core$Array$isEmpty(nextDat.webPoints) ? [] : A2(
 				$gren_lang$core$Array$pushFirst,
-				currWeb,
-				A3($author$project$Page$Truss$calcWebPoints, dat, nextCurrWeb, index + 1));
+				{
+					end: nextCurrWeb,
+					start: A2($author$project$Vector2$add, currWeb, webOffset)
+				},
+				A2(
+					$gren_lang$core$Array$pushFirst,
+					{
+						end: A2($author$project$Vector2$add, currWeb, webOffsetDir),
+						start: currWeb
+					},
+					nextDat.webLines));
+			return {webLines: webLines, webPoints: webPoints};
 		}
 	});
 var $author$project$Vector2$dot = F2(
@@ -7272,11 +7288,13 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 	};
 	var endPointLower = A2($author$project$Vector2$mul, trussAlong, chordLen);
 	var endPointUpper = A2($author$project$Vector2$add, endPointLower, vertGapDist);
-	var webPoints = A3(
+	var dat = A3(
 		$author$project$Page$Truss$calcWebPoints,
 		{endPointX: endPointLower.x, startCount: startCount, startWebWidthOffset: startWebWidthOffset, webOffsetDn: webOffsetDn, webOffsetUp: webOffsetUp, webWidthOffset: webWidthOffset},
 		webStart,
 		0);
+	var webLines = dat.webLines;
+	var webPoints = dat.webPoints;
 	var endDistance = ((A2(
 		$gren_lang$core$Math$modBy,
 		2,
@@ -7287,7 +7305,13 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 			$gren_lang$core$Array$last(webPoints)));
 	return $gren_lang$core$Result$Ok(
 		{
-			endDistance: formatF(endDistance)
+			endDistance: formatF(endDistance),
+			lowerChordEnd: endPointLower,
+			lowerChordStart: {x: 0.0, y: 0.0},
+			upperChordEnd: endPointUpper,
+			upperChordStart: vertGapDist,
+			webLines: webLines,
+			webPoints: webPoints
 		});
 };
 var $author$project$Page$Truss$calculateTruss = function (model) {
@@ -7419,6 +7443,37 @@ var $author$project$Page$Truss$calculateTruss = function (model) {
 	return $gren_lang$core$Result$Err('enter the angle of the roof');
 };
 var $gren_lang$browser$Html$hr = $gren_lang$browser$Html$node('hr');
+var $gren_lang$browser$Svg$line = $gren_lang$browser$Svg$trustedNode('line');
+var $gren_lang$browser$Svg$Attributes$x1 = $gren_lang$browser$VirtualDom$attribute('x1');
+var $gren_lang$browser$Svg$Attributes$x2 = $gren_lang$browser$VirtualDom$attribute('x2');
+var $gren_lang$browser$Svg$Attributes$y1 = $gren_lang$browser$VirtualDom$attribute('y1');
+var $gren_lang$browser$Svg$Attributes$y2 = $gren_lang$browser$VirtualDom$attribute('y2');
+var $author$project$Page$Truss$lines = F2(
+	function (sw, linesArr) {
+		return A2(
+			$gren_lang$core$Array$map,
+			function (_v0) {
+				var start = _v0.start;
+				var end = _v0.end;
+				return A2(
+					$gren_lang$browser$Svg$line,
+					[
+						$gren_lang$browser$Svg$Attributes$x1(
+						$gren_lang$core$String$fromFloat(start.x)),
+						$gren_lang$browser$Svg$Attributes$y1(
+						$gren_lang$core$String$fromFloat(start.y)),
+						$gren_lang$browser$Svg$Attributes$x2(
+						$gren_lang$core$String$fromFloat(end.x)),
+						$gren_lang$browser$Svg$Attributes$y2(
+						$gren_lang$core$String$fromFloat(end.y)),
+						$gren_lang$browser$Svg$Attributes$stroke('var(--text)'),
+						$gren_lang$browser$Svg$Attributes$strokeWidth(
+						$gren_lang$core$String$fromFloat(sw))
+					],
+					[]);
+			},
+			linesArr);
+	});
 var $author$project$Page$Truss$makeInput = F5(
 	function (label, idTxt, stepV, currTxt, updateMsg) {
 		return A2(
@@ -7496,6 +7551,76 @@ var $author$project$Page$Truss$makeOutput = F3(
 				])
 			]);
 	});
+var $gren_lang$core$Array$first = function (array) {
+	return A2($gren_lang$core$Array$get, 0, array);
+};
+var $gren_lang$core$Array$popFirst = function (array) {
+	var _v0 = $gren_lang$core$Array$first(array);
+	if (_v0.$ === 'Just') {
+		var value = _v0.a;
+		return $gren_lang$core$Maybe$Just(
+			{
+				first: value,
+				rest: A2($gren_lang$core$Array$dropFirst, 1, array)
+			});
+	} else {
+		return $gren_lang$core$Maybe$Nothing;
+	}
+};
+var $gren_lang$core$Array$intersperse = F2(
+	function (sep, xs) {
+		var _v0 = $gren_lang$core$Array$popFirst(xs);
+		if (_v0.$ === 'Nothing') {
+			return [];
+		} else {
+			var _v1 = _v0.a;
+			var head = _v1.first;
+			var tail = _v1.rest;
+			var step = F2(
+				function (x, rest) {
+					return A2(
+						$gren_lang$core$Array$pushFirst,
+						sep,
+						A2($gren_lang$core$Array$pushFirst, x, rest));
+				});
+			var spersed = A3(
+				$gren_lang$core$Array$foldr,
+				step,
+				[],
+				tail);
+			return A2($gren_lang$core$Array$pushFirst, head, spersed);
+		}
+	});
+var $gren_lang$browser$Svg$polyline = $gren_lang$browser$Svg$trustedNode('polyline');
+var $author$project$Page$Truss$polylineF = F2(
+	function (sw, pointsArr) {
+		return A2(
+			$gren_lang$browser$Svg$polyline,
+			[
+				$gren_lang$browser$Svg$Attributes$points(
+				A3(
+					$gren_lang$core$Array$foldl,
+					$gren_lang$core$Basics$append,
+					'',
+					A2(
+						$gren_lang$core$Array$intersperse,
+						' ',
+						A2(
+							$gren_lang$core$Array$map,
+							function (_v0) {
+								var x = _v0.x;
+								var y = _v0.y;
+								return $gren_lang$core$String$fromFloat(x) + (',' + $gren_lang$core$String$fromFloat(y));
+							},
+							pointsArr)))),
+				$gren_lang$browser$Svg$Attributes$fill('none'),
+				$gren_lang$browser$Svg$Attributes$stroke('var(--text)'),
+				$gren_lang$browser$Svg$Attributes$strokeWidth(
+				$gren_lang$core$String$fromFloat(sw))
+			],
+			[]);
+	});
+var $gren_lang$browser$Svg$Attributes$viewBox = $gren_lang$browser$VirtualDom$attribute('viewBox');
 var $author$project$Page$Truss$view = function (model) {
 	var result = $author$project$Page$Truss$calculateTruss(model);
 	return {
@@ -7547,6 +7672,58 @@ var $author$project$Page$Truss$view = function (model) {
 				} else {
 					var endDistance = result.a.endDistance;
 					return A3($author$project$Page$Truss$makeOutput, 'End distance', 'end-distance', endDistance);
+				}
+			}(),
+				function () {
+				if (result.$ === 'Ok') {
+					var _v2 = result.a;
+					var endDistance = _v2.endDistance;
+					var webPoints = _v2.webPoints;
+					var webLines = _v2.webLines;
+					var lowerChordStart = _v2.lowerChordStart;
+					var upperChordStart = _v2.upperChordStart;
+					var lowerChordEnd = _v2.lowerChordEnd;
+					var upperChordEnd = _v2.upperChordEnd;
+					var trussWidth = upperChordEnd.x;
+					var trussHeight = upperChordEnd.y;
+					var sw = (trussWidth * 2.0) / 1000.0;
+					var vbHeight = trussHeight + (sw * 2);
+					var vbWidth = trussWidth + (sw * 2);
+					var changeCoords = function (_v4) {
+						var x = _v4.x;
+						var y = _v4.y;
+						return {x: x + sw, y: (trussHeight - y) + sw};
+					};
+					var webLinesMap = A2(
+						$gren_lang$core$Array$map,
+						function (_v3) {
+							var start = _v3.start;
+							var end = _v3.end;
+							return {
+								end: changeCoords(end),
+								start: changeCoords(start)
+							};
+						},
+						webLines);
+					return A2(
+						$gren_lang$browser$Svg$svg,
+						[
+							$gren_lang$browser$Svg$Attributes$width('1000'),
+							$gren_lang$browser$Svg$Attributes$viewBox(
+							'0 0 ' + ($gren_lang$core$String$fromFloat(vbWidth) + (' ' + $gren_lang$core$String$fromFloat(vbHeight))))
+						],
+						A2(
+							$gren_lang$core$Array$pushLast,
+							A2(
+								$author$project$Page$Truss$polylineF,
+								sw,
+								A2(
+									$gren_lang$core$Array$map,
+									changeCoords,
+									[lowerChordStart, lowerChordEnd, upperChordEnd, upperChordStart, lowerChordStart])),
+							A2($author$project$Page$Truss$lines, sw, webLinesMap)));
+				} else {
+					return $gren_lang$browser$Html$text('');
 				}
 			}()
 			])

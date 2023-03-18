@@ -10,8 +10,8 @@ import Html.Attributes exposing ( class, id, readonly, step, style, type_, value
 import Html.Events exposing ( onClick, onInput )
 import Math
 import SpaCmd exposing ( SpaCmd(..) )
-import Svg exposing ( Svg, foreignObject, polygon, svg, filter, feGaussianBlur, feComposite, feFlood, feOffset )
-import Svg.Attributes exposing ( fill, height, points, stroke, viewBox, width, x, y, in_, in2, operator, result, strokeWidth, strokeLinejoin, floodOpacity, floodColor, stdDeviation, dx, dy )
+import Svg exposing ( Svg, line, polyline, svg )
+import Svg.Attributes exposing ( fill, points, stroke, strokeWidth, viewBox, width, x1, x2, y1, y2 )
 import Task
 import Url.Builder as Builder
 import Url.Parser.Query as Query
@@ -255,9 +255,94 @@ view model =
 
                 Ok { endDistance } ->
                     makeOutput "End distance" "end-distance" endDistance
+            , case result of
+                Ok { endDistance, webPoints, webLines, lowerChordStart, upperChordStart, lowerChordEnd, upperChordEnd } ->
+                    let
+                        trussWidth =
+                            upperChordEnd.x
+
+                        trussHeight =
+                            upperChordEnd.y
+
+                        sw =
+                            trussWidth * 2.0 / 1000.0
+
+                        vbWidth =
+                            trussWidth + sw * 2
+
+                        vbHeight =
+                            trussHeight + sw * 2
+
+                        changeCoords : Float2 -> Float2
+                        changeCoords { x, y } =
+                            { x = x + sw
+                            , y = trussHeight - y + sw
+                            }
+
+                        webLinesMap =
+                            webLines
+                                |> Array.map
+                                        (\{ start, end } ->
+                                            { start = changeCoords start
+                                            , end = changeCoords end
+                                            }
+                                        )
+                    in
+                    svg
+                        [ width "1000"
+                        , viewBox ("0 0 " ++ String.fromFloat vbWidth ++ " " ++ String.fromFloat vbHeight)
+                        ]
+                        (lines sw webLinesMap
+                            |> Array.pushLast
+                                    ([ lowerChordStart
+                                     , lowerChordEnd
+                                     , upperChordEnd
+                                     , upperChordStart
+                                     , lowerChordStart
+                                     ]
+                                        |> Array.map changeCoords
+                                        |> polylineF sw
+                                    )
+                        )
+
+                Err _ ->
+                    text ""
             ]
         ]
     }
+
+
+lines : Float -> Array LineSeg2 -> Array (Svg msg)
+lines sw linesArr =
+    linesArr
+        |> Array.map
+                (\{ start, end } ->
+                    line
+                        [ x1 (String.fromFloat start.x)
+                        , y1 (String.fromFloat start.y)
+                        , x2 (String.fromFloat end.x)
+                        , y2 (String.fromFloat end.y)
+                        , stroke "var(--text)"
+                        , strokeWidth (String.fromFloat sw)
+                        ]
+                        []
+                )
+
+
+polylineF : Float -> Array Float2 -> Svg msg
+polylineF sw pointsArr =
+    polyline
+        [ points
+            (pointsArr
+                |> Array.map (\{ x, y } -> String.fromFloat x ++ "," ++ String.fromFloat y)
+                |> Array.intersperse " "
+                |> Array.foldl (++) ""
+            )
+        , fill "none"
+        , stroke "var(--text)"
+        , strokeWidth (String.fromFloat sw)
+        ]
+        []
 
 
 type alias InputData =
@@ -321,6 +406,80 @@ makeOutput label idTxt calc =
         ]
 
 
+type alias WebData =
+    { endPointX : Float
+    , webOffsetUp : Float2
+    , webOffsetDn : Float2
+    , webWidthOffset : Float2
+    , startWebWidthOffset : Float2
+    , startCount : Int
+    }
+
+
+calcWebPoints :
+    WebData
+    -> Float2
+    -> Int
+    -> { webPoints : Array Float2
+       , webLines : Array LineSeg2
+       }
+calcWebPoints dat currWeb index =
+    let
+        { endPointX, webOffsetUp, webOffsetDn, webWidthOffset, startWebWidthOffset, startCount } =
+            dat
+    in
+    if currWeb.x > endPointX then
+        { webPoints = []
+        , webLines = []
+        }
+    else
+        let
+            isTop =
+                Math.modBy 2 index == 1
+
+            webOffset =
+                if index < startCount then
+                    startWebWidthOffset
+                else
+                    webWidthOffset
+
+            webOffsetDir =
+                if isTop then
+                    webOffsetDn
+                else
+                    webOffsetUp
+
+            nextCurrWeb =
+                webOffsetDir
+                    |> V2.add currWeb
+                    |> V2.add webOffset
+
+            nextDat =
+                calcWebPoints dat nextCurrWeb (index + 1)
+
+            webPoints =
+                nextDat.webPoints
+                    |> Array.pushFirst currWeb
+
+            webLines =
+                if Array.isEmpty nextDat.webPoints then
+                    []
+                else
+                    nextDat.webLines
+                        |> Array.pushFirst
+                                { start = currWeb
+                                , end = V2.add currWeb webOffsetDir
+                                }
+                        |> Array.pushFirst
+                                { start = V2.add currWeb webOffset
+                                , end = nextCurrWeb
+                                }
+        in
+        { webPoints = webPoints
+        , webLines = webLines
+        }
+
+
 type alias FilledModel =
     { chordLen : Float
     , chordGap : Float
@@ -333,51 +492,21 @@ type alias FilledModel =
     }
 
 
+type alias LineSeg2 =
+    { start : Float2
+    , end : Float2
+    }
+
+
 type alias TrussCalc =
     { endDistance : Float
+    , webPoints : Array Float2
+    , webLines : Array LineSeg2
+    , lowerChordStart : Float2
+    , upperChordStart : Float2
+    , lowerChordEnd : Float2
+    , upperChordEnd : Float2
     }
-
-
-type alias WebData =
-    { endPointX : Float
-    , webOffsetUp : Float2
-    , webOffsetDn : Float2
-    , webWidthOffset : Float2
-    , startWebWidthOffset : Float2
-    , startCount : Int
-    }
-
-
-calcWebPoints : WebData -> Float2 -> Int -> Array Float2
-calcWebPoints dat currWeb index =
-    let
-        { endPointX, webOffsetUp, webOffsetDn, webWidthOffset, startWebWidthOffset, startCount } =
-            dat
-    in
-    if currWeb.x > endPointX then
-        []
-    else
-        let
-            isTop =
-                Math.modBy 2 index == 1
-
-            webOffset =
-                if index < startCount then
-                    startWebWidthOffset
-                else
-                    webWidthOffset
-
-            nextCurrWeb =
-                (if isTop then
-                    webOffsetDn
-                 else
-                    webOffsetUp
-                )
-                    |> V2.add currWeb
-                    |> V2.add webOffset
-        in
-        calcWebPoints dat nextCurrWeb (index + 1)
-            |> Array.pushFirst currWeb
 
 
 finishTrussCalc : FilledModel -> Result String TrussCalc
@@ -422,7 +551,7 @@ finishTrussCalc { chordLen, chordGap, web, startWeb, startCount, roof, webAngle,
         startWebWidthOffset =
             V2.mul trussAlong (startWeb / Math.sin webRad)
 
-        webPoints =
+        dat =
             calcWebPoints
                 { endPointX = endPointLower.x
                 , webOffsetUp = webOffsetUp
@@ -433,6 +562,12 @@ finishTrussCalc { chordLen, chordGap, web, startWeb, startCount, roof, webAngle,
                 }
                 webStart
                 0
+
+        webPoints =
+            dat.webPoints
+
+        webLines =
+            dat.webLines
 
         endDistance =
             Array.last webPoints
@@ -450,4 +585,13 @@ finishTrussCalc { chordLen, chordGap, web, startWeb, startCount, roof, webAngle,
     in
     Ok
         { endDistance = formatF endDistance
+        , webPoints = webPoints
+        , webLines = webLines
+        , lowerChordStart =
+            { x = 0.0
+            , y = 0.0
+            }
+        , lowerChordEnd = endPointLower
+        , upperChordStart = vertGapDist
+        , upperChordEnd = endPointUpper
         }
