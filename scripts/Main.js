@@ -7062,8 +7062,8 @@ var $author$project$Page$Triangle$view = function (model) {
 					A2(
 					$gren_lang$browser$Svg$polygon,
 					[
-						$gren_lang$browser$Svg$Attributes$fill('white'),
-						$gren_lang$browser$Svg$Attributes$stroke('white'),
+						$gren_lang$browser$Svg$Attributes$fill('var(--background)'),
+						$gren_lang$browser$Svg$Attributes$stroke('var(--background)'),
 						$gren_lang$browser$Svg$Attributes$points(
 						A2($author$project$Page$Triangle$getButtonExists, res.a, model.a) ? '150,50 590,335 150,335 150,230 197,230 200,227 200,188 197,185 150,185' : '150,50 590,335 150,335 150,230 162,230 165,227 165,188 162,185 150,185'),
 						A2($gren_lang$browser$Html$Attributes$style, 'filter', 'url(#inset-shadow)'),
