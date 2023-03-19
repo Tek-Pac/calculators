@@ -18,28 +18,38 @@ import Url.Parser.Query as Query
 import Vector2 as V2 exposing ( Float2, v2 )
 
 
+qApply : Query.Parser a -> Query.Parser (a -> b) -> Query.Parser b
+qApply argParser funcParser =
+    Query.map2 (<|) funcParser argParser
+
+
 queryParser : Query.Parser Model
 queryParser =
-    Query.map8
-        (\chordLen chordGap web startWeb startCount roof webAngle webStart ->
+    -- We can't do any more than map8
+    Query.map
+        (\chordLen chordGap web startWeb startCount nextWeb nextCount roof webAngle webStart ->
             { chordLen = Maybe.withDefault "" chordLen
             , chordGap = Maybe.withDefault "" chordGap
             , web = Maybe.withDefault "" web
             , startWeb = Maybe.withDefault "" startWeb
             , startCount = Maybe.withDefault "" startCount
+            , nextWeb = Maybe.withDefault "" nextWeb
+            , nextCount = Maybe.withDefault "" nextCount
             , roof = Maybe.withDefault "7.5" roof
             , webAngle = Maybe.withDefault "45" webAngle
             , webStart = Maybe.withDefault "125" webStart
             }
         )
         (Query.string "chordLen")
-        (Query.string "chordGap")
-        (Query.string "web")
-        (Query.string "startWeb")
-        (Query.string "startCount")
-        (Query.string "roof")
-        (Query.string "webAngle")
-        (Query.string "webStart")
+        |> qApply (Query.string "chordGap")
+        |> qApply (Query.string "web")
+        |> qApply (Query.string "startWeb")
+        |> qApply (Query.string "startCount")
+        |> qApply (Query.string "nextWeb")
+        |> qApply (Query.string "nextCount")
+        |> qApply (Query.string "roof")
+        |> qApply (Query.string "webAngle")
+        |> qApply (Query.string "webStart")
 
 
 queryBuilder : Model -> Array Builder.QueryParameter
@@ -49,6 +59,8 @@ queryBuilder model =
     , Builder.string "web" model.web
     , Builder.string "startWeb" model.startWeb
     , Builder.string "startCount" model.startCount
+    , Builder.string "nextWeb" model.nextWeb
+    , Builder.string "nextCount" model.nextCount
     , Builder.string "roof" model.roof
     , Builder.string "webAngle" model.webAngle
     , Builder.string "webStart" model.webStart
@@ -61,6 +73,8 @@ type alias Model =
     , web : String
     , startWeb : String
     , startCount : String
+    , nextWeb : String
+    , nextCount : String
     , roof : String
     , webAngle : String
     , webStart : String
@@ -80,6 +94,8 @@ type Msg
     | UpdateWeb String
     | UpdateStartWeb String
     | UpdateStartCount String
+    | UpdateNextWeb String
+    | UpdateNextCount String
     | UpdateRoof String
     | UpdateWebAngle String
     | UpdateWebStart String
@@ -127,6 +143,12 @@ update msg model =
         UpdateStartCount s ->
             doFocus { model | startCount = s } "start-count"
 
+        UpdateNextWeb s ->
+            doFocus { model | nextWeb = s } "next-web"
+
+        UpdateNextCount s ->
+            doFocus { model | nextCount = s } "next-count"
+
         UpdateRoof r ->
             doFocus { model | roof = r } "roof"
 
@@ -151,31 +173,51 @@ calculateTruss model =
             , web = String.toFloat model.web
             , startWeb = String.toFloat model.startWeb
             , startCount = String.toInt model.startCount
+            , nextWeb = String.toFloat model.nextWeb
+            , nextCount = String.toInt model.nextCount
             , roof = String.toFloat model.roof
             , webAngle = String.toFloat model.webAngle
             , webStart = String.toFloat model.webStart
             }
     in
     case parsedModel of
-        { chordLen = Just chordLen, chordGap = Just chordGap, web = Just web, startWeb = Nothing, startCount = Nothing, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
+        { chordLen = Just chordLen, chordGap = Just chordGap, web = Just web, startWeb = Nothing, startCount = Nothing, nextWeb = Nothing, nextCount = Nothing, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
             finishTrussCalc
                 { chordLen = chordLen
                 , chordGap = chordGap
                 , web = web
                 , startWeb = 0
                 , startCount = 0
+                , nextWeb = 0
+                , nextCount = 0
                 , roof = roof
                 , webAngle = webAngle
                 , webStart = webStart
                 }
 
-        { chordLen = Just chordLen, chordGap = Just chordGap, web = Just web, startWeb = Just startWeb, startCount = Just startCount, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
+        { chordLen = Just chordLen, chordGap = Just chordGap, web = Just web, startWeb = Just startWeb, startCount = Just startCount, nextWeb = Nothing, nextCount = Nothing, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
             finishTrussCalc
                 { chordLen = chordLen
                 , chordGap = chordGap
                 , web = web
                 , startWeb = startWeb
                 , startCount = startCount
+                , nextWeb = 0
+                , nextCount = 0
+                , roof = roof
+                , webAngle = webAngle
+                , webStart = webStart
+                }
+
+        { chordLen = Just chordLen, chordGap = Just chordGap, web = Just web, startWeb = Just startWeb, startCount = Just startCount, nextWeb = Just nextWeb, nextCount = Just nextCount, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
+            finishTrussCalc
+                { chordLen = chordLen
+                , chordGap = chordGap
+                , web = web
+                , startWeb = startWeb
+                , startCount = startCount
+                , nextWeb = nextWeb
+                , nextCount = nextCount
                 , roof = roof
                 , webAngle = webAngle
                 , webStart = webStart
@@ -215,6 +257,22 @@ calculateTruss model =
         { startWeb = Nothing } ->
             Err "enter the size of the initial webs"
 
+        -- Check the next webs
+        -- The user has entered a next web width, but not a valid count
+        { nextCount = Nothing } ->
+            case String.toFloat model.nextCount of
+                Just _ ->
+                    -- the user has entered something like 3.5
+                    Err "enter an integral number of next webs"
+
+                Nothing ->
+                    -- the user hasn't entered anything
+                    Err "enter the number of next webs too"
+
+        -- The user has entered a next web count, but not a width
+        { nextWeb = Nothing } ->
+            Err "enter the size of the next webs"
+
 
 view : Model -> Browser.Document Msg
 view model =
@@ -241,6 +299,8 @@ view model =
             , makeInput "Web profile width" "web" 0.5 model.web UpdateWeb
             , makeInput "Initial web profile width" "start-web" 0.5 model.startWeb UpdateStartWeb
             , makeInput "Initial web count" "start-count" 1 model.startCount UpdateStartCount
+            , makeInput "Next web profile width" "next-web" 0.5 model.nextWeb UpdateNextWeb
+            , makeInput "Next web count" "next-count" 1 model.nextCount UpdateNextCount
             , makeInput "Roof angle" "roof" 0.5 model.roof UpdateRoof
             , makeInput "Web angle" "web-angle" 0.1 model.webAngle UpdateWebAngle
             , makeInput "Web start distance" "web-start" 5 model.webStart UpdateWebStart
@@ -423,6 +483,8 @@ type alias WebData =
     , webWidthOffset : Float2
     , startWebWidthOffset : Float2
     , startCount : Int
+    , nextWebWidthOffset : Float2
+    , nextCount : Int
     }
 
 
@@ -435,7 +497,7 @@ calcWebPoints :
        }
 calcWebPoints dat currWeb index =
     let
-        { endPointX, webOffsetUp, webOffsetDn, webWidthOffset, startWebWidthOffset, startCount } =
+        { endPointX, webOffsetUp, webOffsetDn, webWidthOffset, startWebWidthOffset, startCount, nextWebWidthOffset, nextCount } =
             dat
     in
     if currWeb.x > endPointX then
@@ -450,6 +512,8 @@ calcWebPoints dat currWeb index =
             webOffset =
                 if index < startCount then
                     startWebWidthOffset
+                else if index < startCount + nextCount then
+                    nextWebWidthOffset
                 else
                     webWidthOffset
 
@@ -496,6 +560,8 @@ type alias FilledModel =
     , web : Float
     , startWeb : Float
     , startCount : Int
+    , nextWeb : Float
+    , nextCount : Int
     , roof : Float
     , webAngle : Float
     , webStart : Float
@@ -520,7 +586,7 @@ type alias TrussCalc =
 
 
 finishTrussCalc : FilledModel -> Result String TrussCalc
-finishTrussCalc { chordLen, chordGap, web, startWeb, startCount, roof, webAngle, webStart = webDist } =
+finishTrussCalc { chordLen, chordGap, web, startWeb, startCount, nextWeb, nextCount, roof, webAngle, webStart = webDist } =
     let
         roofRad =
             Math.degrees roof
@@ -561,6 +627,9 @@ finishTrussCalc { chordLen, chordGap, web, startWeb, startCount, roof, webAngle,
         startWebWidthOffset =
             V2.mul trussAlong (startWeb / Math.sin webRad)
 
+        nextWebWidthOffset =
+            V2.mul trussAlong (nextWeb / Math.sin webRad)
+
         dat =
             calcWebPoints
                 { endPointX = endPointLower.x
@@ -569,6 +638,8 @@ finishTrussCalc { chordLen, chordGap, web, startWeb, startCount, roof, webAngle,
                 , webWidthOffset = webWidthOffset
                 , startWebWidthOffset = startWebWidthOffset
                 , startCount = startCount
+                , nextWebWidthOffset = nextWebWidthOffset
+                , nextCount = nextCount
                 }
                 webStart
                 0
