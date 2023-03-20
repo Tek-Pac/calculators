@@ -330,8 +330,12 @@ view model =
                             else
                                 upperChordEnd.y
 
+                        assumedWidth =
+                            1000.0
+
+                        -- 1 pixel in the final
                         sw =
-                            trussWidth * 2.0 / 1000.0
+                            trussWidth * 1.0 / assumedWidth
 
                         vbWidth =
                             trussWidth + sw * 2
@@ -359,7 +363,8 @@ view model =
                                         )
                     in
                     svg
-                        [ width "1000"
+                        [ -- fill the screen when it is small
+                          style "width" "clamp(75%, 1000px, 100%)"
                         , viewBox ("0 0 " ++ String.fromFloat vbWidth ++ " " ++ String.fromFloat vbHeight)
                         ]
                         (lines sw webLinesMap

@@ -7851,11 +7851,10 @@ var $author$project$Page$Truss$view = function (model) {
 					var lowerChordEnd = _v2.lowerChordEnd;
 					var upperChordEnd = _v2.upperChordEnd;
 					var trussWidth = upperChordEnd.x;
-					var sw = (trussWidth * 2.0) / 1000.0;
-					var vbWidth = trussWidth + (sw * 2);
 					var isDown = _Utils_cmp(upperChordEnd.y, upperChordStart.y) < 0;
 					var trussHeight = isDown ? (upperChordStart.y - lowerChordEnd.y) : upperChordEnd.y;
-					var vbHeight = trussHeight + (sw * 2);
+					var assumedWidth = 1000.0;
+					var sw = (trussWidth * 1.0) / assumedWidth;
 					var changeCoords = function (_v4) {
 						var x = _v4.x;
 						var y = _v4.y;
@@ -7875,10 +7874,12 @@ var $author$project$Page$Truss$view = function (model) {
 							};
 						},
 						webLines);
+					var vbHeight = trussHeight + (sw * 2);
+					var vbWidth = trussWidth + (sw * 2);
 					return A2(
 						$gren_lang$browser$Svg$svg,
 						[
-							$gren_lang$browser$Svg$Attributes$width('1000'),
+							A2($gren_lang$browser$Html$Attributes$style, 'width', 'clamp(75%, 1000px, 100%)'),
 							$gren_lang$browser$Svg$Attributes$viewBox(
 							'0 0 ' + ($gren_lang$core$String$fromFloat(vbWidth) + (' ' + $gren_lang$core$String$fromFloat(vbHeight))))
 						],
