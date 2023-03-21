@@ -316,10 +316,7 @@ view model =
                         [ text e
                         ]
 
-                Ok { endDistance } ->
-                    makeOutput "End distance" "end-distance" endDistance
-            , case result of
-                Ok { endDistance, webPoints, webLines, lowerChordStart, upperChordStart, lowerChordEnd, upperChordEnd } ->
+                Ok { endDistance, webPoints, webLines, lowerChordStart, upperChordStart, lowerChordEnd, upperChordEnd, webOffsetDn, webOffsetUp } ->
                     let
                         trussWidth =
                             upperChordEnd.x
@@ -365,26 +362,30 @@ view model =
                                             }
                                         )
                     in
-                    svg
-                        [ -- fill the screen when it is small
-                          style "width" "clamp(75%, 1000px, 100%)"
-                        , viewBox ("0 0 " ++ String.fromFloat vbWidth ++ " " ++ String.fromFloat vbHeight)
+                    div
+                        [ class "center"
                         ]
-                        (lines sw webLinesMap
-                            |> Array.pushLast
-                                    ([ lowerChordStart
-                                     , lowerChordEnd
-                                     , upperChordEnd
-                                     , upperChordStart
-                                     , lowerChordStart
-                                     ]
-                                        |> Array.map changeCoords
-                                        |> polylineF sw
-                                    )
-                        )
-
-                Err _ ->
-                    text ""
+                        [ makeOutput "End distance" "end-distance" endDistance
+                        , makeOutputLine "Up distance" "up-distance" webOffsetUp
+                        , makeOutputLine "Dn distance" "dn-distance" webOffsetDn
+                        , svg
+                            [ -- fill the screen when it is small
+                              style "width" "clamp(75%, 1000px, 100%)"
+                            , viewBox ("0 0 " ++ String.fromFloat vbWidth ++ " " ++ String.fromFloat vbHeight)
+                            ]
+                            (lines sw webLinesMap
+                                |> Array.pushLast
+                                        ([ lowerChordStart
+                                         , lowerChordEnd
+                                         , upperChordEnd
+                                         , upperChordStart
+                                         , lowerChordStart
+                                         ]
+                                            |> Array.map changeCoords
+                                            |> polylineF sw
+                                        )
+                            )
+                        ]
             ]
         ]
     }
@@ -437,8 +438,8 @@ makeInput label idTxt stepV currTxt updateMsg =
     div
         []
         [ text label
-        , text "         "
         , br [] []
+        , text "         "
         , input
             [ value currTxt
             , onInput updateMsg
@@ -469,6 +470,7 @@ makeOutput label idTxt calc =
         []
         [ text label
         , br [] []
+        , text "         "
         , input
             [ value (String.fromFloat calc)
             , readonly True
@@ -478,6 +480,47 @@ makeOutput label idTxt calc =
             []
         , button
             [ onClick (DoCopy idTxt)
+            ]
+            [ text "📋"
+            ]
+        ]
+
+
+makeOutputLine : String -> String -> Float2 -> Html Msg
+makeOutputLine label idTxt { x, y } =
+    let
+        idX =
+            idTxt ++ "-x"
+
+        idY =
+            idTxt ++ "-y"
+    in
+    div
+        []
+        [ text label
+        , br [] []
+        , text "         "
+        , input
+            [ value (String.fromFloat x)
+            , readonly True
+            , id idX
+            , type_ "number"
+            ]
+            []
+        , button
+            [ onClick (DoCopy idX)
+            ]
+            [ text "📋"
+            ]
+        , input
+            [ value (String.fromFloat y)
+            , readonly True
+            , id idY
+            , type_ "number"
+            ]
+            []
+        , button
+            [ onClick (DoCopy idY)
             ]
             [ text "📋"
             ]
@@ -590,6 +633,8 @@ type alias TrussCalc =
     , upperChordStart : Float2
     , lowerChordEnd : Float2
     , upperChordEnd : Float2
+    , webOffsetUp : Float2
+    , webOffsetDn : Float2
     }
 
 
@@ -671,6 +716,13 @@ finishTrussCalc { chordLen, chordGap, web, startWeb, startCount, nextWeb, nextCo
         formatF : Float -> Float
         formatF value =
             toFloat (Math.round (value * 1000000)) / 1000000
+
+        -- 6 dp
+        formatF2 : Float2 -> Float2
+        formatF2 { x, y } =
+            { x = formatF x
+            , y = formatF y
+            }
     in
     Ok
         { endDistance = formatF endDistance
@@ -683,4 +735,6 @@ finishTrussCalc { chordLen, chordGap, web, startWeb, startCount, nextWeb, nextCo
         , lowerChordEnd = endPointLower
         , upperChordStart = vertGapDist
         , upperChordEnd = endPointUpper
+        , webOffsetUp = formatF2 webOffsetUp
+        , webOffsetDn = formatF2 webOffsetDn
         }

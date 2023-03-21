@@ -7363,6 +7363,14 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 	var formatF = function (value) {
 		return $gren_lang$core$Math$round(value * 1000000) / 1000000;
 	};
+	var formatF2 = function (_v1) {
+		var x = _v1.x;
+		var y = _v1.y;
+		return {
+			x: formatF(x),
+			y: formatF(y)
+		};
+	};
 	var endPointLower = A2($author$project$Vector2$mul, trussAlong, chordLen);
 	var endPointUpper = A2($author$project$Vector2$add, endPointLower, vertGapDist);
 	var dat = A3(
@@ -7388,6 +7396,8 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 			upperChordEnd: endPointUpper,
 			upperChordStart: vertGapDist,
 			webLines: webLines,
+			webOffsetDn: formatF2(webOffsetDn),
+			webOffsetUp: formatF2(webOffsetUp),
 			webPoints: webPoints
 		});
 };
@@ -7650,11 +7660,11 @@ var $author$project$Page$Truss$makeInput = F5(
 			[],
 			[
 				$gren_lang$browser$Html$text(label),
-				$gren_lang$browser$Html$text('         '),
 				A2(
 				$gren_lang$browser$Html$br,
 				[],
 				[]),
+				$gren_lang$browser$Html$text('         '),
 				A2(
 				$gren_lang$browser$Html$input,
 				[
@@ -7699,6 +7709,7 @@ var $author$project$Page$Truss$makeOutput = F3(
 				$gren_lang$browser$Html$br,
 				[],
 				[]),
+				$gren_lang$browser$Html$text('         '),
 				A2(
 				$gren_lang$browser$Html$input,
 				[
@@ -7714,6 +7725,62 @@ var $author$project$Page$Truss$makeOutput = F3(
 				[
 					$gren_lang$browser$Html$Events$onClick(
 					$author$project$Page$Truss$DoCopy(idTxt))
+				],
+				[
+					$gren_lang$browser$Html$text('📋')
+				])
+			]);
+	});
+var $author$project$Page$Truss$makeOutputLine = F3(
+	function (label, idTxt, _v0) {
+		var x = _v0.x;
+		var y = _v0.y;
+		var idY = idTxt + '-y';
+		var idX = idTxt + '-x';
+		return A2(
+			$gren_lang$browser$Html$div,
+			[],
+			[
+				$gren_lang$browser$Html$text(label),
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
+				$gren_lang$browser$Html$text('         '),
+				A2(
+				$gren_lang$browser$Html$input,
+				[
+					$gren_lang$browser$Html$Attributes$value(
+					$gren_lang$core$String$fromFloat(x)),
+					$gren_lang$browser$Html$Attributes$readonly(true),
+					$gren_lang$browser$Html$Attributes$id(idX),
+					$gren_lang$browser$Html$Attributes$type_('number')
+				],
+				[]),
+				A2(
+				$gren_lang$browser$Html$button,
+				[
+					$gren_lang$browser$Html$Events$onClick(
+					$author$project$Page$Truss$DoCopy(idX))
+				],
+				[
+					$gren_lang$browser$Html$text('📋')
+				]),
+				A2(
+				$gren_lang$browser$Html$input,
+				[
+					$gren_lang$browser$Html$Attributes$value(
+					$gren_lang$core$String$fromFloat(y)),
+					$gren_lang$browser$Html$Attributes$readonly(true),
+					$gren_lang$browser$Html$Attributes$id(idY),
+					$gren_lang$browser$Html$Attributes$type_('number')
+				],
+				[]),
+				A2(
+				$gren_lang$browser$Html$button,
+				[
+					$gren_lang$browser$Html$Events$onClick(
+					$author$project$Page$Truss$DoCopy(idY))
 				],
 				[
 					$gren_lang$browser$Html$text('📋')
@@ -7846,28 +7913,24 @@ var $author$project$Page$Truss$view = function (model) {
 							$gren_lang$browser$Html$text(e)
 						]);
 				} else {
-					var endDistance = result.a.endDistance;
-					return A3($author$project$Page$Truss$makeOutput, 'End distance', 'end-distance', endDistance);
-				}
-			}(),
-				function () {
-				if (result.$ === 'Ok') {
-					var _v2 = result.a;
-					var endDistance = _v2.endDistance;
-					var webPoints = _v2.webPoints;
-					var webLines = _v2.webLines;
-					var lowerChordStart = _v2.lowerChordStart;
-					var upperChordStart = _v2.upperChordStart;
-					var lowerChordEnd = _v2.lowerChordEnd;
-					var upperChordEnd = _v2.upperChordEnd;
+					var _v1 = result.a;
+					var endDistance = _v1.endDistance;
+					var webPoints = _v1.webPoints;
+					var webLines = _v1.webLines;
+					var lowerChordStart = _v1.lowerChordStart;
+					var upperChordStart = _v1.upperChordStart;
+					var lowerChordEnd = _v1.lowerChordEnd;
+					var upperChordEnd = _v1.upperChordEnd;
+					var webOffsetDn = _v1.webOffsetDn;
+					var webOffsetUp = _v1.webOffsetUp;
 					var trussWidth = upperChordEnd.x;
 					var isDown = _Utils_cmp(upperChordEnd.y, upperChordStart.y) < 0;
 					var trussHeight = isDown ? (upperChordStart.y - lowerChordEnd.y) : upperChordEnd.y;
 					var assumedWidth = 1000.0;
 					var sw = (trussWidth * 1.0) / assumedWidth;
-					var changeCoords = function (_v4) {
-						var x = _v4.x;
-						var y = _v4.y;
+					var changeCoords = function (_v3) {
+						var x = _v3.x;
+						var y = _v3.y;
 						return {
 							x: x + sw,
 							y: isDown ? ((upperChordStart.y - y) + sw) : ((trussHeight - y) + sw)
@@ -7875,9 +7938,9 @@ var $author$project$Page$Truss$view = function (model) {
 					};
 					var webLinesMap = A2(
 						$gren_lang$core$Array$map,
-						function (_v3) {
-							var start = _v3.start;
-							var end = _v3.end;
+						function (_v2) {
+							var start = _v2.start;
+							var end = _v2.end;
 							return {
 								end: changeCoords(end),
 								start: changeCoords(start)
@@ -7887,24 +7950,32 @@ var $author$project$Page$Truss$view = function (model) {
 					var vbHeight = trussHeight + (sw * 2);
 					var vbWidth = trussWidth + (sw * 2);
 					return A2(
-						$gren_lang$browser$Svg$svg,
+						$gren_lang$browser$Html$div,
 						[
-							A2($gren_lang$browser$Html$Attributes$style, 'width', 'clamp(75%, 1000px, 100%)'),
-							$gren_lang$browser$Svg$Attributes$viewBox(
-							'0 0 ' + ($gren_lang$core$String$fromFloat(vbWidth) + (' ' + $gren_lang$core$String$fromFloat(vbHeight))))
+							$gren_lang$browser$Html$Attributes$class('center')
 						],
-						A2(
-							$gren_lang$core$Array$pushLast,
+						[
+							A3($author$project$Page$Truss$makeOutput, 'End distance', 'end-distance', endDistance),
+							A3($author$project$Page$Truss$makeOutputLine, 'Up distance', 'up-distance', webOffsetUp),
+							A3($author$project$Page$Truss$makeOutputLine, 'Dn distance', 'dn-distance', webOffsetDn),
 							A2(
-								$author$project$Page$Truss$polylineF,
-								sw,
+							$gren_lang$browser$Svg$svg,
+							[
+								A2($gren_lang$browser$Html$Attributes$style, 'width', 'clamp(75%, 1000px, 100%)'),
+								$gren_lang$browser$Svg$Attributes$viewBox(
+								'0 0 ' + ($gren_lang$core$String$fromFloat(vbWidth) + (' ' + $gren_lang$core$String$fromFloat(vbHeight))))
+							],
+							A2(
+								$gren_lang$core$Array$pushLast,
 								A2(
-									$gren_lang$core$Array$map,
-									changeCoords,
-									[lowerChordStart, lowerChordEnd, upperChordEnd, upperChordStart, lowerChordStart])),
-							A2($author$project$Page$Truss$lines, sw, webLinesMap)));
-				} else {
-					return $gren_lang$browser$Html$text('');
+									$author$project$Page$Truss$polylineF,
+									sw,
+									A2(
+										$gren_lang$core$Array$map,
+										changeCoords,
+										[lowerChordStart, lowerChordEnd, upperChordEnd, upperChordStart, lowerChordStart])),
+								A2($author$project$Page$Truss$lines, sw, webLinesMap)))
+						]);
 				}
 			}()
 			])
