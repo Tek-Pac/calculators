@@ -7050,7 +7050,12 @@ var $author$project$Page$Triangle$view = function (model) {
 				$gren_lang$browser$Html$Attributes$class('center')
 			],
 			[
-				$gren_lang$browser$Html$text('Triangles'),
+				A2(
+				$gren_lang$browser$Html$h1,
+				[],
+				[
+					$gren_lang$browser$Html$text('Triangles')
+				]),
 				A2(
 				$gren_lang$browser$Html$br,
 				[],
@@ -7805,7 +7810,12 @@ var $author$project$Page$Truss$view = function (model) {
 				$gren_lang$browser$Html$Attributes$class('center')
 			],
 			[
-				$gren_lang$browser$Html$text('Truss'),
+				A2(
+				$gren_lang$browser$Html$h1,
+				[],
+				[
+					$gren_lang$browser$Html$text('Truss')
+				]),
 				A2(
 				$gren_lang$browser$Html$br,
 				[],

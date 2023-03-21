@@ -5,7 +5,7 @@ module Page.Truss exposing ( Model, Msg(..), update, view, queryParser, queryBui
 
 import Browser
 import Browser.Dom as Dom
-import Html exposing ( Html, br, button, div, hr, input, text )
+import Html exposing ( Html, br, button, div, h1, hr, input, text )
 import Html.Attributes exposing ( class, id, readonly, step, style, type_, value )
 import Html.Events exposing ( onClick, onInput )
 import Math
@@ -292,7 +292,10 @@ view model =
             [ id "truss"
             , class "center"
             ]
-            [ text "Truss"
+            [ h1
+                []
+                [ text "Truss"
+                ]
             , br [] []
             , makeInput "Chord length" "chord-len" 0.5 model.chordLen UpdateChordLen
             , makeInput "Gap between chords" "chord-gap" 0.5 model.chordGap UpdateChordGap

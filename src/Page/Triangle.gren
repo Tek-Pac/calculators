@@ -5,7 +5,7 @@ module Page.Triangle exposing ( Model, Msg(..), update, view, queryParser, query
 
 import Browser
 import Browser.Dom as Dom
-import Html exposing ( Html, br, button, div, input, text )
+import Html exposing ( Html, br, button, div, h1, input, text )
 import Html.Attributes exposing ( class, id, readonly, step, style, type_, value )
 import Html.Events exposing ( onClick, onInput )
 import Math
@@ -303,7 +303,10 @@ view model =
             [ id "triangle"
             , class "center"
             ]
-            [ text "Triangles"
+            [ h1
+                []
+                [ text "Triangles"
+                ]
             , br [] []
             , svg
                 [ width "600"
