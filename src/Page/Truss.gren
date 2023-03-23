@@ -358,10 +358,6 @@ calculateTruss model =
 
 view : Model -> Browser.Document Msg
 view model =
-    let
-        result =
-            calculateTruss model
-    in
     { title = "Truss"
     , body =
         [ button
@@ -392,7 +388,7 @@ view model =
             , makeInput "Web angle" "web-angle" 0.1 model.webAngle UpdateWebAngle
             , makeInput "Web start distance" "web-start" 5 model.webStart UpdateWebStart
             , hr [] []
-            , case result of
+            , case calculateTruss model of
                 Err e ->
                     div
                         [ class "center"
@@ -400,7 +396,7 @@ view model =
                         [ text e
                         ]
 
-                Ok { endDistance, webPoints, webLines, lowerChordStart, upperChordStart, lowerChordEnd, upperChordEnd, webOffsetDn, webOffsetUp, chordDoublingRes } ->
+                Ok { endDistance, webPoints, webLines, lowerChordStart, upperChordStart, lowerChordEnd, upperChordEnd, webOffsetDn, webOffsetUp, chordDoublingRes, chordVert } ->
                     let
                         trussWidth =
                             upperChordEnd.x
@@ -410,9 +406,9 @@ view model =
 
                         trussHeight =
                             if isDown then
-                                upperChordStart.y - lowerChordEnd.y
+                                upperChordStart.y - lowerChordEnd.y + chordVert.y + chordVert.y
                             else
-                                upperChordEnd.y
+                                upperChordEnd.y + chordVert.y + chordVert.y
 
                         assumedWidth =
                             1000.0
@@ -432,9 +428,9 @@ view model =
                             { x = x + sw
                             , y =
                                 if isDown then
-                                    upperChordStart.y - y + sw
+                                    upperChordStart.y - y + sw + chordVert.y
                                 else
-                                    trussHeight - y + sw
+                                    trussHeight - y + sw - chordVert.y
                             }
 
                         webLinesMap =
@@ -457,25 +453,44 @@ view model =
                               style "width" "clamp(75%, 1000px, 100%)"
                             , viewBox ("0 0 " ++ String.fromFloat vbWidth ++ " " ++ String.fromFloat vbHeight)
                             ]
-                            (lines sw webLinesMap
-                                |> Array.pushLast
-                                        ([ lowerChordStart
-                                         , lowerChordEnd
-                                         , upperChordEnd
-                                         , upperChordStart
-                                         , lowerChordStart
-                                         ]
-                                            |> Array.map changeCoords
-                                            |> polylineF sw
-                                        )
+                            (lines
+                                sw
+                                (webLinesMap
+                                    -- left line
+                                    |> Array.pushLast
+                                            { start = changeCoords (V2.sub lowerChordStart chordVert)
+                                            , end = changeCoords (V2.add upperChordStart chordVert)
+                                            }
+                                    -- top outer line
+                                    |> Array.pushLast
+                                            { start = changeCoords (V2.add upperChordStart chordVert)
+                                            , end = changeCoords (V2.add upperChordEnd chordVert)
+                                            }
+                                    -- top inner line
+                                    |> Array.pushLast
+                                            { start = changeCoords upperChordStart
+                                            , end = changeCoords upperChordEnd
+                                            }
+                                    -- right line
+                                    |> Array.pushLast
+                                            { start = changeCoords (V2.sub lowerChordEnd chordVert)
+                                            , end = changeCoords (V2.add upperChordEnd chordVert)
+                                            }
+                                    -- bottom outer line
+                                    |> Array.pushLast
+                                            { start = changeCoords (V2.sub lowerChordStart chordVert)
+                                            , end = changeCoords (V2.sub lowerChordEnd chordVert)
+                                            }
+                                    -- bottom inner line
+                                    |> Array.pushLast
+                                            { start = changeCoords lowerChordStart
+                                            , end = changeCoords lowerChordEnd
+                                            }
+                                )
                                 |> Array.pushLast
                                         (case chordDoublingRes of
                                             Just { start, end } ->
-                                                [ start
-                                                , end
-                                                ]
-                                                    |> Array.map changeCoords
-                                                    |> polylineF sw
+                                                doLine sw (changeCoords start) (changeCoords end)
 
                                             Nothing ->
                                                 text ""
@@ -487,21 +502,23 @@ view model =
     }
 
 
+doLine : Float -> Float2 -> Float2 -> Svg msg
+doLine sw start end =
+    line
+        [ x1 (String.fromFloat start.x)
+        , y1 (String.fromFloat start.y)
+        , x2 (String.fromFloat end.x)
+        , y2 (String.fromFloat end.y)
+        , stroke "var(--text)"
+        , strokeWidth (String.fromFloat sw)
+        ]
+        []
+
+
 lines : Float -> Array LineSeg2 -> Array (Svg msg)
 lines sw linesArr =
     linesArr
-        |> Array.map
-                (\{ start, end } ->
-                    line
-                        [ x1 (String.fromFloat start.x)
-                        , y1 (String.fromFloat start.y)
-                        , x2 (String.fromFloat end.x)
-                        , y2 (String.fromFloat end.y)
-                        , stroke "var(--text)"
-                        , strokeWidth (String.fromFloat sw)
-                        ]
-                        []
-                )
+        |> Array.map (\ls -> doLine sw ls.start ls.end)
 
 
 polylineF : Float -> Array Float2 -> Svg msg
@@ -778,6 +795,7 @@ type alias TrussCalc =
             }
     , webOffsetUp : Float2
     , webOffsetDn : Float2
+    , chordVert : Float2
     }
 
 
@@ -832,6 +850,9 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
         nextWebWidthOffset =
             V2.mul trussAlong (nextWeb / Math.sin webRad)
 
+        chordVert =
+            v2 0 (chordHeight / Math.cos roofRad)
+
         dat =
             calcWebPoints
                 { endPointX = endPointLower.x
@@ -845,7 +866,7 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
                 , nextWebWidthOffset = nextWebWidthOffset
                 , nextCount = nextCount
                 , chordDoubling = chordDoubling
-                , chordVert = v2 0 (chordHeight / Math.cos roofRad)
+                , chordVert = chordVert
                 }
                 webStart
                 0
@@ -891,4 +912,5 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
         , chordDoublingRes = dat.chordDoublingRes
         , webOffsetUp = formatF2 webOffsetUp
         , webOffsetDn = formatF2 webOffsetDn
+        , chordVert = chordVert
         }
