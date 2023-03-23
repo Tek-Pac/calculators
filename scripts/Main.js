@@ -5421,30 +5421,44 @@ var $author$project$Page$Truss$queryParser = A2(
 								$gren_lang$url$Url$Parser$Query$string('web'),
 								A2(
 									$author$project$Page$Truss$qApply,
-									$gren_lang$url$Url$Parser$Query$string('chordGap'),
+									$gren_lang$url$Url$Parser$Query$string('chordDoubling'),
 									A2(
-										$gren_lang$url$Url$Parser$Query$map,
-										function (chordLen) {
-											return function (chordGap) {
-												return function (web) {
-													return function (startWeb) {
-														return function (startCount) {
-															return function (nextWeb) {
-																return function (nextCount) {
-																	return function (roof) {
-																		return function (webAngle) {
-																			return function (webStart) {
-																				return {
-																					chordGap: A2($gren_lang$core$Maybe$withDefault, '', chordGap),
-																					chordLen: A2($gren_lang$core$Maybe$withDefault, '', chordLen),
-																					nextCount: A2($gren_lang$core$Maybe$withDefault, '', nextCount),
-																					nextWeb: A2($gren_lang$core$Maybe$withDefault, '', nextWeb),
-																					roof: A2($gren_lang$core$Maybe$withDefault, '7.5', roof),
-																					startCount: A2($gren_lang$core$Maybe$withDefault, '', startCount),
-																					startWeb: A2($gren_lang$core$Maybe$withDefault, '', startWeb),
-																					web: A2($gren_lang$core$Maybe$withDefault, '', web),
-																					webAngle: A2($gren_lang$core$Maybe$withDefault, '45', webAngle),
-																					webStart: A2($gren_lang$core$Maybe$withDefault, '125', webStart)
+										$author$project$Page$Truss$qApply,
+										$gren_lang$url$Url$Parser$Query$string('chordHeight'),
+										A2(
+											$author$project$Page$Truss$qApply,
+											$gren_lang$url$Url$Parser$Query$string('chordGap'),
+											A2(
+												$gren_lang$url$Url$Parser$Query$map,
+												function (chordLen) {
+													return function (chordGap) {
+														return function (chordHeight) {
+															return function (chordDoubling) {
+																return function (web) {
+																	return function (startWeb) {
+																		return function (startCount) {
+																			return function (nextWeb) {
+																				return function (nextCount) {
+																					return function (roof) {
+																						return function (webAngle) {
+																							return function (webStart) {
+																								return {
+																									chordDoubling: A2($gren_lang$core$Maybe$withDefault, '', chordDoubling),
+																									chordGap: A2($gren_lang$core$Maybe$withDefault, '', chordGap),
+																									chordHeight: A2($gren_lang$core$Maybe$withDefault, '', chordHeight),
+																									chordLen: A2($gren_lang$core$Maybe$withDefault, '', chordLen),
+																									nextCount: A2($gren_lang$core$Maybe$withDefault, '', nextCount),
+																									nextWeb: A2($gren_lang$core$Maybe$withDefault, '', nextWeb),
+																									roof: A2($gren_lang$core$Maybe$withDefault, '7.5', roof),
+																									startCount: A2($gren_lang$core$Maybe$withDefault, '', startCount),
+																									startWeb: A2($gren_lang$core$Maybe$withDefault, '', startWeb),
+																									web: A2($gren_lang$core$Maybe$withDefault, '', web),
+																									webAngle: A2($gren_lang$core$Maybe$withDefault, '45', webAngle),
+																									webStart: A2($gren_lang$core$Maybe$withDefault, '125', webStart)
+																								};
+																							};
+																						};
+																					};
 																				};
 																			};
 																		};
@@ -5453,10 +5467,8 @@ var $author$project$Page$Truss$queryParser = A2(
 															};
 														};
 													};
-												};
-											};
-										},
-										$gren_lang$url$Url$Parser$Query$string('chordLen')))))))))));
+												},
+												$gren_lang$url$Url$Parser$Query$string('chordLen')))))))))))));
 var $gren_lang$url$Url$Parser$query = function (_v0) {
 	var queryParser = _v0.a;
 	return $gren_lang$url$Url$Parser$Parser(
@@ -5677,6 +5689,8 @@ var $author$project$Page$Truss$queryBuilder = function (model) {
 	return [
 		A2($gren_lang$url$Url$Builder$string, 'chordLen', model.chordLen),
 		A2($gren_lang$url$Url$Builder$string, 'chordGap', model.chordGap),
+		A2($gren_lang$url$Url$Builder$string, 'chordHeight', model.chordHeight),
+		A2($gren_lang$url$Url$Builder$string, 'chordDoubling', model.chordDoubling),
 		A2($gren_lang$url$Url$Builder$string, 'web', model.web),
 		A2($gren_lang$url$Url$Builder$string, 'startWeb', model.startWeb),
 		A2($gren_lang$url$Url$Builder$string, 'startCount', model.startCount),
@@ -5998,6 +6012,22 @@ var $author$project$Page$Truss$update = F2(
 						model,
 						{chordGap: c}),
 					'chord-gap');
+			case 'UpdateChordHeight':
+				var c = msg.a;
+				return A2(
+					$author$project$Page$Truss$doFocus,
+					_Utils_update(
+						model,
+						{chordHeight: c}),
+					'chord-height');
+			case 'UpdateChordDoubling':
+				var c = msg.a;
+				return A2(
+					$author$project$Page$Truss$doFocus,
+					_Utils_update(
+						model,
+						{chordDoubling: c}),
+					'chord-doubling');
 			case 'UpdateWeb':
 				var w = msg.a;
 				return A2(
@@ -7164,8 +7194,14 @@ var $author$project$Page$Triangle$view = function (model) {
 	};
 };
 var $author$project$Page$Truss$HomePage = {$: 'HomePage'};
+var $author$project$Page$Truss$UpdateChordDoubling = function (a) {
+	return {$: 'UpdateChordDoubling', a: a};
+};
 var $author$project$Page$Truss$UpdateChordGap = function (a) {
 	return {$: 'UpdateChordGap', a: a};
+};
+var $author$project$Page$Truss$UpdateChordHeight = function (a) {
+	return {$: 'UpdateChordHeight', a: a};
 };
 var $author$project$Page$Truss$UpdateChordLen = function (a) {
 	return {$: 'UpdateChordLen', a: a};
@@ -7206,6 +7242,7 @@ var $gren_lang$core$Array$isEmpty = function (array) {
 	return !$gren_lang$core$Array$length(array);
 };
 var $gren_lang$core$Math$modBy = _Math_modBy;
+var $gren_lang$core$Basics$neq = _Utils_notEqual;
 var $gren_lang$core$Array$pushFirst = F2(
 	function (value, array) {
 		return A2(
@@ -7213,26 +7250,36 @@ var $gren_lang$core$Array$pushFirst = F2(
 			[value],
 			array);
 	});
+var $author$project$Vector2$v2 = F2(
+	function (x, y) {
+		return {x: x, y: y};
+	});
 var $author$project$Page$Truss$calcWebPoints = F3(
 	function (dat, currWeb, index) {
 		var _v0 = dat;
 		var endPointX = _v0.endPointX;
 		var webOffsetUp = _v0.webOffsetUp;
+		var webOffsetUpCd = _v0.webOffsetUpCd;
 		var webOffsetDn = _v0.webOffsetDn;
+		var webOffsetDnCd = _v0.webOffsetDnCd;
 		var webWidthOffset = _v0.webWidthOffset;
 		var startWebWidthOffset = _v0.startWebWidthOffset;
 		var startCount = _v0.startCount;
 		var nextWebWidthOffset = _v0.nextWebWidthOffset;
 		var nextCount = _v0.nextCount;
+		var chordDoubling = _v0.chordDoubling;
+		var chordVert = _v0.chordVert;
 		if (_Utils_cmp(currWeb.x, endPointX) > 0) {
 			return {
+				chordDoublingRes: $gren_lang$core$Maybe$Nothing,
 				webLines: [],
 				webPoints: []
 			};
 		} else {
+			var webStartGraphicalOffset = ((!index) && (chordDoubling > 0)) ? chordVert : A2($author$project$Vector2$v2, 0, 0);
 			var webOffset = (_Utils_cmp(index, startCount) < 0) ? startWebWidthOffset : ((_Utils_cmp(index, startCount + nextCount) < 0) ? nextWebWidthOffset : webWidthOffset);
 			var isTop = A2($gren_lang$core$Math$modBy, 2, index) === 1;
-			var webOffsetDir = isTop ? webOffsetDn : webOffsetUp;
+			var webOffsetDir = (_Utils_cmp(index, (chordDoubling * 2) - 1) < 0) ? (isTop ? webOffsetDnCd : ((!index) ? A2($author$project$Vector2$add, webOffsetUpCd, chordVert) : webOffsetUpCd)) : (isTop ? webOffsetDn : webOffsetUp);
 			var nextCurrWeb = A2(
 				$author$project$Vector2$add,
 				webOffset,
@@ -7243,16 +7290,24 @@ var $author$project$Page$Truss$calcWebPoints = F3(
 				$gren_lang$core$Array$pushFirst,
 				{
 					end: nextCurrWeb,
-					start: A2($author$project$Vector2$add, currWeb, webOffset)
+					start: A2(
+						$author$project$Vector2$add,
+						A2($author$project$Vector2$add, currWeb, webOffset),
+						webStartGraphicalOffset)
 				},
 				A2(
 					$gren_lang$core$Array$pushFirst,
 					{
 						end: A2($author$project$Vector2$add, currWeb, webOffsetDir),
-						start: currWeb
+						start: A2($author$project$Vector2$add, currWeb, webStartGraphicalOffset)
 					},
 					nextDat.webLines));
-			return {webLines: webLines, webPoints: webPoints};
+			var chordDoublingRes = ((!(!index)) && _Utils_eq(index, (chordDoubling * 2) - 1)) ? $gren_lang$core$Maybe$Just(
+				{
+					end: A2($author$project$Vector2$add, currWeb, webOffsetDnCd),
+					start: chordVert
+				}) : nextDat.chordDoublingRes;
+			return {chordDoublingRes: chordDoublingRes, webLines: webLines, webPoints: webPoints};
 		}
 	});
 var $author$project$Vector2$dot = F2(
@@ -7306,13 +7361,11 @@ var $author$project$Vector2$mul = F2(
 	function (v, a) {
 		return A2($author$project$Vector2$scale, a, v);
 	});
-var $author$project$Vector2$v2 = F2(
-	function (x, y) {
-		return {x: x, y: y};
-	});
 var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 	var chordLen = _v0.chordLen;
 	var chordGap = _v0.chordGap;
+	var chordHeight = _v0.chordHeight;
+	var chordDoubling = _v0.chordDoubling;
 	var web = _v0.web;
 	var startWeb = _v0.startWeb;
 	var startCount = _v0.startCount;
@@ -7348,6 +7401,10 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 		$author$project$Vector2$div,
 		A2($author$project$Vector2$mul, webAlongDn, chordGap),
 		$gren_lang$core$Math$sin(webRad));
+	var webOffsetDnCd = A2(
+		$author$project$Vector2$div,
+		A2($author$project$Vector2$mul, webAlongDn, chordGap - chordHeight),
+		$gren_lang$core$Math$sin(webRad));
 	var webAlongUp = A2(
 		$author$project$Vector2$v2,
 		$gren_lang$core$Math$cos(roofRad + webRad),
@@ -7355,6 +7412,10 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 	var webOffsetUp = A2(
 		$author$project$Vector2$div,
 		A2($author$project$Vector2$mul, webAlongUp, chordGap),
+		$gren_lang$core$Math$sin(webRad));
+	var webOffsetUpCd = A2(
+		$author$project$Vector2$div,
+		A2($author$project$Vector2$mul, webAlongUp, chordGap - chordHeight),
 		$gren_lang$core$Math$sin(webRad));
 	var nextWebWidthOffset = A2(
 		$author$project$Vector2$mul,
@@ -7375,7 +7436,23 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 	var endPointUpper = A2($author$project$Vector2$add, endPointLower, vertGapDist);
 	var dat = A3(
 		$author$project$Page$Truss$calcWebPoints,
-		{endPointX: endPointLower.x, nextCount: nextCount, nextWebWidthOffset: nextWebWidthOffset, startCount: startCount, startWebWidthOffset: startWebWidthOffset, webOffsetDn: webOffsetDn, webOffsetUp: webOffsetUp, webWidthOffset: webWidthOffset},
+		{
+			chordDoubling: chordDoubling,
+			chordVert: A2(
+				$author$project$Vector2$v2,
+				0,
+				chordHeight / $gren_lang$core$Math$cos(roofRad)),
+			endPointX: endPointLower.x,
+			nextCount: nextCount,
+			nextWebWidthOffset: nextWebWidthOffset,
+			startCount: startCount,
+			startWebWidthOffset: startWebWidthOffset,
+			webOffsetDn: webOffsetDn,
+			webOffsetDnCd: webOffsetDnCd,
+			webOffsetUp: webOffsetUp,
+			webOffsetUpCd: webOffsetUpCd,
+			webWidthOffset: webWidthOffset
+		},
 		webStart,
 		0);
 	var webLines = dat.webLines;
@@ -7390,6 +7467,7 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 			$gren_lang$core$Array$last(webPoints)));
 	return $gren_lang$core$Result$Ok(
 		{
+			chordDoublingRes: dat.chordDoublingRes,
 			endDistance: formatF(endDistance),
 			lowerChordEnd: endPointLower,
 			lowerChordStart: {x: 0.0, y: 0.0},
@@ -7403,7 +7481,9 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 };
 var $author$project$Page$Truss$calculateTruss = function (model) {
 	var parsedModel = {
+		chordDoubling: $gren_lang$core$String$toInt(model.chordDoubling),
 		chordGap: $gren_lang$core$String$toFloat(model.chordGap),
+		chordHeight: $gren_lang$core$String$toFloat(model.chordHeight),
 		chordLen: $gren_lang$core$String$toFloat(model.chordLen),
 		nextCount: $gren_lang$core$String$toInt(model.nextCount),
 		nextWeb: $gren_lang$core$String$toFloat(model.nextWeb),
@@ -7414,211 +7494,341 @@ var $author$project$Page$Truss$calculateTruss = function (model) {
 		webAngle: $gren_lang$core$String$toFloat(model.webAngle),
 		webStart: $gren_lang$core$String$toFloat(model.webStart)
 	};
-	_v0$6:
+	_v0$9:
 	while (true) {
-		_v0$7:
+		_v0$10:
 		while (true) {
-			_v0$8:
+			_v0$11:
 			while (true) {
-				_v0$9:
+				_v0$12:
 				while (true) {
-					if (parsedModel.chordLen.$ === 'Just') {
-						if (parsedModel.chordGap.$ === 'Just') {
-							if (parsedModel.web.$ === 'Just') {
-								if (parsedModel.startWeb.$ === 'Just') {
-									if (parsedModel.startCount.$ === 'Just') {
-										if (parsedModel.nextWeb.$ === 'Just') {
-											if (parsedModel.nextCount.$ === 'Just') {
-												if (parsedModel.roof.$ === 'Just') {
-													if (parsedModel.webAngle.$ === 'Just') {
-														if (parsedModel.webStart.$ === 'Just') {
-															var chordLen = parsedModel.chordLen.a;
-															var chordGap = parsedModel.chordGap.a;
-															var web = parsedModel.web.a;
-															var startWeb = parsedModel.startWeb.a;
-															var startCount = parsedModel.startCount.a;
-															var nextWeb = parsedModel.nextWeb.a;
-															var nextCount = parsedModel.nextCount.a;
-															var roof = parsedModel.roof.a;
-															var webAngle = parsedModel.webAngle.a;
-															var webStart = parsedModel.webStart.a;
-															return $author$project$Page$Truss$finishTrussCalc(
-																{chordGap: chordGap, chordLen: chordLen, nextCount: nextCount, nextWeb: nextWeb, roof: roof, startCount: startCount, startWeb: startWeb, web: web, webAngle: webAngle, webStart: webStart});
+					_v0$13:
+					while (true) {
+						if (parsedModel.chordLen.$ === 'Just') {
+							if (parsedModel.chordGap.$ === 'Just') {
+								if (parsedModel.web.$ === 'Just') {
+									if (parsedModel.startWeb.$ === 'Just') {
+										if (parsedModel.startCount.$ === 'Just') {
+											if (parsedModel.nextWeb.$ === 'Just') {
+												if (parsedModel.nextCount.$ === 'Just') {
+													if (parsedModel.roof.$ === 'Just') {
+														if (parsedModel.webAngle.$ === 'Just') {
+															if (parsedModel.webStart.$ === 'Just') {
+																if (parsedModel.chordDoubling.$ === 'Nothing') {
+																	var chordLen = parsedModel.chordLen.a;
+																	var chordGap = parsedModel.chordGap.a;
+																	var _v15 = parsedModel.chordDoubling;
+																	var web = parsedModel.web.a;
+																	var startWeb = parsedModel.startWeb.a;
+																	var startCount = parsedModel.startCount.a;
+																	var nextWeb = parsedModel.nextWeb.a;
+																	var nextCount = parsedModel.nextCount.a;
+																	var roof = parsedModel.roof.a;
+																	var webAngle = parsedModel.webAngle.a;
+																	var webStart = parsedModel.webStart.a;
+																	return $author$project$Page$Truss$finishTrussCalc(
+																		{
+																			chordDoubling: 0,
+																			chordGap: chordGap,
+																			chordHeight: A2($gren_lang$core$Maybe$withDefault, 0, parsedModel.chordHeight),
+																			chordLen: chordLen,
+																			nextCount: nextCount,
+																			nextWeb: nextWeb,
+																			roof: roof,
+																			startCount: startCount,
+																			startWeb: startWeb,
+																			web: web,
+																			webAngle: webAngle,
+																			webStart: webStart
+																		});
+																} else {
+																	if (parsedModel.chordHeight.$ === 'Just') {
+																		var chordLen = parsedModel.chordLen.a;
+																		var chordGap = parsedModel.chordGap.a;
+																		var chordHeight = parsedModel.chordHeight.a;
+																		var chordDoubling = parsedModel.chordDoubling.a;
+																		var web = parsedModel.web.a;
+																		var startWeb = parsedModel.startWeb.a;
+																		var startCount = parsedModel.startCount.a;
+																		var nextWeb = parsedModel.nextWeb.a;
+																		var nextCount = parsedModel.nextCount.a;
+																		var roof = parsedModel.roof.a;
+																		var webAngle = parsedModel.webAngle.a;
+																		var webStart = parsedModel.webStart.a;
+																		return $author$project$Page$Truss$finishTrussCalc(
+																			{chordDoubling: chordDoubling, chordGap: chordGap, chordHeight: chordHeight, chordLen: chordLen, nextCount: nextCount, nextWeb: nextWeb, roof: roof, startCount: startCount, startWeb: startWeb, web: web, webAngle: webAngle, webStart: webStart});
+																	} else {
+																		break _v0$12;
+																	}
+																}
+															} else {
+																break _v0$11;
+															}
 														} else {
-															break _v0$8;
+															break _v0$10;
 														}
 													} else {
-														break _v0$7;
+														break _v0$9;
 													}
 												} else {
-													break _v0$6;
+													if (parsedModel.roof.$ === 'Nothing') {
+														break _v0$9;
+													} else {
+														if (parsedModel.webAngle.$ === 'Nothing') {
+															break _v0$10;
+														} else {
+															if (parsedModel.webStart.$ === 'Nothing') {
+																break _v0$11;
+															} else {
+																if (parsedModel.chordHeight.$ === 'Nothing') {
+																	break _v0$12;
+																} else {
+																	var _v26 = parsedModel.nextCount;
+																	var _v27 = $gren_lang$core$String$toFloat(model.nextCount);
+																	if (_v27.$ === 'Just') {
+																		return $gren_lang$core$Result$Err('enter an integral number of next webs');
+																	} else {
+																		return $gren_lang$core$Result$Err('enter the number of next webs too');
+																	}
+																}
+															}
+														}
+													}
 												}
 											} else {
-												if (parsedModel.roof.$ === 'Nothing') {
-													break _v0$6;
-												} else {
-													if (parsedModel.webAngle.$ === 'Nothing') {
-														break _v0$7;
-													} else {
-														if (parsedModel.webStart.$ === 'Nothing') {
-															break _v0$8;
-														} else {
-															var _v16 = parsedModel.nextCount;
-															var _v17 = $gren_lang$core$String$toFloat(model.nextCount);
-															if (_v17.$ === 'Just') {
-																return $gren_lang$core$Result$Err('enter an integral number of next webs');
+												if (parsedModel.nextCount.$ === 'Nothing') {
+													if (parsedModel.roof.$ === 'Just') {
+														if (parsedModel.webAngle.$ === 'Just') {
+															if (parsedModel.webStart.$ === 'Just') {
+																if (parsedModel.chordDoubling.$ === 'Nothing') {
+																	var chordLen = parsedModel.chordLen.a;
+																	var chordGap = parsedModel.chordGap.a;
+																	var _v10 = parsedModel.chordDoubling;
+																	var web = parsedModel.web.a;
+																	var startWeb = parsedModel.startWeb.a;
+																	var startCount = parsedModel.startCount.a;
+																	var _v11 = parsedModel.nextWeb;
+																	var _v12 = parsedModel.nextCount;
+																	var roof = parsedModel.roof.a;
+																	var webAngle = parsedModel.webAngle.a;
+																	var webStart = parsedModel.webStart.a;
+																	return $author$project$Page$Truss$finishTrussCalc(
+																		{
+																			chordDoubling: 0,
+																			chordGap: chordGap,
+																			chordHeight: A2($gren_lang$core$Maybe$withDefault, 0, parsedModel.chordHeight),
+																			chordLen: chordLen,
+																			nextCount: 0,
+																			nextWeb: 0,
+																			roof: roof,
+																			startCount: startCount,
+																			startWeb: startWeb,
+																			web: web,
+																			webAngle: webAngle,
+																			webStart: webStart
+																		});
+																} else {
+																	if (parsedModel.chordHeight.$ === 'Just') {
+																		var chordLen = parsedModel.chordLen.a;
+																		var chordGap = parsedModel.chordGap.a;
+																		var chordHeight = parsedModel.chordHeight.a;
+																		var chordDoubling = parsedModel.chordDoubling.a;
+																		var web = parsedModel.web.a;
+																		var startWeb = parsedModel.startWeb.a;
+																		var startCount = parsedModel.startCount.a;
+																		var _v13 = parsedModel.nextWeb;
+																		var _v14 = parsedModel.nextCount;
+																		var roof = parsedModel.roof.a;
+																		var webAngle = parsedModel.webAngle.a;
+																		var webStart = parsedModel.webStart.a;
+																		return $author$project$Page$Truss$finishTrussCalc(
+																			{chordDoubling: chordDoubling, chordGap: chordGap, chordHeight: chordHeight, chordLen: chordLen, nextCount: 0, nextWeb: 0, roof: roof, startCount: startCount, startWeb: startWeb, web: web, webAngle: webAngle, webStart: webStart});
+																	} else {
+																		break _v0$12;
+																	}
+																}
 															} else {
-																return $gren_lang$core$Result$Err('enter the number of next webs too');
+																break _v0$11;
+															}
+														} else {
+															break _v0$10;
+														}
+													} else {
+														break _v0$9;
+													}
+												} else {
+													if (parsedModel.roof.$ === 'Nothing') {
+														break _v0$9;
+													} else {
+														if (parsedModel.webAngle.$ === 'Nothing') {
+															break _v0$10;
+														} else {
+															if (parsedModel.webStart.$ === 'Nothing') {
+																break _v0$11;
+															} else {
+																if (parsedModel.chordHeight.$ === 'Nothing') {
+																	break _v0$12;
+																} else {
+																	var _v28 = parsedModel.nextWeb;
+																	return $gren_lang$core$Result$Err('enter the size of the next webs');
+																}
 															}
 														}
 													}
 												}
 											}
 										} else {
-											if (parsedModel.nextCount.$ === 'Nothing') {
-												if (parsedModel.roof.$ === 'Just') {
-													if (parsedModel.webAngle.$ === 'Just') {
-														if (parsedModel.webStart.$ === 'Just') {
-															var chordLen = parsedModel.chordLen.a;
-															var chordGap = parsedModel.chordGap.a;
-															var web = parsedModel.web.a;
-															var startWeb = parsedModel.startWeb.a;
-															var startCount = parsedModel.startCount.a;
-															var _v5 = parsedModel.nextWeb;
-															var _v6 = parsedModel.nextCount;
-															var roof = parsedModel.roof.a;
-															var webAngle = parsedModel.webAngle.a;
-															var webStart = parsedModel.webStart.a;
-															return $author$project$Page$Truss$finishTrussCalc(
-																{chordGap: chordGap, chordLen: chordLen, nextCount: 0, nextWeb: 0, roof: roof, startCount: startCount, startWeb: startWeb, web: web, webAngle: webAngle, webStart: webStart});
-														} else {
-															break _v0$8;
-														}
-													} else {
-														break _v0$7;
-													}
-												} else {
-													break _v0$6;
-												}
+											if (parsedModel.roof.$ === 'Nothing') {
+												break _v0$9;
 											} else {
-												if (parsedModel.roof.$ === 'Nothing') {
-													break _v0$6;
+												if (parsedModel.webAngle.$ === 'Nothing') {
+													break _v0$10;
 												} else {
-													if (parsedModel.webAngle.$ === 'Nothing') {
-														break _v0$7;
+													if (parsedModel.webStart.$ === 'Nothing') {
+														break _v0$11;
 													} else {
-														if (parsedModel.webStart.$ === 'Nothing') {
-															break _v0$8;
+														if (parsedModel.chordHeight.$ === 'Nothing') {
+															break _v0$12;
 														} else {
-															var _v18 = parsedModel.nextWeb;
-															return $gren_lang$core$Result$Err('enter the size of the next webs');
+															break _v0$13;
 														}
 													}
 												}
 											}
 										}
 									} else {
-										if (parsedModel.roof.$ === 'Nothing') {
-											break _v0$6;
-										} else {
-											if (parsedModel.webAngle.$ === 'Nothing') {
-												break _v0$7;
-											} else {
-												if (parsedModel.webStart.$ === 'Nothing') {
-													break _v0$8;
+										if (parsedModel.startCount.$ === 'Nothing') {
+											if ((parsedModel.nextWeb.$ === 'Nothing') && (parsedModel.nextCount.$ === 'Nothing')) {
+												if (parsedModel.roof.$ === 'Just') {
+													if (parsedModel.webAngle.$ === 'Just') {
+														if (parsedModel.webStart.$ === 'Just') {
+															if (parsedModel.chordDoubling.$ === 'Nothing') {
+																var chordLen = parsedModel.chordLen.a;
+																var chordGap = parsedModel.chordGap.a;
+																var _v1 = parsedModel.chordDoubling;
+																var web = parsedModel.web.a;
+																var _v2 = parsedModel.startWeb;
+																var _v3 = parsedModel.startCount;
+																var _v4 = parsedModel.nextWeb;
+																var _v5 = parsedModel.nextCount;
+																var roof = parsedModel.roof.a;
+																var webAngle = parsedModel.webAngle.a;
+																var webStart = parsedModel.webStart.a;
+																return $author$project$Page$Truss$finishTrussCalc(
+																	{
+																		chordDoubling: 0,
+																		chordGap: chordGap,
+																		chordHeight: A2($gren_lang$core$Maybe$withDefault, 0, parsedModel.chordHeight),
+																		chordLen: chordLen,
+																		nextCount: 0,
+																		nextWeb: 0,
+																		roof: roof,
+																		startCount: 0,
+																		startWeb: 0,
+																		web: web,
+																		webAngle: webAngle,
+																		webStart: webStart
+																	});
+															} else {
+																if (parsedModel.chordHeight.$ === 'Just') {
+																	var chordLen = parsedModel.chordLen.a;
+																	var chordGap = parsedModel.chordGap.a;
+																	var chordHeight = parsedModel.chordHeight.a;
+																	var chordDoubling = parsedModel.chordDoubling.a;
+																	var web = parsedModel.web.a;
+																	var _v6 = parsedModel.startWeb;
+																	var _v7 = parsedModel.startCount;
+																	var _v8 = parsedModel.nextWeb;
+																	var _v9 = parsedModel.nextCount;
+																	var roof = parsedModel.roof.a;
+																	var webAngle = parsedModel.webAngle.a;
+																	var webStart = parsedModel.webStart.a;
+																	return $author$project$Page$Truss$finishTrussCalc(
+																		{chordDoubling: chordDoubling, chordGap: chordGap, chordHeight: chordHeight, chordLen: chordLen, nextCount: 0, nextWeb: 0, roof: roof, startCount: 0, startWeb: 0, web: web, webAngle: webAngle, webStart: webStart});
+																} else {
+																	break _v0$12;
+																}
+															}
+														} else {
+															break _v0$11;
+														}
+													} else {
+														break _v0$10;
+													}
 												} else {
 													break _v0$9;
+												}
+											} else {
+												if (parsedModel.roof.$ === 'Nothing') {
+													break _v0$9;
+												} else {
+													if (parsedModel.webAngle.$ === 'Nothing') {
+														break _v0$10;
+													} else {
+														if (parsedModel.webStart.$ === 'Nothing') {
+															break _v0$11;
+														} else {
+															if (parsedModel.chordHeight.$ === 'Nothing') {
+																break _v0$12;
+															} else {
+																break _v0$13;
+															}
+														}
+													}
+												}
+											}
+										} else {
+											if (parsedModel.roof.$ === 'Nothing') {
+												break _v0$9;
+											} else {
+												if (parsedModel.webAngle.$ === 'Nothing') {
+													break _v0$10;
+												} else {
+													if (parsedModel.webStart.$ === 'Nothing') {
+														break _v0$11;
+													} else {
+														if (parsedModel.chordHeight.$ === 'Nothing') {
+															break _v0$12;
+														} else {
+															var _v25 = parsedModel.startWeb;
+															return $gren_lang$core$Result$Err('enter the size of the initial webs');
+														}
+													}
 												}
 											}
 										}
 									}
 								} else {
-									if (parsedModel.startCount.$ === 'Nothing') {
-										if ((parsedModel.nextWeb.$ === 'Nothing') && (parsedModel.nextCount.$ === 'Nothing')) {
-											if (parsedModel.roof.$ === 'Just') {
-												if (parsedModel.webAngle.$ === 'Just') {
-													if (parsedModel.webStart.$ === 'Just') {
-														var chordLen = parsedModel.chordLen.a;
-														var chordGap = parsedModel.chordGap.a;
-														var web = parsedModel.web.a;
-														var _v1 = parsedModel.startWeb;
-														var _v2 = parsedModel.startCount;
-														var _v3 = parsedModel.nextWeb;
-														var _v4 = parsedModel.nextCount;
-														var roof = parsedModel.roof.a;
-														var webAngle = parsedModel.webAngle.a;
-														var webStart = parsedModel.webStart.a;
-														return $author$project$Page$Truss$finishTrussCalc(
-															{chordGap: chordGap, chordLen: chordLen, nextCount: 0, nextWeb: 0, roof: roof, startCount: 0, startWeb: 0, web: web, webAngle: webAngle, webStart: webStart});
-													} else {
-														break _v0$8;
-													}
-												} else {
-													break _v0$7;
-												}
-											} else {
-												break _v0$6;
-											}
-										} else {
-											if (parsedModel.roof.$ === 'Nothing') {
-												break _v0$6;
-											} else {
-												if (parsedModel.webAngle.$ === 'Nothing') {
-													break _v0$7;
-												} else {
-													if (parsedModel.webStart.$ === 'Nothing') {
-														break _v0$8;
-													} else {
-														break _v0$9;
-													}
-												}
-											}
-										}
-									} else {
-										if (parsedModel.roof.$ === 'Nothing') {
-											break _v0$6;
-										} else {
-											if (parsedModel.webAngle.$ === 'Nothing') {
-												break _v0$7;
-											} else {
-												if (parsedModel.webStart.$ === 'Nothing') {
-													break _v0$8;
-												} else {
-													var _v15 = parsedModel.startWeb;
-													return $gren_lang$core$Result$Err('enter the size of the initial webs');
-												}
-											}
-										}
-									}
+									var _v18 = parsedModel.web;
+									return $gren_lang$core$Result$Err('enter the width of the web profile');
 								}
 							} else {
-								var _v9 = parsedModel.web;
-								return $gren_lang$core$Result$Err('enter the width of the web profile');
+								var _v17 = parsedModel.chordGap;
+								return $gren_lang$core$Result$Err('enter the gap between the chords');
 							}
 						} else {
-							var _v8 = parsedModel.chordGap;
-							return $gren_lang$core$Result$Err('enter the gap between the chords');
+							var _v16 = parsedModel.chordLen;
+							return $gren_lang$core$Result$Err('enter the length of the chord');
 						}
+					}
+					var _v23 = parsedModel.startCount;
+					var _v24 = $gren_lang$core$String$toFloat(model.startCount);
+					if (_v24.$ === 'Just') {
+						return $gren_lang$core$Result$Err('enter an integral number of initial webs');
 					} else {
-						var _v7 = parsedModel.chordLen;
-						return $gren_lang$core$Result$Err('enter the length of the chord');
+						return $gren_lang$core$Result$Err('enter the number of initial webs too');
 					}
 				}
-				var _v13 = parsedModel.startCount;
-				var _v14 = $gren_lang$core$String$toFloat(model.startCount);
-				if (_v14.$ === 'Just') {
-					return $gren_lang$core$Result$Err('enter an integral number of initial webs');
-				} else {
-					return $gren_lang$core$Result$Err('enter the number of initial webs too');
-				}
+				var _v22 = parsedModel.chordHeight;
+				return $gren_lang$core$Result$Err('enter the height of the chord profile too');
 			}
-			var _v12 = parsedModel.webStart;
+			var _v21 = parsedModel.webStart;
 			return $gren_lang$core$Result$Err('enter the web start distance');
 		}
-		var _v11 = parsedModel.webAngle;
+		var _v20 = parsedModel.webAngle;
 		return $gren_lang$core$Result$Err('enter the angle that you want the webs to be at');
 	}
-	var _v10 = parsedModel.roof;
+	var _v19 = parsedModel.roof;
 	return $gren_lang$core$Result$Err('enter the angle of the roof');
 };
 var $gren_lang$browser$Html$hr = $gren_lang$browser$Html$node('hr');
@@ -7889,6 +8099,8 @@ var $author$project$Page$Truss$view = function (model) {
 				[]),
 				A5($author$project$Page$Truss$makeInput, 'Chord length', 'chord-len', 0.5, model.chordLen, $author$project$Page$Truss$UpdateChordLen),
 				A5($author$project$Page$Truss$makeInput, 'Gap between chords', 'chord-gap', 0.5, model.chordGap, $author$project$Page$Truss$UpdateChordGap),
+				A5($author$project$Page$Truss$makeInput, 'Chord height', 'chord-height', 0.5, model.chordHeight, $author$project$Page$Truss$UpdateChordHeight),
+				A5($author$project$Page$Truss$makeInput, 'Chord doubling count', 'chord-doubling', 1, model.chordDoubling, $author$project$Page$Truss$UpdateChordDoubling),
 				A5($author$project$Page$Truss$makeInput, 'Web profile width', 'web', 0.5, model.web, $author$project$Page$Truss$UpdateWeb),
 				A5($author$project$Page$Truss$makeInput, 'Initial web profile width', 'start-web', 0.5, model.startWeb, $author$project$Page$Truss$UpdateStartWeb),
 				A5($author$project$Page$Truss$makeInput, 'Initial web count', 'start-count', 1, model.startCount, $author$project$Page$Truss$UpdateStartCount),
@@ -7923,14 +8135,15 @@ var $author$project$Page$Truss$view = function (model) {
 					var upperChordEnd = _v1.upperChordEnd;
 					var webOffsetDn = _v1.webOffsetDn;
 					var webOffsetUp = _v1.webOffsetUp;
+					var chordDoublingRes = _v1.chordDoublingRes;
 					var trussWidth = upperChordEnd.x;
 					var isDown = _Utils_cmp(upperChordEnd.y, upperChordStart.y) < 0;
 					var trussHeight = isDown ? (upperChordStart.y - lowerChordEnd.y) : upperChordEnd.y;
 					var assumedWidth = 1000.0;
 					var sw = (trussWidth * 1.0) / assumedWidth;
-					var changeCoords = function (_v3) {
-						var x = _v3.x;
-						var y = _v3.y;
+					var changeCoords = function (_v5) {
+						var x = _v5.x;
+						var y = _v5.y;
 						return {
 							x: x + sw,
 							y: isDown ? ((upperChordStart.y - y) + sw) : ((trussHeight - y) + sw)
@@ -7938,9 +8151,9 @@ var $author$project$Page$Truss$view = function (model) {
 					};
 					var webLinesMap = A2(
 						$gren_lang$core$Array$map,
-						function (_v2) {
-							var start = _v2.start;
-							var end = _v2.end;
+						function (_v4) {
+							var start = _v4.start;
+							var end = _v4.end;
 							return {
 								end: changeCoords(end),
 								start: changeCoords(start)
@@ -7967,14 +8180,32 @@ var $author$project$Page$Truss$view = function (model) {
 							],
 							A2(
 								$gren_lang$core$Array$pushLast,
+								function () {
+									if (chordDoublingRes.$ === 'Just') {
+										var _v3 = chordDoublingRes.a;
+										var start = _v3.start;
+										var end = _v3.end;
+										return A2(
+											$author$project$Page$Truss$polylineF,
+											sw,
+											A2(
+												$gren_lang$core$Array$map,
+												changeCoords,
+												[start, end]));
+									} else {
+										return $gren_lang$browser$Html$text('');
+									}
+								}(),
 								A2(
-									$author$project$Page$Truss$polylineF,
-									sw,
+									$gren_lang$core$Array$pushLast,
 									A2(
-										$gren_lang$core$Array$map,
-										changeCoords,
-										[lowerChordStart, lowerChordEnd, upperChordEnd, upperChordStart, lowerChordStart])),
-								A2($author$project$Page$Truss$lines, sw, webLinesMap)))
+										$author$project$Page$Truss$polylineF,
+										sw,
+										A2(
+											$gren_lang$core$Array$map,
+											changeCoords,
+											[lowerChordStart, lowerChordEnd, upperChordEnd, upperChordStart, lowerChordStart])),
+									A2($author$project$Page$Truss$lines, sw, webLinesMap))))
 						]);
 				}
 			}()

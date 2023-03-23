@@ -27,9 +27,11 @@ queryParser : Query.Parser Model
 queryParser =
     -- We can't do any more than map8
     Query.map
-        (\chordLen chordGap web startWeb startCount nextWeb nextCount roof webAngle webStart ->
+        (\chordLen chordGap chordHeight chordDoubling web startWeb startCount nextWeb nextCount roof webAngle webStart ->
             { chordLen = Maybe.withDefault "" chordLen
             , chordGap = Maybe.withDefault "" chordGap
+            , chordHeight = Maybe.withDefault "" chordHeight
+            , chordDoubling = Maybe.withDefault "" chordDoubling
             , web = Maybe.withDefault "" web
             , startWeb = Maybe.withDefault "" startWeb
             , startCount = Maybe.withDefault "" startCount
@@ -42,6 +44,8 @@ queryParser =
         )
         (Query.string "chordLen")
         |> qApply (Query.string "chordGap")
+        |> qApply (Query.string "chordHeight")
+        |> qApply (Query.string "chordDoubling")
         |> qApply (Query.string "web")
         |> qApply (Query.string "startWeb")
         |> qApply (Query.string "startCount")
@@ -56,6 +60,8 @@ queryBuilder : Model -> Array Builder.QueryParameter
 queryBuilder model =
     [ Builder.string "chordLen" model.chordLen
     , Builder.string "chordGap" model.chordGap
+    , Builder.string "chordHeight" model.chordHeight
+    , Builder.string "chordDoubling" model.chordDoubling
     , Builder.string "web" model.web
     , Builder.string "startWeb" model.startWeb
     , Builder.string "startCount" model.startCount
@@ -70,6 +76,8 @@ queryBuilder model =
 type alias Model =
     { chordLen : String
     , chordGap : String
+    , chordHeight : String
+    , chordDoubling : String
     , web : String
     , startWeb : String
     , startCount : String
@@ -91,6 +99,8 @@ type Msg
     = HomePage
     | UpdateChordLen String
     | UpdateChordGap String
+    | UpdateChordHeight String
+    | UpdateChordDoubling String
     | UpdateWeb String
     | UpdateStartWeb String
     | UpdateStartCount String
@@ -134,6 +144,12 @@ update msg model =
         UpdateChordGap c ->
             doFocus { model | chordGap = c } "chord-gap"
 
+        UpdateChordHeight c ->
+            doFocus { model | chordHeight = c } "chord-height"
+
+        UpdateChordDoubling c ->
+            doFocus { model | chordDoubling = c } "chord-doubling"
+
         UpdateWeb w ->
             doFocus { model | web = w } "web"
 
@@ -170,6 +186,8 @@ calculateTruss model =
         parsedModel =
             { chordLen = String.toFloat model.chordLen
             , chordGap = String.toFloat model.chordGap
+            , chordHeight = String.toFloat model.chordHeight
+            , chordDoubling = String.toInt model.chordDoubling
             , web = String.toFloat model.web
             , startWeb = String.toFloat model.startWeb
             , startCount = String.toInt model.startCount
@@ -181,10 +199,14 @@ calculateTruss model =
             }
     in
     case parsedModel of
-        { chordLen = Just chordLen, chordGap = Just chordGap, web = Just web, startWeb = Nothing, startCount = Nothing, nextWeb = Nothing, nextCount = Nothing, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
+        { chordLen = Just chordLen, chordGap = Just chordGap, chordDoubling = Nothing, web = Just web, startWeb = Nothing, startCount = Nothing, nextWeb = Nothing, nextCount = Nothing, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
             finishTrussCalc
                 { chordLen = chordLen
                 , chordGap = chordGap
+                , chordHeight =
+                    parsedModel.chordHeight
+                        |> Maybe.withDefault 0
+                , chordDoubling = 0
                 , web = web
                 , startWeb = 0
                 , startCount = 0
@@ -195,10 +217,30 @@ calculateTruss model =
                 , webStart = webStart
                 }
 
-        { chordLen = Just chordLen, chordGap = Just chordGap, web = Just web, startWeb = Just startWeb, startCount = Just startCount, nextWeb = Nothing, nextCount = Nothing, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
+        { chordLen = Just chordLen, chordGap = Just chordGap, chordHeight = Just chordHeight, chordDoubling = Just chordDoubling, web = Just web, startWeb = Nothing, startCount = Nothing, nextWeb = Nothing, nextCount = Nothing, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
             finishTrussCalc
                 { chordLen = chordLen
                 , chordGap = chordGap
+                , chordHeight = chordHeight
+                , chordDoubling = chordDoubling
+                , web = web
+                , startWeb = 0
+                , startCount = 0
+                , nextWeb = 0
+                , nextCount = 0
+                , roof = roof
+                , webAngle = webAngle
+                , webStart = webStart
+                }
+
+        { chordLen = Just chordLen, chordGap = Just chordGap, chordDoubling = Nothing, web = Just web, startWeb = Just startWeb, startCount = Just startCount, nextWeb = Nothing, nextCount = Nothing, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
+            finishTrussCalc
+                { chordLen = chordLen
+                , chordGap = chordGap
+                , chordHeight =
+                    parsedModel.chordHeight
+                        |> Maybe.withDefault 0
+                , chordDoubling = 0
                 , web = web
                 , startWeb = startWeb
                 , startCount = startCount
@@ -209,10 +251,46 @@ calculateTruss model =
                 , webStart = webStart
                 }
 
-        { chordLen = Just chordLen, chordGap = Just chordGap, web = Just web, startWeb = Just startWeb, startCount = Just startCount, nextWeb = Just nextWeb, nextCount = Just nextCount, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
+        { chordLen = Just chordLen, chordGap = Just chordGap, chordHeight = Just chordHeight, chordDoubling = Just chordDoubling, web = Just web, startWeb = Just startWeb, startCount = Just startCount, nextWeb = Nothing, nextCount = Nothing, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
             finishTrussCalc
                 { chordLen = chordLen
                 , chordGap = chordGap
+                , chordHeight = chordHeight
+                , chordDoubling = chordDoubling
+                , web = web
+                , startWeb = startWeb
+                , startCount = startCount
+                , nextWeb = 0
+                , nextCount = 0
+                , roof = roof
+                , webAngle = webAngle
+                , webStart = webStart
+                }
+
+        { chordLen = Just chordLen, chordGap = Just chordGap, chordDoubling = Nothing, web = Just web, startWeb = Just startWeb, startCount = Just startCount, nextWeb = Just nextWeb, nextCount = Just nextCount, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
+            finishTrussCalc
+                { chordLen = chordLen
+                , chordGap = chordGap
+                , chordHeight =
+                    parsedModel.chordHeight
+                        |> Maybe.withDefault 0
+                , chordDoubling = 0
+                , web = web
+                , startWeb = startWeb
+                , startCount = startCount
+                , nextWeb = nextWeb
+                , nextCount = nextCount
+                , roof = roof
+                , webAngle = webAngle
+                , webStart = webStart
+                }
+
+        { chordLen = Just chordLen, chordGap = Just chordGap, chordHeight = Just chordHeight, chordDoubling = Just chordDoubling, web = Just web, startWeb = Just startWeb, startCount = Just startCount, nextWeb = Just nextWeb, nextCount = Just nextCount, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
+            finishTrussCalc
+                { chordLen = chordLen
+                , chordGap = chordGap
+                , chordHeight = chordHeight
+                , chordDoubling = chordDoubling
                 , web = web
                 , startWeb = startWeb
                 , startCount = startCount
@@ -240,6 +318,10 @@ calculateTruss model =
 
         { webStart = Nothing } ->
             Err "enter the web start distance"
+
+        -- The user has entered a chord doubling, but not set the chord height
+        { chordHeight = Nothing } ->
+            Err "enter the height of the chord profile too"
 
         -- Check the initial webs
         -- The user has entered an initial web width, but not a valid count
@@ -299,6 +381,8 @@ view model =
             , br [] []
             , makeInput "Chord length" "chord-len" 0.5 model.chordLen UpdateChordLen
             , makeInput "Gap between chords" "chord-gap" 0.5 model.chordGap UpdateChordGap
+            , makeInput "Chord height" "chord-height" 0.5 model.chordHeight UpdateChordHeight
+            , makeInput "Chord doubling count" "chord-doubling" 1 model.chordDoubling UpdateChordDoubling
             , makeInput "Web profile width" "web" 0.5 model.web UpdateWeb
             , makeInput "Initial web profile width" "start-web" 0.5 model.startWeb UpdateStartWeb
             , makeInput "Initial web count" "start-count" 1 model.startCount UpdateStartCount
@@ -316,7 +400,7 @@ view model =
                         [ text e
                         ]
 
-                Ok { endDistance, webPoints, webLines, lowerChordStart, upperChordStart, lowerChordEnd, upperChordEnd, webOffsetDn, webOffsetUp } ->
+                Ok { endDistance, webPoints, webLines, lowerChordStart, upperChordStart, lowerChordEnd, upperChordEnd, webOffsetDn, webOffsetUp, chordDoublingRes } ->
                     let
                         trussWidth =
                             upperChordEnd.x
@@ -383,6 +467,18 @@ view model =
                                          ]
                                             |> Array.map changeCoords
                                             |> polylineF sw
+                                        )
+                                |> Array.pushLast
+                                        (case chordDoublingRes of
+                                            Just { start, end } ->
+                                                [ start
+                                                , end
+                                                ]
+                                                    |> Array.map changeCoords
+                                                    |> polylineF sw
+
+                                            Nothing ->
+                                                text ""
                                         )
                             )
                         ]
@@ -527,15 +623,23 @@ makeOutputLine label idTxt { x, y } =
         ]
 
 
+
+-- chordHeight is 90 degrees to the chord
+
+
 type alias WebData =
     { endPointX : Float
     , webOffsetUp : Float2
     , webOffsetDn : Float2
+    , webOffsetUpCd : Float2
+    , webOffsetDnCd : Float2
     , webWidthOffset : Float2
     , startWebWidthOffset : Float2
     , startCount : Int
     , nextWebWidthOffset : Float2
     , nextCount : Int
+    , chordDoubling : Int
+    , chordVert : Float2
     }
 
 
@@ -545,15 +649,21 @@ calcWebPoints :
     -> Int
     -> { webPoints : Array Float2
        , webLines : Array LineSeg2
+       , chordDoublingRes :
+            Maybe
+                { start : Float2
+                , end : Float2
+                }
        }
 calcWebPoints dat currWeb index =
     let
-        { endPointX, webOffsetUp, webOffsetDn, webWidthOffset, startWebWidthOffset, startCount, nextWebWidthOffset, nextCount } =
+        { endPointX, webOffsetUp, webOffsetUpCd, webOffsetDn, webOffsetDnCd, webWidthOffset, startWebWidthOffset, startCount, nextWebWidthOffset, nextCount, chordDoubling, chordVert } =
             dat
     in
     if currWeb.x > endPointX then
         { webPoints = []
         , webLines = []
+        , chordDoublingRes = Nothing
         }
     else
         let
@@ -568,8 +678,23 @@ calcWebPoints dat currWeb index =
                 else
                     webWidthOffset
 
+            webStartGraphicalOffset =
+                if index == 0 && chordDoubling > 0 then
+                    chordVert
+                else
+                    v2 0 0
+
             webOffsetDir =
-                if isTop then
+                if index < chordDoubling * 2 - 1 then
+                    -- 1 goes to just before the second web
+                    -- 2 goes to just before the fourth web
+                    if isTop then
+                        webOffsetDnCd
+                    else if index == 0 then
+                        V2.add webOffsetUpCd chordVert
+                    else
+                        webOffsetUpCd
+                else if isTop then
                     webOffsetDn
                 else
                     webOffsetUp
@@ -592,22 +717,35 @@ calcWebPoints dat currWeb index =
                 else
                     nextDat.webLines
                         |> Array.pushFirst
-                                { start = currWeb
+                                { start = V2.add currWeb webStartGraphicalOffset
                                 , end = V2.add currWeb webOffsetDir
                                 }
                         |> Array.pushFirst
-                                { start = V2.add currWeb webOffset
+                                { start = V2.add (V2.add currWeb webOffset) webStartGraphicalOffset
                                 , end = nextCurrWeb
                                 }
+
+            chordDoublingRes =
+                if index /= 0 && index == chordDoubling * 2 - 1 then
+                    -- the down chord
+                    Just
+                        { start = chordVert
+                        , end = V2.add currWeb webOffsetDnCd
+                        }
+                else
+                    nextDat.chordDoublingRes
         in
         { webPoints = webPoints
         , webLines = webLines
+        , chordDoublingRes = chordDoublingRes
         }
 
 
 type alias FilledModel =
     { chordLen : Float
     , chordGap : Float
+    , chordHeight : Float
+    , chordDoubling : Int
     , web : Float
     , startWeb : Float
     , startCount : Int
@@ -633,13 +771,18 @@ type alias TrussCalc =
     , upperChordStart : Float2
     , lowerChordEnd : Float2
     , upperChordEnd : Float2
+    , chordDoublingRes :
+        Maybe
+            { start : Float2
+            , end : Float2
+            }
     , webOffsetUp : Float2
     , webOffsetDn : Float2
     }
 
 
 finishTrussCalc : FilledModel -> Result String TrussCalc
-finishTrussCalc { chordLen, chordGap, web, startWeb, startCount, nextWeb, nextCount, roof, webAngle, webStart = webDist } =
+finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb, startCount, nextWeb, nextCount, roof, webAngle, webStart = webDist } =
     let
         roofRad =
             Math.degrees roof
@@ -674,6 +817,12 @@ finishTrussCalc { chordLen, chordGap, web, startWeb, startCount, nextWeb, nextCo
         webOffsetDn =
             V2.div (V2.mul webAlongDn chordGap) (Math.sin webRad)
 
+        webOffsetUpCd =
+            V2.div (V2.mul webAlongUp (chordGap - chordHeight)) (Math.sin webRad)
+
+        webOffsetDnCd =
+            V2.div (V2.mul webAlongDn (chordGap - chordHeight)) (Math.sin webRad)
+
         webWidthOffset =
             V2.mul trussAlong (web / Math.sin webRad)
 
@@ -688,11 +837,15 @@ finishTrussCalc { chordLen, chordGap, web, startWeb, startCount, nextWeb, nextCo
                 { endPointX = endPointLower.x
                 , webOffsetUp = webOffsetUp
                 , webOffsetDn = webOffsetDn
+                , webOffsetUpCd = webOffsetUpCd
+                , webOffsetDnCd = webOffsetDnCd
                 , webWidthOffset = webWidthOffset
                 , startWebWidthOffset = startWebWidthOffset
                 , startCount = startCount
                 , nextWebWidthOffset = nextWebWidthOffset
                 , nextCount = nextCount
+                , chordDoubling = chordDoubling
+                , chordVert = v2 0 (chordHeight / Math.cos roofRad)
                 }
                 webStart
                 0
@@ -735,6 +888,7 @@ finishTrussCalc { chordLen, chordGap, web, startWeb, startCount, nextWeb, nextCo
         , lowerChordEnd = endPointLower
         , upperChordStart = vertGapDist
         , upperChordEnd = endPointUpper
+        , chordDoublingRes = dat.chordDoublingRes
         , webOffsetUp = formatF2 webOffsetUp
         , webOffsetDn = formatF2 webOffsetDn
         }
