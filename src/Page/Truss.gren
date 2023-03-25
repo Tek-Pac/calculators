@@ -739,24 +739,6 @@ calcWebPoints dat currWeb index =
                 else
                     V2.length webOffsetDn + webWidthToLenMul * webWidth
 
-            startWebLen =
-                if index < startCount then
-                    webLen
-                else
-                    0
-
-            nextWebLen =
-                if index >= startCount && index < startCount + nextCount then
-                    webLen
-                else
-                    0
-
-            mainWebLen =
-                if index >= startCount + nextCount then
-                    webLen
-                else
-                    0
-
             webStartGraphicalOffset =
                 if index == 0 && chordDoubling > 0 then
                     chordVert
@@ -786,14 +768,15 @@ calcWebPoints dat currWeb index =
             nextDat =
                 calcWebPoints dat nextCurrWeb (index + 1)
 
+            isNextWeb =
+                not (Array.isEmpty nextDat.webPoints)
+
             webPoints =
                 nextDat.webPoints
                     |> Array.pushFirst currWeb
 
             webLines =
-                if Array.isEmpty nextDat.webPoints then
-                    []
-                else
+                if isNextWeb then
                     nextDat.webLines
                         |> Array.pushFirst
                                 { start = V2.add currWeb webStartGraphicalOffset
@@ -803,6 +786,8 @@ calcWebPoints dat currWeb index =
                                 { start = V2.add (V2.add currWeb webOffset) webStartGraphicalOffset
                                 , end = nextCurrWeb
                                 }
+                else
+                    []
 
             chordDoubleLen =
                 if index /= 0 && index == chordDoubling * 2 - 1 then
@@ -822,6 +807,24 @@ calcWebPoints dat currWeb index =
 
             nextTotals =
                 nextDat.totals
+
+            startWebLen =
+                if index < startCount && isNextWeb then
+                    webLen
+                else
+                    0
+
+            nextWebLen =
+                if index >= startCount && index < startCount + nextCount && isNextWeb then
+                    webLen
+                else
+                    0
+
+            mainWebLen =
+                if index >= startCount + nextCount && isNextWeb then
+                    webLen
+                else
+                    0
 
             totals =
                 { startWeb = nextTotals.startWeb + startWebLen

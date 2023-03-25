@@ -7268,6 +7268,7 @@ var $author$project$Vector2$mul = F2(
 		return A2($author$project$Vector2$scale, a, v);
 	});
 var $gren_lang$core$Basics$neq = _Utils_notEqual;
+var $gren_lang$core$Basics$not = _Basics_not;
 var $gren_lang$core$Array$pushFirst = F2(
 	function (value, array) {
 		return A2(
@@ -7313,9 +7314,6 @@ var $author$project$Page$Truss$calcWebPoints = F3(
 			var webStartGraphicalOffset = ((!index) && (chordDoubling > 0)) ? chordVert : A2($author$project$Vector2$v2, 0, 0);
 			var webOffset = A2($author$project$Vector2$mul, webOffsetVec, webWidth);
 			var webLen = (_Utils_cmp(index, (chordDoubling * 2) - 1) < 0) ? ($author$project$Vector2$length(webOffsetDnCd) + (webWidthToLenMul * webWidth)) : ($author$project$Vector2$length(webOffsetDn) + (webWidthToLenMul * webWidth));
-			var startWebLen = (_Utils_cmp(index, startCount) < 0) ? webLen : 0;
-			var nextWebLen = ((_Utils_cmp(index, startCount) > -1) && (_Utils_cmp(index, startCount + nextCount) < 0)) ? webLen : 0;
-			var mainWebLen = (_Utils_cmp(index, startCount + nextCount) > -1) ? webLen : 0;
 			var isTop = A2($gren_lang$core$Math$modBy, 2, index) === 1;
 			var webOffsetDir = (_Utils_cmp(index, (chordDoubling * 2) - 1) < 0) ? (isTop ? webOffsetDnCd : ((!index) ? A2($author$project$Vector2$add, webOffsetUpCd, chordVert) : webOffsetUpCd)) : (isTop ? webOffsetDn : webOffsetUp);
 			var nextCurrWeb = A2(
@@ -7325,7 +7323,11 @@ var $author$project$Page$Truss$calcWebPoints = F3(
 			var nextDat = A3($author$project$Page$Truss$calcWebPoints, dat, nextCurrWeb, index + 1);
 			var nextTotals = nextDat.totals;
 			var webPoints = A2($gren_lang$core$Array$pushFirst, currWeb, nextDat.webPoints);
-			var webLines = $gren_lang$core$Array$isEmpty(nextDat.webPoints) ? [] : A2(
+			var isNextWeb = !$gren_lang$core$Array$isEmpty(nextDat.webPoints);
+			var mainWebLen = ((_Utils_cmp(index, startCount + nextCount) > -1) && isNextWeb) ? webLen : 0;
+			var nextWebLen = ((_Utils_cmp(index, startCount) > -1) && ((_Utils_cmp(index, startCount + nextCount) < 0) && isNextWeb)) ? webLen : 0;
+			var startWebLen = ((_Utils_cmp(index, startCount) < 0) && isNextWeb) ? webLen : 0;
+			var webLines = isNextWeb ? A2(
 				$gren_lang$core$Array$pushFirst,
 				{
 					end: nextCurrWeb,
@@ -7340,7 +7342,7 @@ var $author$project$Page$Truss$calcWebPoints = F3(
 						end: A2($author$project$Vector2$add, currWeb, webOffsetDir),
 						start: A2($author$project$Vector2$add, currWeb, webStartGraphicalOffset)
 					},
-					nextDat.webLines));
+					nextDat.webLines)) : [];
 			var chordDoublingRes = ((!(!index)) && _Utils_eq(index, (chordDoubling * 2) - 1)) ? $gren_lang$core$Maybe$Just(
 				{
 					end: A2($author$project$Vector2$add, currWeb, webOffsetDnCd),
