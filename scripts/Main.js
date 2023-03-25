@@ -7241,7 +7241,29 @@ var $author$project$Vector2$add = F2(
 var $gren_lang$core$Array$isEmpty = function (array) {
 	return !$gren_lang$core$Array$length(array);
 };
+var $author$project$Vector2$dot = F2(
+	function (_v0, _v1) {
+		var x1 = _v0.x;
+		var y1 = _v0.y;
+		var x2 = _v1.x;
+		var y2 = _v1.y;
+		return (x1 * x2) + (y1 * y2);
+	});
+var $author$project$Vector2$length = function (v) {
+	return $gren_lang$core$Math$sqrt(
+		A2($author$project$Vector2$dot, v, v));
+};
 var $gren_lang$core$Math$modBy = _Math_modBy;
+var $author$project$Vector2$scale = F2(
+	function (a, _v0) {
+		var x = _v0.x;
+		var y = _v0.y;
+		return {x: a * x, y: a * y};
+	});
+var $author$project$Vector2$mul = F2(
+	function (v, a) {
+		return A2($author$project$Vector2$scale, a, v);
+	});
 var $gren_lang$core$Basics$neq = _Utils_notEqual;
 var $gren_lang$core$Array$pushFirst = F2(
 	function (value, array) {
@@ -7258,26 +7280,39 @@ var $author$project$Page$Truss$calcWebPoints = F3(
 	function (dat, currWeb, index) {
 		var _v0 = dat;
 		var endPointX = _v0.endPointX;
-		var webOffsetUp = _v0.webOffsetUp;
-		var webOffsetUpCd = _v0.webOffsetUpCd;
-		var webOffsetDn = _v0.webOffsetDn;
-		var webOffsetDnCd = _v0.webOffsetDnCd;
-		var webWidthOffset = _v0.webWidthOffset;
-		var startWebWidthOffset = _v0.startWebWidthOffset;
-		var startCount = _v0.startCount;
-		var nextWebWidthOffset = _v0.nextWebWidthOffset;
-		var nextCount = _v0.nextCount;
+		var webs = _v0.webs;
 		var chordDoubling = _v0.chordDoubling;
 		var chordVert = _v0.chordVert;
+		var mainChordLen = _v0.mainChordLen;
+		var _v1 = webs;
+		var offsets = _v1.offsets;
+		var mainWebWidth = _v1.mainWebWidth;
+		var startWebWidth = _v1.startWebWidth;
+		var nextWebWidth = _v1.nextWebWidth;
+		var startCount = _v1.startCount;
+		var nextCount = _v1.nextCount;
+		var webWidthToLenMul = _v1.webWidthToLenMul;
+		var _v2 = offsets;
+		var webOffsetUp = _v2.webOffsetUp;
+		var webOffsetUpCd = _v2.webOffsetUpCd;
+		var webOffsetDn = _v2.webOffsetDn;
+		var webOffsetDnCd = _v2.webOffsetDnCd;
+		var webOffsetVec = _v2.webOffsetVec;
 		if (_Utils_cmp(currWeb.x, endPointX) > 0) {
 			return {
 				chordDoublingRes: $gren_lang$core$Maybe$Nothing,
+				totals: {chord: mainChordLen * 2, mainWeb: 0, nextWeb: 0, startWeb: 0},
 				webLines: [],
 				webPoints: []
 			};
 		} else {
+			var webWidth = (_Utils_cmp(index, startCount) < 0) ? startWebWidth : ((_Utils_cmp(index, startCount + nextCount) < 0) ? nextWebWidth : mainWebWidth);
 			var webStartGraphicalOffset = ((!index) && (chordDoubling > 0)) ? chordVert : A2($author$project$Vector2$v2, 0, 0);
-			var webOffset = (_Utils_cmp(index, startCount) < 0) ? startWebWidthOffset : ((_Utils_cmp(index, startCount + nextCount) < 0) ? nextWebWidthOffset : webWidthOffset);
+			var webOffset = A2($author$project$Vector2$mul, webOffsetVec, webWidth);
+			var webLen = (_Utils_cmp(index, (chordDoubling * 2) - 1) < 0) ? ($author$project$Vector2$length(webOffsetDnCd) + (webWidthToLenMul * webWidth)) : ($author$project$Vector2$length(webOffsetDn) + (webWidthToLenMul * webWidth));
+			var startWebLen = (_Utils_cmp(index, startCount) < 0) ? webLen : 0;
+			var nextWebLen = ((_Utils_cmp(index, startCount) > -1) && (_Utils_cmp(index, startCount + nextCount) < 0)) ? webLen : 0;
+			var mainWebLen = (_Utils_cmp(index, startCount + nextCount) > -1) ? webLen : 0;
 			var isTop = A2($gren_lang$core$Math$modBy, 2, index) === 1;
 			var webOffsetDir = (_Utils_cmp(index, (chordDoubling * 2) - 1) < 0) ? (isTop ? webOffsetDnCd : ((!index) ? A2($author$project$Vector2$add, webOffsetUpCd, chordVert) : webOffsetUpCd)) : (isTop ? webOffsetDn : webOffsetUp);
 			var nextCurrWeb = A2(
@@ -7285,6 +7320,7 @@ var $author$project$Page$Truss$calcWebPoints = F3(
 				webOffset,
 				A2($author$project$Vector2$add, currWeb, webOffsetDir));
 			var nextDat = A3($author$project$Page$Truss$calcWebPoints, dat, nextCurrWeb, index + 1);
+			var nextTotals = nextDat.totals;
 			var webPoints = A2($gren_lang$core$Array$pushFirst, currWeb, nextDat.webPoints);
 			var webLines = $gren_lang$core$Array$isEmpty(nextDat.webPoints) ? [] : A2(
 				$gren_lang$core$Array$pushFirst,
@@ -7307,21 +7343,12 @@ var $author$project$Page$Truss$calcWebPoints = F3(
 					end: A2($author$project$Vector2$add, currWeb, webOffsetDnCd),
 					start: chordVert
 				}) : nextDat.chordDoublingRes;
-			return {chordDoublingRes: chordDoublingRes, webLines: webLines, webPoints: webPoints};
+			var chordDoubleLen = ((!(!index)) && _Utils_eq(index, (chordDoubling * 2) - 1)) ? $author$project$Vector2$length(
+				A2($author$project$Vector2$add, currWeb, webOffsetDir)) : 0;
+			var totals = {chord: nextTotals.chord + chordDoubleLen, mainWeb: nextTotals.mainWeb + mainWebLen, nextWeb: nextTotals.nextWeb + nextWebLen, startWeb: nextTotals.startWeb + startWebLen};
+			return {chordDoublingRes: chordDoublingRes, totals: totals, webLines: webLines, webPoints: webPoints};
 		}
 	});
-var $author$project$Vector2$dot = F2(
-	function (_v0, _v1) {
-		var x1 = _v0.x;
-		var y1 = _v0.y;
-		var x2 = _v1.x;
-		var y2 = _v1.y;
-		return (x1 * x2) + (y1 * y2);
-	});
-var $author$project$Vector2$length = function (v) {
-	return $gren_lang$core$Math$sqrt(
-		A2($author$project$Vector2$dot, v, v));
-};
 var $author$project$Vector2$sub = F2(
 	function (_v0, _v1) {
 		var x1 = _v0.x;
@@ -7351,16 +7378,6 @@ var $gren_lang$core$Array$last = function (array) {
 		$gren_lang$core$Array$length(array) - 1,
 		array);
 };
-var $author$project$Vector2$scale = F2(
-	function (a, _v0) {
-		var x = _v0.x;
-		var y = _v0.y;
-		return {x: a * x, y: a * y};
-	});
-var $author$project$Vector2$mul = F2(
-	function (v, a) {
-		return A2($author$project$Vector2$scale, a, v);
-	});
 var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 	var chordLen = _v0.chordLen;
 	var chordGap = _v0.chordGap;
@@ -7380,15 +7397,7 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 		$author$project$Vector2$v2,
 		$gren_lang$core$Math$cos(roofRad),
 		$gren_lang$core$Math$sin(roofRad));
-	var startWebWidthOffset = A2(
-		$author$project$Vector2$mul,
-		trussAlong,
-		startWeb / $gren_lang$core$Math$sin(webRad));
 	var webStart = A2($author$project$Vector2$mul, trussAlong, webDist);
-	var webWidthOffset = A2(
-		$author$project$Vector2$mul,
-		trussAlong,
-		web / $gren_lang$core$Math$sin(webRad));
 	var vertGapDist = A2(
 		$author$project$Vector2$v2,
 		0,
@@ -7417,10 +7426,7 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 		$author$project$Vector2$div,
 		A2($author$project$Vector2$mul, webAlongUp, chordGap - chordHeight),
 		$gren_lang$core$Math$sin(webRad));
-	var nextWebWidthOffset = A2(
-		$author$project$Vector2$mul,
-		trussAlong,
-		nextWeb / $gren_lang$core$Math$sin(webRad));
+	var mainChordLen = chordLen + (chordHeight * $gren_lang$core$Math$tan(roofRad));
 	var formatF = function (value) {
 		return $gren_lang$core$Math$round(value * 1000000) / 1000000;
 	};
@@ -7440,19 +7446,40 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 		chordHeight / $gren_lang$core$Math$cos(roofRad));
 	var dat = A3(
 		$author$project$Page$Truss$calcWebPoints,
-		{chordDoubling: chordDoubling, chordVert: chordVert, endPointX: endPointLower.x, nextCount: nextCount, nextWebWidthOffset: nextWebWidthOffset, startCount: startCount, startWebWidthOffset: startWebWidthOffset, webOffsetDn: webOffsetDn, webOffsetDnCd: webOffsetDnCd, webOffsetUp: webOffsetUp, webOffsetUpCd: webOffsetUpCd, webWidthOffset: webWidthOffset},
+		{
+			chordDoubling: chordDoubling,
+			chordVert: chordVert,
+			endPointX: endPointLower.x,
+			mainChordLen: mainChordLen,
+			webs: {
+				mainWebWidth: web,
+				nextCount: nextCount,
+				nextWebWidth: nextWeb,
+				offsets: {
+					webOffsetDn: webOffsetDn,
+					webOffsetDnCd: webOffsetDnCd,
+					webOffsetUp: webOffsetUp,
+					webOffsetUpCd: webOffsetUpCd,
+					webOffsetVec: A2(
+						$author$project$Vector2$div,
+						trussAlong,
+						$gren_lang$core$Math$sin(webRad))
+				},
+				startCount: startCount,
+				startWebWidth: startWeb,
+				webWidthToLenMul: 1 / $gren_lang$core$Math$tan(webRad)
+			}
+		},
 		webStart,
 		0);
-	var webLines = dat.webLines;
-	var webPoints = dat.webPoints;
 	var endDistance = ((A2(
 		$gren_lang$core$Math$modBy,
 		2,
-		$gren_lang$core$Array$length(webPoints)) === 1) ? $author$project$Vector2$distance(endPointLower) : $author$project$Vector2$distance(endPointUpper))(
+		$gren_lang$core$Array$length(dat.webPoints)) === 1) ? $author$project$Vector2$distance(endPointLower) : $author$project$Vector2$distance(endPointUpper))(
 		A2(
 			$gren_lang$core$Maybe$withDefault,
 			A2($author$project$Vector2$v2, 0, 9999),
-			$gren_lang$core$Array$last(webPoints)));
+			$gren_lang$core$Array$last(dat.webPoints)));
 	return $gren_lang$core$Result$Ok(
 		{
 			chordDoublingRes: dat.chordDoublingRes,
@@ -7460,12 +7487,18 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 			endDistance: formatF(endDistance),
 			lowerChordEnd: endPointLower,
 			lowerChordStart: {x: 0.0, y: 0.0},
+			totals: {
+				chord: formatF(dat.totals.chord),
+				mainWeb: formatF(dat.totals.mainWeb),
+				nextWeb: formatF(dat.totals.nextWeb),
+				startWeb: formatF(dat.totals.startWeb)
+			},
 			upperChordEnd: endPointUpper,
 			upperChordStart: vertGapDist,
-			webLines: webLines,
+			webLines: dat.webLines,
 			webOffsetDn: formatF2(webOffsetDn),
 			webOffsetUp: formatF2(webOffsetUp),
-			webPoints: webPoints
+			webPoints: dat.webPoints
 		});
 };
 var $author$project$Page$Truss$calculateTruss = function (model) {
@@ -8059,6 +8092,7 @@ var $author$project$Page$Truss$view = function (model) {
 					var webOffsetUp = _v1.webOffsetUp;
 					var chordDoublingRes = _v1.chordDoublingRes;
 					var chordVert = _v1.chordVert;
+					var totals = _v1.totals;
 					var trussWidth = upperChordEnd.x;
 					var isDown = _Utils_cmp(upperChordEnd.y, upperChordStart.y) < 0;
 					var trussHeight = isDown ? (((upperChordStart.y - lowerChordEnd.y) + chordVert.y) + chordVert.y) : ((upperChordEnd.y + chordVert.y) + chordVert.y);
@@ -8094,6 +8128,10 @@ var $author$project$Page$Truss$view = function (model) {
 							A3($author$project$Page$Truss$makeOutput, 'End distance', 'end-distance', endDistance),
 							A3($author$project$Page$Truss$makeOutputLine, 'Up distance', 'up-distance', webOffsetUp),
 							A3($author$project$Page$Truss$makeOutputLine, 'Dn distance', 'dn-distance', webOffsetDn),
+							(!(!totals.startWeb)) ? A3($author$project$Page$Truss$makeOutput, 'Total initial web length', 'total-start-web-len', totals.startWeb) : $gren_lang$browser$Html$text(''),
+							(!(!totals.nextWeb)) ? A3($author$project$Page$Truss$makeOutput, 'Total next web length', 'total-next-web-len', totals.nextWeb) : $gren_lang$browser$Html$text(''),
+							A3($author$project$Page$Truss$makeOutput, 'Total main web length', 'total-main-web-len', totals.mainWeb),
+							A3($author$project$Page$Truss$makeOutput, 'Total chord length', 'total-chord-len', totals.chord),
 							A2(
 							$gren_lang$browser$Svg$svg,
 							[

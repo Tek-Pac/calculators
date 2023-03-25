@@ -396,7 +396,7 @@ view model =
                         [ text e
                         ]
 
-                Ok { endDistance, webPoints, webLines, lowerChordStart, upperChordStart, lowerChordEnd, upperChordEnd, webOffsetDn, webOffsetUp, chordDoublingRes, chordVert } ->
+                Ok { endDistance, webPoints, webLines, lowerChordStart, upperChordStart, lowerChordEnd, upperChordEnd, webOffsetDn, webOffsetUp, chordDoublingRes, chordVert, totals } ->
                     let
                         trussWidth =
                             upperChordEnd.x
@@ -448,6 +448,16 @@ view model =
                         [ makeOutput "End distance" "end-distance" endDistance
                         , makeOutputLine "Up distance" "up-distance" webOffsetUp
                         , makeOutputLine "Dn distance" "dn-distance" webOffsetDn
+                        , if totals.startWeb /= 0 then
+                            makeOutput "Total initial web length" "total-start-web-len" totals.startWeb
+                          else
+                            text ""
+                        , if totals.nextWeb /= 0 then
+                            makeOutput "Total next web length" "total-next-web-len" totals.nextWeb
+                          else
+                            text ""
+                        , makeOutput "Total main web length" "total-main-web-len" totals.mainWeb
+                        , makeOutput "Total chord length" "total-chord-len" totals.chord
                         , svg
                             [ -- fill the screen when it is small
                               style "width" "clamp(75%, 1000px, 100%)"
@@ -646,17 +656,24 @@ makeOutputLine label idTxt { x, y } =
 
 type alias WebData =
     { endPointX : Float
-    , webOffsetUp : Float2
-    , webOffsetDn : Float2
-    , webOffsetUpCd : Float2
-    , webOffsetDnCd : Float2
-    , webWidthOffset : Float2
-    , startWebWidthOffset : Float2
-    , startCount : Int
-    , nextWebWidthOffset : Float2
-    , nextCount : Int
+    , webs :
+        { offsets :
+            { webOffsetUp : Float2
+            , webOffsetDn : Float2
+            , webOffsetUpCd : Float2
+            , webOffsetDnCd : Float2
+            , webOffsetVec : Float2
+            }
+        , mainWebWidth : Float
+        , startWebWidth : Float
+        , nextWebWidth : Float
+        , startCount : Int
+        , nextCount : Int
+        , webWidthToLenMul : Float
+        }
     , chordDoubling : Int
     , chordVert : Float2
+    , mainChordLen : Float
     }
 
 
@@ -671,29 +688,74 @@ calcWebPoints :
                 { start : Float2
                 , end : Float2
                 }
+       , totals :
+            { startWeb : Float
+            , nextWeb : Float
+            , mainWeb : Float
+            , chord : Float
+            }
        }
 calcWebPoints dat currWeb index =
     let
-        { endPointX, webOffsetUp, webOffsetUpCd, webOffsetDn, webOffsetDnCd, webWidthOffset, startWebWidthOffset, startCount, nextWebWidthOffset, nextCount, chordDoubling, chordVert } =
+        { endPointX, webs, chordDoubling, chordVert, mainChordLen } =
             dat
+
+        { offsets, mainWebWidth, startWebWidth, nextWebWidth, startCount, nextCount, webWidthToLenMul } =
+            webs
+
+        { webOffsetUp, webOffsetUpCd, webOffsetDn, webOffsetDnCd, webOffsetVec } =
+            offsets
     in
     if currWeb.x > endPointX then
         { webPoints = []
         , webLines = []
         , chordDoublingRes = Nothing
+        , totals =
+            { startWeb = 0
+            , nextWeb = 0
+            , mainWeb = 0
+            , chord = mainChordLen * 2
+            }
         }
     else
         let
             isTop =
                 Math.modBy 2 index == 1
 
-            webOffset =
+            webWidth =
                 if index < startCount then
-                    startWebWidthOffset
+                    startWebWidth
                 else if index < startCount + nextCount then
-                    nextWebWidthOffset
+                    nextWebWidth
                 else
-                    webWidthOffset
+                    mainWebWidth
+
+            webOffset =
+                V2.mul webOffsetVec webWidth
+
+            webLen =
+                if index < chordDoubling * 2 - 1 then
+                    V2.length webOffsetDnCd + webWidthToLenMul * webWidth
+                else
+                    V2.length webOffsetDn + webWidthToLenMul * webWidth
+
+            startWebLen =
+                if index < startCount then
+                    webLen
+                else
+                    0
+
+            nextWebLen =
+                if index >= startCount && index < startCount + nextCount then
+                    webLen
+                else
+                    0
+
+            mainWebLen =
+                if index >= startCount + nextCount then
+                    webLen
+                else
+                    0
 
             webStartGraphicalOffset =
                 if index == 0 && chordDoubling > 0 then
@@ -742,6 +804,12 @@ calcWebPoints dat currWeb index =
                                 , end = nextCurrWeb
                                 }
 
+            chordDoubleLen =
+                if index /= 0 && index == chordDoubling * 2 - 1 then
+                    V2.length (V2.add currWeb webOffsetDir)
+                else
+                    0
+
             chordDoublingRes =
                 if index /= 0 && index == chordDoubling * 2 - 1 then
                     -- the down chord
@@ -751,10 +819,21 @@ calcWebPoints dat currWeb index =
                         }
                 else
                     nextDat.chordDoublingRes
+
+            nextTotals =
+                nextDat.totals
+
+            totals =
+                { startWeb = nextTotals.startWeb + startWebLen
+                , nextWeb = nextTotals.nextWeb + nextWebLen
+                , mainWeb = nextTotals.mainWeb + mainWebLen
+                , chord = nextTotals.chord + chordDoubleLen
+                }
         in
         { webPoints = webPoints
         , webLines = webLines
         , chordDoublingRes = chordDoublingRes
+        , totals = totals
         }
 
 
@@ -796,6 +875,12 @@ type alias TrussCalc =
     , webOffsetUp : Float2
     , webOffsetDn : Float2
     , chordVert : Float2
+    , totals :
+        { startWeb : Float
+        , nextWeb : Float
+        , mainWeb : Float
+        , chord : Float
+        }
     }
 
 
@@ -841,46 +926,41 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
         webOffsetDnCd =
             V2.div (V2.mul webAlongDn (chordGap - chordHeight)) (Math.sin webRad)
 
-        webWidthOffset =
-            V2.mul trussAlong (web / Math.sin webRad)
-
-        startWebWidthOffset =
-            V2.mul trussAlong (startWeb / Math.sin webRad)
-
-        nextWebWidthOffset =
-            V2.mul trussAlong (nextWeb / Math.sin webRad)
-
         chordVert =
             v2 0 (chordHeight / Math.cos roofRad)
+
+        mainChordLen =
+            chordLen + (chordHeight * Math.tan roofRad)
 
         dat =
             calcWebPoints
                 { endPointX = endPointLower.x
-                , webOffsetUp = webOffsetUp
-                , webOffsetDn = webOffsetDn
-                , webOffsetUpCd = webOffsetUpCd
-                , webOffsetDnCd = webOffsetDnCd
-                , webWidthOffset = webWidthOffset
-                , startWebWidthOffset = startWebWidthOffset
-                , startCount = startCount
-                , nextWebWidthOffset = nextWebWidthOffset
-                , nextCount = nextCount
+                , webs =
+                    { offsets =
+                        { webOffsetUp = webOffsetUp
+                        , webOffsetDn = webOffsetDn
+                        , webOffsetUpCd = webOffsetUpCd
+                        , webOffsetDnCd = webOffsetDnCd
+                        , webOffsetVec = V2.div trussAlong (Math.sin webRad)
+                        }
+                    , mainWebWidth = web
+                    , startWebWidth = startWeb
+                    , nextWebWidth = nextWeb
+                    , startCount = startCount
+                    , nextCount = nextCount
+                    , webWidthToLenMul = 1 / Math.tan webRad
+                    }
                 , chordDoubling = chordDoubling
                 , chordVert = chordVert
+                , mainChordLen = mainChordLen
                 }
                 webStart
                 0
 
-        webPoints =
-            dat.webPoints
-
-        webLines =
-            dat.webLines
-
         endDistance =
-            Array.last webPoints
+            Array.last dat.webPoints
                 |> Maybe.withDefault (v2 0 9999)
-                |> (if Math.modBy 2 (Array.length webPoints) == 1 then
+                |> (if Math.modBy 2 (Array.length dat.webPoints) == 1 then
                         V2.distance endPointLower
                      else
                         V2.distance endPointUpper
@@ -900,8 +980,8 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
     in
     Ok
         { endDistance = formatF endDistance
-        , webPoints = webPoints
-        , webLines = webLines
+        , webPoints = dat.webPoints
+        , webLines = dat.webLines
         , lowerChordStart =
             { x = 0.0
             , y = 0.0
@@ -913,4 +993,10 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
         , webOffsetUp = formatF2 webOffsetUp
         , webOffsetDn = formatF2 webOffsetDn
         , chordVert = chordVert
+        , totals =
+            { startWeb = formatF dat.totals.startWeb
+            , nextWeb = formatF dat.totals.nextWeb
+            , mainWeb = formatF dat.totals.mainWeb
+            , chord = formatF dat.totals.chord
+            }
         }
