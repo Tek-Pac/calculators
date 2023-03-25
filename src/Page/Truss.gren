@@ -884,6 +884,19 @@ type alias TrussCalc =
     }
 
 
+maybeErr : x -> Bool -> Maybe x -> Maybe x
+maybeErr err useDefault orig =
+    case orig of
+        Nothing ->
+            if useDefault then
+                Just err
+            else
+                Nothing
+
+        _ ->
+            orig
+
+
 finishTrussCalc : FilledModel -> Result String TrussCalc
 finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb, startCount, nextWeb, nextCount, roof, webAngle, webStart = webDist } =
     let
@@ -977,26 +990,50 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
             { x = formatF x
             , y = formatF y
             }
+
+        webMax =
+            90 - Math.abs roof
+
+        -- chordLen, chordGap, chordHeight, chordDoubling, web, startWeb, startCount, nextWeb, nextCount, roof, webAngle, webStart = webDist
+        error =
+            Nothing
+                |> maybeErr "chord length should be positive" (chordLen < 0)
+                |> maybeErr "gap between chords should be positive" (chordGap < 0)
+                |> maybeErr "chord height should be positive" (chordHeight < 0)
+                |> maybeErr "chord doubling count should be positive" (chordDoubling < 0)
+                |> maybeErr "web profile width should be positive" (web < 0)
+                |> maybeErr "initial web profile width should be positive" (startWeb < 0)
+                |> maybeErr "initial web count should be positive" (startCount < 0)
+                |> maybeErr "next web profile width should be positive" (nextWeb < 0)
+                |> maybeErr "next web count should be positive" (nextCount < 0)
+                |> maybeErr ("web angle should be less than " ++ String.fromFloat webMax ++ " degrees") (webAngle > webMax)
+                |> maybeErr "web angle should be positive" (webAngle < 0)
+                |> maybeErr "web start distance should be positive" (webDist < 0)
     in
-    Ok
-        { endDistance = formatF endDistance
-        , webPoints = dat.webPoints
-        , webLines = dat.webLines
-        , lowerChordStart =
-            { x = 0.0
-            , y = 0.0
-            }
-        , lowerChordEnd = endPointLower
-        , upperChordStart = vertGapDist
-        , upperChordEnd = endPointUpper
-        , chordDoublingRes = dat.chordDoublingRes
-        , webOffsetUp = formatF2 webOffsetUp
-        , webOffsetDn = formatF2 webOffsetDn
-        , chordVert = chordVert
-        , totals =
-            { startWeb = formatF dat.totals.startWeb
-            , nextWeb = formatF dat.totals.nextWeb
-            , mainWeb = formatF dat.totals.mainWeb
-            , chord = formatF dat.totals.chord
-            }
-        }
+    case error of
+        Just e ->
+            Err e
+
+        Nothing ->
+            Ok
+                { endDistance = formatF endDistance
+                , webPoints = dat.webPoints
+                , webLines = dat.webLines
+                , lowerChordStart =
+                    { x = 0.0
+                    , y = 0.0
+                    }
+                , lowerChordEnd = endPointLower
+                , upperChordStart = vertGapDist
+                , upperChordEnd = endPointUpper
+                , chordDoublingRes = dat.chordDoublingRes
+                , webOffsetUp = formatF2 webOffsetUp
+                , webOffsetDn = formatF2 webOffsetDn
+                , chordVert = chordVert
+                , totals =
+                    { startWeb = formatF dat.totals.startWeb
+                    , nextWeb = formatF dat.totals.nextWeb
+                    , mainWeb = formatF dat.totals.mainWeb
+                    , chord = formatF dat.totals.chord
+                    }
+                }

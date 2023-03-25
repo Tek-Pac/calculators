@@ -7238,6 +7238,9 @@ var $author$project$Vector2$add = F2(
 		var y2 = _v1.y;
 		return {x: x1 + x2, y: y1 + y2};
 	});
+var $gren_lang$core$Math$abs = function (n) {
+	return (n < 0) ? (-n) : n;
+};
 var $gren_lang$core$Array$isEmpty = function (array) {
 	return !$gren_lang$core$Array$length(array);
 };
@@ -7378,6 +7381,14 @@ var $gren_lang$core$Array$last = function (array) {
 		$gren_lang$core$Array$length(array) - 1,
 		array);
 };
+var $author$project$Page$Truss$maybeErr = F3(
+	function (err, useDefault, orig) {
+		if (orig.$ === 'Nothing') {
+			return useDefault ? $gren_lang$core$Maybe$Just(err) : $gren_lang$core$Maybe$Nothing;
+		} else {
+			return orig;
+		}
+	});
 var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 	var chordLen = _v0.chordLen;
 	var chordGap = _v0.chordGap;
@@ -7392,6 +7403,7 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 	var webAngle = _v0.webAngle;
 	var webDist = _v0.webStart;
 	var webRad = $gren_lang$core$Math$degrees(webAngle);
+	var webMax = 90 - $gren_lang$core$Math$abs(roof);
 	var roofRad = $gren_lang$core$Math$degrees(roof);
 	var trussAlong = A2(
 		$author$project$Vector2$v2,
@@ -7430,14 +7442,59 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 	var formatF = function (value) {
 		return $gren_lang$core$Math$round(value * 1000000) / 1000000;
 	};
-	var formatF2 = function (_v1) {
-		var x = _v1.x;
-		var y = _v1.y;
+	var formatF2 = function (_v2) {
+		var x = _v2.x;
+		var y = _v2.y;
 		return {
 			x: formatF(x),
 			y: formatF(y)
 		};
 	};
+	var error = A3(
+		$author$project$Page$Truss$maybeErr,
+		'web start distance should be positive',
+		webDist < 0,
+		A3(
+			$author$project$Page$Truss$maybeErr,
+			'web angle should be positive',
+			webAngle < 0,
+			A3(
+				$author$project$Page$Truss$maybeErr,
+				'web angle should be less than ' + ($gren_lang$core$String$fromFloat(webMax) + ' degrees'),
+				_Utils_cmp(webAngle, webMax) > 0,
+				A3(
+					$author$project$Page$Truss$maybeErr,
+					'next web count should be positive',
+					nextCount < 0,
+					A3(
+						$author$project$Page$Truss$maybeErr,
+						'next web profile width should be positive',
+						nextWeb < 0,
+						A3(
+							$author$project$Page$Truss$maybeErr,
+							'initial web count should be positive',
+							startCount < 0,
+							A3(
+								$author$project$Page$Truss$maybeErr,
+								'initial web profile width should be positive',
+								startWeb < 0,
+								A3(
+									$author$project$Page$Truss$maybeErr,
+									'web profile width should be positive',
+									web < 0,
+									A3(
+										$author$project$Page$Truss$maybeErr,
+										'chord doubling count should be positive',
+										chordDoubling < 0,
+										A3(
+											$author$project$Page$Truss$maybeErr,
+											'chord height should be positive',
+											chordHeight < 0,
+											A3(
+												$author$project$Page$Truss$maybeErr,
+												'gap between chords should be positive',
+												chordGap < 0,
+												A3($author$project$Page$Truss$maybeErr, 'chord length should be positive', chordLen < 0, $gren_lang$core$Maybe$Nothing))))))))))));
 	var endPointLower = A2($author$project$Vector2$mul, trussAlong, chordLen);
 	var endPointUpper = A2($author$project$Vector2$add, endPointLower, vertGapDist);
 	var chordVert = A2(
@@ -7480,26 +7537,31 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 			$gren_lang$core$Maybe$withDefault,
 			A2($author$project$Vector2$v2, 0, 9999),
 			$gren_lang$core$Array$last(dat.webPoints)));
-	return $gren_lang$core$Result$Ok(
-		{
-			chordDoublingRes: dat.chordDoublingRes,
-			chordVert: chordVert,
-			endDistance: formatF(endDistance),
-			lowerChordEnd: endPointLower,
-			lowerChordStart: {x: 0.0, y: 0.0},
-			totals: {
-				chord: formatF(dat.totals.chord),
-				mainWeb: formatF(dat.totals.mainWeb),
-				nextWeb: formatF(dat.totals.nextWeb),
-				startWeb: formatF(dat.totals.startWeb)
-			},
-			upperChordEnd: endPointUpper,
-			upperChordStart: vertGapDist,
-			webLines: dat.webLines,
-			webOffsetDn: formatF2(webOffsetDn),
-			webOffsetUp: formatF2(webOffsetUp),
-			webPoints: dat.webPoints
-		});
+	if (error.$ === 'Just') {
+		var e = error.a;
+		return $gren_lang$core$Result$Err(e);
+	} else {
+		return $gren_lang$core$Result$Ok(
+			{
+				chordDoublingRes: dat.chordDoublingRes,
+				chordVert: chordVert,
+				endDistance: formatF(endDistance),
+				lowerChordEnd: endPointLower,
+				lowerChordStart: {x: 0.0, y: 0.0},
+				totals: {
+					chord: formatF(dat.totals.chord),
+					mainWeb: formatF(dat.totals.mainWeb),
+					nextWeb: formatF(dat.totals.nextWeb),
+					startWeb: formatF(dat.totals.startWeb)
+				},
+				upperChordEnd: endPointUpper,
+				upperChordStart: vertGapDist,
+				webLines: dat.webLines,
+				webOffsetDn: formatF2(webOffsetDn),
+				webOffsetUp: formatF2(webOffsetUp),
+				webPoints: dat.webPoints
+			});
+	}
 };
 var $author$project$Page$Truss$calculateTruss = function (model) {
 	var parsedModel = {
