@@ -6747,6 +6747,13 @@ var $gren_lang$browser$Svg$foreignObject = $gren_lang$browser$Svg$trustedNode('f
 var $gren_lang$core$Basics$idiv = _Basics_idiv;
 var $gren_lang$browser$VirtualDom$style = _VirtualDom_style;
 var $gren_lang$browser$Html$Attributes$style = $gren_lang$browser$VirtualDom$style;
+var $gren_lang$browser$Html$Attributes$attribute = $gren_lang$browser$VirtualDom$attribute;
+var $gren_lang$browser$Html$Attributes$tabindex = function (n) {
+	return A2(
+		$gren_lang$browser$Html$Attributes$attribute,
+		'tabIndex',
+		$gren_lang$core$String$fromInt(n));
+};
 var $gren_lang$browser$Svg$Attributes$width = $gren_lang$browser$VirtualDom$attribute('width');
 var $gren_lang$browser$Svg$Attributes$x = $gren_lang$browser$VirtualDom$attribute('x');
 var $gren_lang$browser$Svg$Attributes$y = $gren_lang$browser$VirtualDom$attribute('y');
@@ -6846,7 +6853,8 @@ var $author$project$Page$Triangle$makeInput = function (_v0) {
 						$gren_lang$browser$Html$button,
 						[
 							A2($gren_lang$browser$Html$Attributes$style, 'pointer-events', 'none'),
-							A2($gren_lang$browser$Html$Attributes$style, 'visibility', 'hidden')
+							A2($gren_lang$browser$Html$Attributes$style, 'visibility', 'hidden'),
+							$gren_lang$browser$Html$Attributes$tabindex(-1)
 						],
 						[
 							$gren_lang$browser$Html$text('🔄️')
@@ -7978,7 +7986,8 @@ var $author$project$Page$Truss$makeInput = F5(
 				$gren_lang$browser$Html$button,
 				[
 					A2($gren_lang$browser$Html$Attributes$style, 'pointer-events', 'none'),
-					A2($gren_lang$browser$Html$Attributes$style, 'opacity', '0')
+					A2($gren_lang$browser$Html$Attributes$style, 'opacity', '0'),
+					$gren_lang$browser$Html$Attributes$tabindex(-1)
 				],
 				[
 					$gren_lang$browser$Html$text('❌')

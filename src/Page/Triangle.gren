@@ -6,7 +6,7 @@ module Page.Triangle exposing ( Model, Msg(..), update, view, queryParser, query
 import Browser
 import Browser.Dom as Dom
 import Html exposing ( Html, br, button, div, h1, input, text )
-import Html.Attributes exposing ( class, id, readonly, step, style, type_, value )
+import Html.Attributes exposing ( class, id, readonly, step, style, tabindex, type_, value )
 import Html.Events exposing ( onClick, onInput )
 import Math
 import SpaCmd exposing ( SpaCmd(..) )
@@ -497,6 +497,7 @@ makeInput { label, idTxt, stepV, calcVal, currTxt, updateMsg, xI, yI, w } =
                 button
                     [ style "pointer-events" "none"
                     , style "visibility" "hidden"
+                    , tabindex -1
                     ]
                     [ text "🔄️"
                     ]
