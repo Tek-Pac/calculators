@@ -2,6 +2,7 @@ port module Main exposing (..)
 
 import Browser
 import Html exposing (..)
+import Page.GalvHole as GalvHole
 import Page.Home as Home
 import Page.KFactor as KFactor
 import Page.Triangle as Triangle
@@ -26,6 +27,7 @@ port pageChanged : (String -> msg) -> Sub msg
 
 type Model
     = HomeModel Home.Model
+    | GalvHoleModel GalvHole.Model
     | KFactorModel KFactor.Model
     | TriangleModel Triangle.Model
     | TrussModel Truss.Model
@@ -33,6 +35,7 @@ type Model
 
 type Msg
     = HomeMsg Home.Msg
+    | GalvHoleMsg GalvHole.Msg
     | KFactorMsg KFactor.Msg
     | TriangleMsg Triangle.Msg
     | TrussMsg Truss.Msg
@@ -70,6 +73,10 @@ view model =
         HomeModel m ->
             Home.view m
                 |> mapDocument HomeMsg
+
+        GalvHoleModel m ->
+            GalvHole.view m
+                |> mapDocument GalvHoleMsg
 
         KFactorModel m ->
             KFactor.view m
@@ -112,6 +119,11 @@ update msg model =
 
         { m = HomeModel m, v = HomeMsg v } ->
             mapPage HomeModel HomeMsg (Home.update v m)
+                |> handleSpaCmd
+                |> handleUrlUpdate model
+
+        { m = GalvHoleModel m, v = GalvHoleMsg v } ->
+            mapPage GalvHoleModel GalvHoleMsg (GalvHole.update v m)
                 |> handleSpaCmd
                 |> handleUrlUpdate model
 
@@ -228,6 +240,7 @@ urlToModel path =
     Parser.parse
         (Parser.oneOf
             [ Parser.map (HomeModel Home.init) Parser.top
+            , Parser.map GalvHoleModel (Parser.s "galv-hole" <?> GalvHole.queryParser)
             , Parser.map KFactorModel (Parser.s "k-factor" <?> KFactor.queryParser)
             , Parser.map TriangleModel (Parser.s "triangle" <?> Triangle.queryParser)
             , Parser.map TrussModel (Parser.s "truss" <?> Truss.queryParser)
@@ -245,6 +258,10 @@ modelToUrl model =
                     HomeModel _ ->
                         []
 
+                    GalvHoleModel _ ->
+                        [ "galv-hole"
+                        ]
+
                     KFactorModel _ ->
                         [ "k-factor"
                         ]
@@ -260,6 +277,9 @@ modelToUrl model =
                 (case model of
                     HomeModel _ ->
                         []
+
+                    GalvHoleModel t ->
+                        GalvHole.queryBuilder t
 
                     KFactorModel k ->
                         KFactor.queryBuilder k

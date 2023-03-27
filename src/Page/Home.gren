@@ -50,6 +50,11 @@ view model =
                 ]
                 [ text "Trusses"
                 ]
+            , button
+                [ onClick GoToGalvHole
+                ]
+                [ text "Galvanising Holes"
+                ]
             ]
         ]
     }
@@ -59,6 +64,7 @@ type Msg
     = GoToKFactor
     | GoToTriangle
     | GoToTruss
+    | GoToGalvHole
 
 
 update : Msg -> Model -> Updated
@@ -77,4 +83,9 @@ update msg model =
         GoToTruss ->
             { model = model
             , command = ChangePage "#/truss"
+            }
+
+        GoToGalvHole ->
+            { model = model
+            , command = ChangePage "#/galv-hole"
             }

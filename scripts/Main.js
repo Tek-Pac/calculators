@@ -4494,6 +4494,9 @@ var $gren_lang$browser$Browser$document = _Browser_document;
 var $gren_lang$core$Platform$Cmd$batch = _Platform_batch;
 var $gren_lang$core$Platform$Cmd$none = $gren_lang$core$Platform$Cmd$batch(
 	[]);
+var $author$project$Main$GalvHoleModel = function (a) {
+	return {$: 'GalvHoleModel', a: a};
+};
 var $author$project$Main$HomeModel = function (a) {
 	return {$: 'HomeModel', a: a};
 };
@@ -5232,11 +5235,91 @@ var $gren_lang$url$Url$Parser$parse = F2(
 					visited: []
 				}));
 	});
-var $author$project$Page$KFactor$BendAllowance = {$: 'BendAllowance'};
-var $author$project$Page$KFactor$ExtraAllowance = {$: 'ExtraAllowance'};
+var $author$project$Page$GalvHole$Chs = {$: 'Chs'};
+var $author$project$Page$GalvHole$chsLibrary = ['21.3', '26.9', '33.7', '42.4', '48.3', '60.3', '76.1', '88.9', '101.6', '114.3', '127', '139.7', '152.4', '165.1', '168.3', '193.7', '219.1', '273.1', '323.9', '355.6', '406.4', '457', '508', '610'];
+var $gren_lang$core$Array$findFirst = _Array_findFirst;
+var $gren_lang$core$Array$member = F2(
+	function (value, array) {
+		var _v0 = A2(
+			$gren_lang$core$Array$findFirst,
+			function (v) {
+				return _Utils_eq(v, value);
+			},
+			array);
+		if (_v0.$ === 'Just') {
+			return true;
+		} else {
+			return false;
+		}
+	});
+var $gren_lang$core$Basics$not = _Basics_not;
+var $author$project$Page$GalvHole$rhsLibrary = ['20*20', '25*25', '30*30', '35*35', '40*40', '50*20', '50*25', '50*50', '65*35', '65*65', '75*25', '75*50', '75*75', '76*38', '89*89', '90*90', '100*50', '100*100', '102*76', '125*75', '125*125', '127*51', '150*50', '150*100', '150*150', '152*76', '200*100', '200*200', '250*150', '250*250', '300*200', '300*300', '350*350', '400*200', '400*300', '400*400'];
+var $author$project$Page$GalvHole$checkCustom = function (model) {
+	var library = function () {
+		var _v0 = model.ty;
+		if (_v0.$ === 'Chs') {
+			return $author$project$Page$GalvHole$chsLibrary;
+		} else {
+			return $author$project$Page$GalvHole$rhsLibrary;
+		}
+	}();
+	var custom = model.c || (!A2($gren_lang$core$Array$member, model.size, library));
+	return _Utils_update(
+		model,
+		{c: custom});
+};
+var $author$project$Page$GalvHole$makeChsModel = F3(
+	function (n, c, size) {
+		return $author$project$Page$GalvHole$checkCustom(
+			{c: c, n: n, size: size, ty: $author$project$Page$GalvHole$Chs});
+	});
+var $author$project$Page$GalvHole$Rhs = {$: 'Rhs'};
+var $author$project$Page$GalvHole$modelForTy = F2(
+	function (n, ty) {
+		return {
+			c: false,
+			n: n,
+			size: function () {
+				if (ty.$ === 'Rhs') {
+					return '75*75';
+				} else {
+					return '48.3';
+				}
+			}(),
+			ty: ty
+		};
+	});
+var $author$project$Page$GalvHole$makeRhsModel = F3(
+	function (n, c, size) {
+		var _v0 = A2($gren_lang$core$String$split, '*', size);
+		if (_v0.length === 2) {
+			var x = _v0[0];
+			var y = _v0[1];
+			return $author$project$Page$GalvHole$checkCustom(
+				{c: c, n: n, size: x + ('*' + y), ty: $author$project$Page$GalvHole$Rhs});
+		} else {
+			return A2($author$project$Page$GalvHole$modelForTy, n, $author$project$Page$GalvHole$Rhs);
+		}
+	});
 var $gren_lang$url$Url$Parser$Internal$Parser = function (a) {
 	return {$: 'Parser', a: a};
 };
+var $gren_lang$url$Url$Parser$Query$map4 = F5(
+	function (func, _v0, _v1, _v2, _v3) {
+		var a = _v0.a;
+		var b = _v1.a;
+		var c = _v2.a;
+		var d = _v3.a;
+		return $gren_lang$url$Url$Parser$Internal$Parser(
+			function (dict) {
+				return A4(
+					func,
+					a(dict),
+					b(dict),
+					c(dict),
+					d(dict));
+			});
+	});
 var $gren_lang$url$Url$Parser$Query$custom = F2(
 	function (key, func) {
 		return $gren_lang$url$Url$Parser$Internal$Parser(
@@ -5248,6 +5331,51 @@ var $gren_lang$url$Url$Parser$Query$custom = F2(
 						A2($gren_lang$core$Dict$get, key, dict)));
 			});
 	});
+var $gren_lang$url$Url$Parser$Query$string = function (key) {
+	return A2(
+		$gren_lang$url$Url$Parser$Query$custom,
+		key,
+		function (stringList) {
+			if (stringList.length === 1) {
+				var str = stringList[0];
+				return $gren_lang$core$Maybe$Just(str);
+			} else {
+				return $gren_lang$core$Maybe$Nothing;
+			}
+		});
+};
+var $author$project$Page$GalvHole$queryParser = A5(
+	$gren_lang$url$Url$Parser$Query$map4,
+	F4(
+		function (profileTypeMaybe, sizeMaybe, cMaybe, nMaybe) {
+			var size = A2($gren_lang$core$Maybe$withDefault, '', sizeMaybe);
+			var profileType = A2($gren_lang$core$Maybe$withDefault, '', profileTypeMaybe);
+			var n = A2($gren_lang$core$Maybe$withDefault, '4', nMaybe);
+			var c = function () {
+				var _v1 = A2($gren_lang$core$Maybe$withDefault, '', cMaybe);
+				if (_v1 === 'true') {
+					return true;
+				} else {
+					return false;
+				}
+			}();
+			switch (profileType) {
+				case 'RHS':
+					return A3($author$project$Page$GalvHole$makeRhsModel, n, c, size);
+				case 'SHS':
+					return A3($author$project$Page$GalvHole$makeRhsModel, n, c, size);
+				case 'CHS':
+					return A3($author$project$Page$GalvHole$makeChsModel, n, c, size);
+				default:
+					return A3($author$project$Page$GalvHole$makeRhsModel, n, c, size);
+			}
+		}),
+	$gren_lang$url$Url$Parser$Query$string('profileType'),
+	$gren_lang$url$Url$Parser$Query$string('size'),
+	$gren_lang$url$Url$Parser$Query$string('custom'),
+	$gren_lang$url$Url$Parser$Query$string('n'));
+var $author$project$Page$KFactor$BendAllowance = {$: 'BendAllowance'};
+var $author$project$Page$KFactor$ExtraAllowance = {$: 'ExtraAllowance'};
 var $gren_lang$url$Url$Parser$Query$enum = F2(
 	function (key, dict) {
 		return A2(
@@ -5308,19 +5436,6 @@ var $gren_lang$url$Url$Parser$Query$map7 = F8(
 					g(dict));
 			});
 	});
-var $gren_lang$url$Url$Parser$Query$string = function (key) {
-	return A2(
-		$gren_lang$url$Url$Parser$Query$custom,
-		key,
-		function (stringList) {
-			if (stringList.length === 1) {
-				var str = stringList[0];
-				return $gren_lang$core$Maybe$Just(str);
-			} else {
-				return $gren_lang$core$Maybe$Nothing;
-			}
-		});
-};
 var $author$project$Page$KFactor$queryParser = A8(
 	$gren_lang$url$Url$Parser$Query$map7,
 	$author$project$Page$KFactor$finishParse,
@@ -5346,22 +5461,6 @@ var $author$project$Page$Triangle$finishParse = F4(
 			c: A2($gren_lang$core$Maybe$withDefault, '', c),
 			theta: A2($gren_lang$core$Maybe$withDefault, '', theta)
 		};
-	});
-var $gren_lang$url$Url$Parser$Query$map4 = F5(
-	function (func, _v0, _v1, _v2, _v3) {
-		var a = _v0.a;
-		var b = _v1.a;
-		var c = _v2.a;
-		var d = _v3.a;
-		return $gren_lang$url$Url$Parser$Internal$Parser(
-			function (dict) {
-				return A4(
-					func,
-					a(dict),
-					b(dict),
-					c(dict),
-					d(dict));
-			});
 	});
 var $author$project$Page$Triangle$queryParser = A5(
 	$gren_lang$url$Url$Parser$Query$map4,
@@ -5555,6 +5654,13 @@ var $author$project$Main$urlToModel = function (path) {
 					$gren_lang$url$Url$Parser$top),
 					A2(
 					$gren_lang$url$Url$Parser$map,
+					$author$project$Main$GalvHoleModel,
+					A2(
+						$gren_lang$url$Url$Parser$questionMark,
+						$gren_lang$url$Url$Parser$s('galv-hole'),
+						$author$project$Page$GalvHole$queryParser)),
+					A2(
+					$gren_lang$url$Url$Parser$map,
 					$author$project$Main$KFactorModel,
 					A2(
 						$gren_lang$url$Url$Parser$questionMark,
@@ -5589,6 +5695,9 @@ var $author$project$Main$PageChanged = function (a) {
 var $gren_lang$core$Json$Decode$string = _Json_decodeString;
 var $author$project$Main$pageChanged = _Platform_incomingPort('pageChanged', $gren_lang$core$Json$Decode$string);
 var $author$project$Main$pageChangedSubscription = $author$project$Main$pageChanged($author$project$Main$PageChanged);
+var $author$project$Main$GalvHoleMsg = function (a) {
+	return {$: 'GalvHoleMsg', a: a};
+};
 var $author$project$Main$HomeMsg = function (a) {
 	return {$: 'HomeMsg', a: a};
 };
@@ -5656,6 +5765,27 @@ var $gren_lang$url$Url$Builder$string = F2(
 			$gren_lang$url$Url$percentEncode(key),
 			$gren_lang$url$Url$percentEncode(value));
 	});
+var $author$project$Page$GalvHole$queryBuilder = function (model) {
+	return [
+		A2(
+		$gren_lang$url$Url$Builder$string,
+		'profileType',
+		function () {
+			var _v0 = model.ty;
+			if (_v0.$ === 'Chs') {
+				return 'CHS';
+			} else {
+				return 'RHS';
+			}
+		}()),
+		A2($gren_lang$url$Url$Builder$string, 'size', model.size),
+		A2(
+		$gren_lang$url$Url$Builder$string,
+		'custom',
+		model.c ? 'true' : 'false'),
+		A2($gren_lang$url$Url$Builder$string, 'n', model.n)
+	];
+};
 var $author$project$Page$KFactor$queryBuilder = function (model) {
 	return [
 		A2($gren_lang$url$Url$Builder$string, 't', model.t),
@@ -5708,6 +5838,8 @@ var $author$project$Main$modelToUrl = function (model) {
 			switch (model.$) {
 				case 'HomeModel':
 					return [];
+				case 'GalvHoleModel':
+					return ['galv-hole'];
 				case 'KFactorModel':
 					return ['k-factor'];
 				case 'TriangleModel':
@@ -5720,6 +5852,9 @@ var $author$project$Main$modelToUrl = function (model) {
 			switch (model.$) {
 				case 'HomeModel':
 					return [];
+				case 'GalvHoleModel':
+					var t = model.a;
+					return $author$project$Page$GalvHole$queryBuilder(t);
 				case 'KFactorModel':
 					var k = model.a;
 					return $author$project$Page$KFactor$queryBuilder(k);
@@ -5779,27 +5914,7 @@ var $author$project$Main$mapPage = F3(
 			model: wrapModel(model)
 		};
 	});
-var $author$project$Page$Home$update = F2(
-	function (msg, model) {
-		switch (msg.$) {
-			case 'GoToKFactor':
-				return {
-					command: $author$project$SpaCmd$ChangePage('#/k-factor'),
-					model: model
-				};
-			case 'GoToTriangle':
-				return {
-					command: $author$project$SpaCmd$ChangePage('#/triangle'),
-					model: model
-				};
-			default:
-				return {
-					command: $author$project$SpaCmd$ChangePage('#/truss'),
-					model: model
-				};
-		}
-	});
-var $author$project$Page$KFactor$NoOp = {$: 'NoOp'};
+var $author$project$Page$GalvHole$NoOp = {$: 'NoOp'};
 var $gren_lang$core$Basics$composeL = F3(
 	function (g, f, x) {
 		return g(
@@ -5825,6 +5940,87 @@ var $gren_lang$core$Task$attempt = F2(
 						task))));
 	});
 var $gren_lang$browser$Browser$Dom$focus = _Browser_call('focus');
+var $author$project$SpaCmd$none = $author$project$SpaCmd$BaseCmd($gren_lang$core$Platform$Cmd$none);
+var $author$project$Page$GalvHole$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'NoOp':
+				return {command: $author$project$SpaCmd$none, model: model};
+			case 'HomePage':
+				return {
+					command: $author$project$SpaCmd$ChangePage('#/'),
+					model: model
+				};
+			case 'UpdateTy':
+				var ty = msg.a;
+				return {
+					command: $author$project$SpaCmd$none,
+					model: A2($author$project$Page$GalvHole$modelForTy, model.n, ty)
+				};
+			case 'UpdateSizeS':
+				var s = msg.a;
+				return {
+					command: $author$project$SpaCmd$none,
+					model: _Utils_update(
+						model,
+						{c: false, size: s})
+				};
+			case 'UpdateSizeC':
+				var s = msg.a;
+				return {
+					command: $author$project$SpaCmd$none,
+					model: _Utils_update(
+						model,
+						{c: true, size: s})
+				};
+			case 'UpdateN':
+				var n = msg.a;
+				return {
+					command: $author$project$SpaCmd$BaseCmd(
+						A2(
+							$gren_lang$core$Task$attempt,
+							function (_v1) {
+								return $author$project$Page$GalvHole$NoOp;
+							},
+							$gren_lang$browser$Browser$Dom$focus('n'))),
+					model: _Utils_update(
+						model,
+						{n: n})
+				};
+			default:
+				var id = msg.a;
+				return {
+					command: $author$project$SpaCmd$CopyId(id),
+					model: model
+				};
+		}
+	});
+var $author$project$Page$Home$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'GoToKFactor':
+				return {
+					command: $author$project$SpaCmd$ChangePage('#/k-factor'),
+					model: model
+				};
+			case 'GoToTriangle':
+				return {
+					command: $author$project$SpaCmd$ChangePage('#/triangle'),
+					model: model
+				};
+			case 'GoToTruss':
+				return {
+					command: $author$project$SpaCmd$ChangePage('#/truss'),
+					model: model
+				};
+			default:
+				return {
+					command: $author$project$SpaCmd$ChangePage('#/galv-hole'),
+					model: model
+				};
+		}
+	});
+var $author$project$Page$KFactor$NoOp = {$: 'NoOp'};
 var $author$project$Page$KFactor$attemptFocus = function (id) {
 	return $author$project$SpaCmd$BaseCmd(
 		A2(
@@ -5834,7 +6030,6 @@ var $author$project$Page$KFactor$attemptFocus = function (id) {
 			},
 			$gren_lang$browser$Browser$Dom$focus(id)));
 };
-var $author$project$SpaCmd$none = $author$project$SpaCmd$BaseCmd($gren_lang$core$Platform$Cmd$none);
 var $author$project$Page$KFactor$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -6103,7 +6298,7 @@ var $author$project$Page$Truss$update = F2(
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		var _v0 = {m: model, v: msg};
-		_v0$5:
+		_v0$6:
 		while (true) {
 			switch (_v0.v.$) {
 				case 'PageChanged':
@@ -6126,7 +6321,23 @@ var $author$project$Main$update = F2(
 									$author$project$Main$HomeMsg,
 									A2($author$project$Page$Home$update, v, m))));
 					} else {
-						break _v0$5;
+						break _v0$6;
+					}
+				case 'GalvHoleMsg':
+					if (_v0.m.$ === 'GalvHoleModel') {
+						var m = _v0.m.a;
+						var v = _v0.v.a;
+						return A2(
+							$author$project$Main$handleUrlUpdate,
+							model,
+							$author$project$Main$handleSpaCmd(
+								A3(
+									$author$project$Main$mapPage,
+									$author$project$Main$GalvHoleModel,
+									$author$project$Main$GalvHoleMsg,
+									A2($author$project$Page$GalvHole$update, v, m))));
+					} else {
+						break _v0$6;
 					}
 				case 'KFactorMsg':
 					if (_v0.m.$ === 'KFactorModel') {
@@ -6142,7 +6353,7 @@ var $author$project$Main$update = F2(
 									$author$project$Main$KFactorMsg,
 									A2($author$project$Page$KFactor$update, v, m))));
 					} else {
-						break _v0$5;
+						break _v0$6;
 					}
 				case 'TriangleMsg':
 					if (_v0.m.$ === 'TriangleModel') {
@@ -6158,7 +6369,7 @@ var $author$project$Main$update = F2(
 									$author$project$Main$TriangleMsg,
 									A2($author$project$Page$Triangle$update, v, m))));
 					} else {
-						break _v0$5;
+						break _v0$6;
 					}
 				default:
 					if (_v0.m.$ === 'TrussModel') {
@@ -6174,7 +6385,7 @@ var $author$project$Main$update = F2(
 									$author$project$Main$TrussMsg,
 									A2($author$project$Page$Truss$update, v, m))));
 					} else {
-						break _v0$5;
+						break _v0$6;
 					}
 			}
 		}
@@ -6192,17 +6403,89 @@ var $author$project$Main$mapDocument = F2(
 			title: doc.title
 		};
 	});
-var $author$project$Page$Home$GoToKFactor = {$: 'GoToKFactor'};
-var $author$project$Page$Home$GoToTriangle = {$: 'GoToTriangle'};
-var $author$project$Page$Home$GoToTruss = {$: 'GoToTruss'};
+var $author$project$Page$GalvHole$HomePage = {$: 'HomePage'};
+var $author$project$Page$GalvHole$UpdateN = function (a) {
+	return {$: 'UpdateN', a: a};
+};
+var $author$project$Page$GalvHole$UpdateTy = function (a) {
+	return {$: 'UpdateTy', a: a};
+};
 var $gren_lang$browser$VirtualDom$node = function (tag) {
 	return _VirtualDom_node(
 		_VirtualDom_noScript(tag));
 };
 var $gren_lang$browser$Html$node = $gren_lang$browser$VirtualDom$node;
+var $gren_lang$browser$Html$br = $gren_lang$browser$Html$node('br');
 var $gren_lang$browser$Html$button = $gren_lang$browser$Html$node('button');
+var $gren_lang$core$String$toFloat = _String_toFloat;
+var $author$project$Page$GalvHole$calculateChsDiagonal = function (model) {
+	var _v0 = $gren_lang$core$String$toFloat(model.size);
+	if (_v0.$ === 'Just') {
+		var od = _v0.a;
+		return $gren_lang$core$Result$Ok(od);
+	} else {
+		return $gren_lang$core$Result$Err('enter an outside diameter');
+	}
+};
+var $author$project$Page$GalvHole$getRhsStrings = function (size) {
+	var _v0 = A2($gren_lang$core$String$split, '*', size);
+	if (_v0.length === 2) {
+		var x = _v0[0];
+		var y = _v0[1];
+		return {x: x, y: y};
+	} else {
+		return {x: '', y: ''};
+	}
+};
+var $author$project$Page$GalvHole$getRhsVals = function (size) {
+	var _v0 = $author$project$Page$GalvHole$getRhsStrings(size);
+	var x = _v0.x;
+	var y = _v0.y;
+	return {
+		x: $gren_lang$core$String$toFloat(x),
+		y: $gren_lang$core$String$toFloat(y)
+	};
+};
+var $gren_lang$core$Basics$mul = _Basics_mul;
+var $gren_lang$core$Math$sqrt = _Math_sqrt;
+var $author$project$Page$GalvHole$calculateRhsDiagonal = function (model) {
+	var _v0 = $author$project$Page$GalvHole$getRhsVals(model.size);
+	if (_v0.x.$ === 'Just') {
+		if (_v0.y.$ === 'Just') {
+			var x = _v0.x.a;
+			var y = _v0.y.a;
+			return $gren_lang$core$Result$Ok(
+				$gren_lang$core$Math$sqrt((x * x) + (y * y)));
+		} else {
+			var _v2 = _v0.y;
+			return $gren_lang$core$Result$Err('enter a height');
+		}
+	} else {
+		var _v1 = _v0.x;
+		return $gren_lang$core$Result$Err('enter a width');
+	}
+};
+var $gren_lang$browser$VirtualDom$property = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_property,
+			_VirtualDom_noInnerHtmlOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var $gren_lang$browser$Html$Attributes$property = $gren_lang$browser$VirtualDom$property;
+var $gren_lang$browser$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			$gren_lang$browser$Html$Attributes$property,
+			key,
+			$gren_lang$core$Json$Encode$string(string));
+	});
+var $gren_lang$browser$Html$Attributes$class = $gren_lang$browser$Html$Attributes$stringProperty('className');
 var $gren_lang$browser$Html$div = $gren_lang$browser$Html$node('div');
+var $gren_lang$core$Basics$fdiv = _Basics_fdiv;
 var $gren_lang$browser$Html$h1 = $gren_lang$browser$Html$node('h1');
+var $gren_lang$browser$Html$hr = $gren_lang$browser$Html$node('hr');
+var $gren_lang$browser$Html$Attributes$id = $gren_lang$browser$Html$Attributes$stringProperty('id');
 var $gren_lang$browser$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -6222,6 +6505,469 @@ var $gren_lang$browser$Html$Events$onClick = function (msg) {
 };
 var $gren_lang$browser$VirtualDom$text = _VirtualDom_text;
 var $gren_lang$browser$Html$text = $gren_lang$browser$VirtualDom$text;
+var $author$project$Page$GalvHole$makeButton = F2(
+	function (click, txt) {
+		return A2(
+			$gren_lang$browser$Html$button,
+			[
+				$gren_lang$browser$Html$Events$onClick(click)
+			],
+			[
+				$gren_lang$browser$Html$text(txt)
+			]);
+	});
+var $author$project$Page$GalvHole$UpdateSizeC = function (a) {
+	return {$: 'UpdateSizeC', a: a};
+};
+var $author$project$Page$GalvHole$UpdateSizeS = function (a) {
+	return {$: 'UpdateSizeS', a: a};
+};
+var $gren_lang$core$Array$first = function (array) {
+	return A2($gren_lang$core$Array$get, 0, array);
+};
+var $gren_lang$core$Basics$sub = _Basics_sub;
+var $gren_lang$core$Array$last = function (array) {
+	return A2(
+		$gren_lang$core$Array$get,
+		$gren_lang$core$Array$length(array) - 1,
+		array);
+};
+var $gren_lang$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $gren_lang$core$Maybe$Just(
+				f(value));
+		} else {
+			return $gren_lang$core$Maybe$Nothing;
+		}
+	});
+var $author$project$Page$GalvHole$makeArraySelector = F2(
+	function (library, val) {
+		var makeArraySelectorInternal = function (idx) {
+			var prev = function () {
+				var _v2 = A2($gren_lang$core$Array$get, idx - 1, library);
+				if (_v2.$ === 'Just') {
+					var a = _v2.a;
+					return a;
+				} else {
+					return A2(
+						$gren_lang$core$Maybe$withDefault,
+						'never',
+						$gren_lang$core$Array$last(library));
+				}
+			}();
+			var next = function () {
+				var _v1 = A2($gren_lang$core$Array$get, idx + 1, library);
+				if (_v1.$ === 'Just') {
+					var a = _v1.a;
+					return a;
+				} else {
+					return A2(
+						$gren_lang$core$Maybe$withDefault,
+						'never',
+						$gren_lang$core$Array$first(library));
+				}
+			}();
+			return [
+				A2(
+				$author$project$Page$GalvHole$makeButton,
+				$author$project$Page$GalvHole$UpdateSizeC(val),
+				'Standard'),
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
+				A2(
+				$author$project$Page$GalvHole$makeButton,
+				$author$project$Page$GalvHole$UpdateSizeS(prev),
+				'←'),
+				$gren_lang$browser$Html$text(' '),
+				A2(
+				$author$project$Page$GalvHole$makeButton,
+				$author$project$Page$GalvHole$UpdateSizeS(next),
+				val),
+				$gren_lang$browser$Html$text(' '),
+				A2(
+				$author$project$Page$GalvHole$makeButton,
+				$author$project$Page$GalvHole$UpdateSizeS(next),
+				'→')
+			];
+		};
+		var getIndex = function (pos) {
+			getIndex:
+			while (true) {
+				var _v0 = A2($gren_lang$core$Array$get, pos, library);
+				if (_v0.$ === 'Just') {
+					var v = _v0.a;
+					if (_Utils_eq(v, val)) {
+						return $gren_lang$core$Maybe$Just(pos);
+					} else {
+						var $temp$pos = pos + 1;
+						pos = $temp$pos;
+						continue getIndex;
+					}
+				} else {
+					return $gren_lang$core$Maybe$Nothing;
+				}
+			}
+		};
+		var idxMaybe = getIndex(0);
+		return A2($gren_lang$core$Maybe$map, makeArraySelectorInternal, idxMaybe);
+	});
+var $gren_lang$core$String$fromFloat = _String_fromNumber;
+var $gren_lang$browser$Html$input = $gren_lang$browser$Html$node('input');
+var $gren_lang$core$Basics$negate = function (n) {
+	return -n;
+};
+var $gren_lang$browser$Html$Events$alwaysStop = function (msg) {
+	return {message: msg, stopPropagation: true};
+};
+var $gren_lang$browser$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var $gren_lang$browser$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			$gren_lang$browser$VirtualDom$on,
+			event,
+			$gren_lang$browser$VirtualDom$MayStopPropagation(decoder));
+	});
+var $gren_lang$core$Json$Decode$field = _Json_decodeField;
+var $gren_lang$core$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($gren_lang$core$Array$foldr, $gren_lang$core$Json$Decode$field, decoder, fields);
+	});
+var $gren_lang$browser$Html$Events$targetValue = A2(
+	$gren_lang$core$Json$Decode$at,
+	['target', 'value'],
+	$gren_lang$core$Json$Decode$string);
+var $gren_lang$browser$Html$Events$onInput = function (tagger) {
+	return A2(
+		$gren_lang$browser$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			$gren_lang$core$Json$Decode$map,
+			$gren_lang$browser$Html$Events$alwaysStop,
+			A2($gren_lang$core$Json$Decode$map, tagger, $gren_lang$browser$Html$Events$targetValue)));
+};
+var $gren_lang$browser$Html$Attributes$step = function (n) {
+	return A2($gren_lang$browser$Html$Attributes$stringProperty, 'step', n);
+};
+var $gren_lang$browser$VirtualDom$style = _VirtualDom_style;
+var $gren_lang$browser$Html$Attributes$style = $gren_lang$browser$VirtualDom$style;
+var $gren_lang$browser$VirtualDom$attribute = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var $gren_lang$browser$Html$Attributes$attribute = $gren_lang$browser$VirtualDom$attribute;
+var $gren_lang$browser$Html$Attributes$tabindex = function (n) {
+	return A2(
+		$gren_lang$browser$Html$Attributes$attribute,
+		'tabIndex',
+		$gren_lang$core$String$fromInt(n));
+};
+var $gren_lang$browser$Html$Attributes$type_ = $gren_lang$browser$Html$Attributes$stringProperty('type');
+var $gren_lang$browser$Html$Attributes$value = $gren_lang$browser$Html$Attributes$stringProperty('value');
+var $author$project$Page$GalvHole$makeInput = F5(
+	function (label, idTxt, stepV, currTxt, updateMsg) {
+		return A2(
+			$gren_lang$browser$Html$div,
+			[],
+			[
+				$gren_lang$browser$Html$text(label),
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
+				$gren_lang$browser$Html$text('         '),
+				A2(
+				$gren_lang$browser$Html$input,
+				[
+					$gren_lang$browser$Html$Attributes$value(currTxt),
+					$gren_lang$browser$Html$Events$onInput(updateMsg),
+					$gren_lang$browser$Html$Attributes$id(idTxt),
+					$gren_lang$browser$Html$Attributes$type_('number'),
+					$gren_lang$browser$Html$Attributes$step(
+					$gren_lang$core$String$fromFloat(stepV))
+				],
+				[]),
+				$gren_lang$core$String$isEmpty(currTxt) ? A2(
+				$gren_lang$browser$Html$button,
+				[
+					A2($gren_lang$browser$Html$Attributes$style, 'pointer-events', 'none'),
+					A2($gren_lang$browser$Html$Attributes$style, 'opacity', '0'),
+					$gren_lang$browser$Html$Attributes$tabindex(-1)
+				],
+				[
+					$gren_lang$browser$Html$text('❌')
+				]) : A2(
+				$gren_lang$browser$Html$button,
+				[
+					$gren_lang$browser$Html$Events$onClick(
+					updateMsg(''))
+				],
+				[
+					$gren_lang$browser$Html$text('❌')
+				])
+			]);
+	});
+var $author$project$Page$GalvHole$makeChsInputs = function (model) {
+	var isStandard = A2($gren_lang$core$Array$member, model.size, $author$project$Page$GalvHole$chsLibrary);
+	var arraySel = model.c ? $gren_lang$core$Maybe$Nothing : A2($author$project$Page$GalvHole$makeArraySelector, $author$project$Page$GalvHole$chsLibrary, model.size);
+	return A2(
+		$gren_lang$browser$Html$div,
+		[],
+		function () {
+			if (arraySel.$ === 'Just') {
+				var a = arraySel.a;
+				return a;
+			} else {
+				return [
+					A2(
+					$author$project$Page$GalvHole$makeButton,
+					isStandard ? $author$project$Page$GalvHole$UpdateSizeS(model.size) : $author$project$Page$GalvHole$UpdateSizeS('48.3'),
+					'Custom'),
+					A5($author$project$Page$GalvHole$makeInput, 'Outer Diameter', 'od', 0.5, model.size, $author$project$Page$GalvHole$UpdateSizeC)
+				];
+			}
+		}());
+};
+var $author$project$Page$GalvHole$DoCopy = function (a) {
+	return {$: 'DoCopy', a: a};
+};
+var $gren_lang$core$Json$Encode$bool = _Json_wrap;
+var $gren_lang$browser$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			$gren_lang$browser$Html$Attributes$property,
+			key,
+			$gren_lang$core$Json$Encode$bool(bool));
+	});
+var $gren_lang$browser$Html$Attributes$readonly = $gren_lang$browser$Html$Attributes$boolProperty('readOnly');
+var $author$project$Page$GalvHole$makeOutput = F3(
+	function (label, idTxt, calc) {
+		return A2(
+			$gren_lang$browser$Html$div,
+			[],
+			[
+				$gren_lang$browser$Html$text(label),
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
+				$gren_lang$browser$Html$text('         '),
+				A2(
+				$gren_lang$browser$Html$input,
+				[
+					$gren_lang$browser$Html$Attributes$value(
+					$gren_lang$core$String$fromFloat(calc)),
+					$gren_lang$browser$Html$Attributes$readonly(true),
+					$gren_lang$browser$Html$Attributes$id(idTxt),
+					$gren_lang$browser$Html$Attributes$type_('number')
+				],
+				[]),
+				A2(
+				$gren_lang$browser$Html$button,
+				[
+					$gren_lang$browser$Html$Events$onClick(
+					$author$project$Page$GalvHole$DoCopy(idTxt))
+				],
+				[
+					$gren_lang$browser$Html$text('📋')
+				])
+			]);
+	});
+var $author$project$Page$GalvHole$makeRhsInputs = function (model) {
+	var isStandard = A2($gren_lang$core$Array$member, model.size, $author$project$Page$GalvHole$rhsLibrary);
+	var arraySel = model.c ? $gren_lang$core$Maybe$Nothing : A2($author$project$Page$GalvHole$makeArraySelector, $author$project$Page$GalvHole$rhsLibrary, model.size);
+	var _v0 = $author$project$Page$GalvHole$getRhsStrings(model.size);
+	var x = _v0.x;
+	var y = _v0.y;
+	return A2(
+		$gren_lang$browser$Html$div,
+		[],
+		function () {
+			if (arraySel.$ === 'Just') {
+				var a = arraySel.a;
+				return a;
+			} else {
+				return [
+					A2(
+					$author$project$Page$GalvHole$makeButton,
+					isStandard ? $author$project$Page$GalvHole$UpdateSizeS(model.size) : $author$project$Page$GalvHole$UpdateSizeS('75*75'),
+					'Custom'),
+					A5(
+					$author$project$Page$GalvHole$makeInput,
+					'Width',
+					'x',
+					0.5,
+					x,
+					function (nx) {
+						return $author$project$Page$GalvHole$UpdateSizeC(nx + ('*' + y));
+					}),
+					A5(
+					$author$project$Page$GalvHole$makeInput,
+					'Height',
+					'y',
+					0.5,
+					y,
+					function (ny) {
+						return $author$project$Page$GalvHole$UpdateSizeC(x + ('*' + ny));
+					})
+				];
+			}
+		}());
+};
+var $gren_lang$core$Result$map = F2(
+	function (func, ra) {
+		if (ra.$ === 'Ok') {
+			var a = ra.a;
+			return $gren_lang$core$Result$Ok(
+				func(a));
+		} else {
+			var e = ra.a;
+			return $gren_lang$core$Result$Err(e);
+		}
+	});
+var $gren_lang$core$Basics$gt = _Utils_gt;
+var $gren_lang$core$Basics$max = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) > 0) ? x : y;
+	});
+var $gren_lang$core$Math$round = _Math_round;
+var $gren_lang$core$Basics$toFloat = _Basics_toFloat;
+var $author$project$Page$GalvHole$view = function (model) {
+	var tyInputs = function () {
+		var _v5 = model.ty;
+		if (_v5.$ === 'Chs') {
+			return $author$project$Page$GalvHole$makeChsInputs(model);
+		} else {
+			return $author$project$Page$GalvHole$makeRhsInputs(model);
+		}
+	}();
+	var tyCalc = function () {
+		var _v3 = $gren_lang$core$String$toInt(model.n);
+		if (_v3.$ === 'Just') {
+			var n = _v3.a;
+			var diagonalRes = function () {
+				var _v4 = model.ty;
+				if (_v4.$ === 'Chs') {
+					return $author$project$Page$GalvHole$calculateChsDiagonal(model);
+				} else {
+					return $author$project$Page$GalvHole$calculateRhsDiagonal(model);
+				}
+			}();
+			return A2(
+				$gren_lang$core$Result$map,
+				function (diagonal) {
+					return {diagonal: diagonal, n: n};
+				},
+				diagonalRes);
+		} else {
+			return $gren_lang$core$Result$Err('enter number of holes');
+		}
+	}();
+	var tyButton = function () {
+		var _v2 = model.ty;
+		if (_v2.$ === 'Chs') {
+			return A2(
+				$author$project$Page$GalvHole$makeButton,
+				$author$project$Page$GalvHole$UpdateTy($author$project$Page$GalvHole$Rhs),
+				'CHS');
+		} else {
+			return A2(
+				$author$project$Page$GalvHole$makeButton,
+				$author$project$Page$GalvHole$UpdateTy($author$project$Page$GalvHole$Chs),
+				'RHS');
+		}
+	}();
+	return {
+		body: [
+			A2(
+			$gren_lang$browser$Html$button,
+			[
+				$gren_lang$browser$Html$Attributes$class('left'),
+				$gren_lang$browser$Html$Events$onClick($author$project$Page$GalvHole$HomePage)
+			],
+			[
+				$gren_lang$browser$Html$text('Home')
+			]),
+			A2(
+			$gren_lang$browser$Html$div,
+			[
+				$gren_lang$browser$Html$Attributes$id('galv-hole'),
+				$gren_lang$browser$Html$Attributes$class('center')
+			],
+			[
+				A2(
+				$gren_lang$browser$Html$h1,
+				[],
+				[
+					$gren_lang$browser$Html$text('Galvanising Holes')
+				]),
+				A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]),
+				tyButton,
+				A2(
+				$gren_lang$browser$Html$hr,
+				[],
+				[]),
+				tyInputs,
+				A2(
+				$gren_lang$browser$Html$hr,
+				[],
+				[]),
+				A5($author$project$Page$GalvHole$makeInput, 'No. of Holes', 'n', 1, model.n, $author$project$Page$GalvHole$UpdateN),
+				A2(
+				$gren_lang$browser$Html$hr,
+				[],
+				[]),
+				function () {
+				if (tyCalc.$ === 'Err') {
+					var e = tyCalc.a;
+					return A2(
+						$gren_lang$browser$Html$div,
+						[
+							$gren_lang$browser$Html$Attributes$class('center')
+						],
+						[
+							$gren_lang$browser$Html$text(e)
+						]);
+				} else {
+					var _v1 = tyCalc.a;
+					var diagonal = _v1.diagonal;
+					var n = _v1.n;
+					var formatF = function (value) {
+						return $gren_lang$core$Math$round(value * 100) / 100;
+					};
+					var basisHole = diagonal / (4 * $gren_lang$core$Math$sqrt(n / 2));
+					var dia = formatF(
+						A2($gren_lang$core$Basics$max, 10, basisHole));
+					return A2(
+						$gren_lang$browser$Html$div,
+						[
+							$gren_lang$browser$Html$Attributes$class('center')
+						],
+						[
+							A3($author$project$Page$GalvHole$makeOutput, 'Min diameter', 'dia', dia)
+						]);
+				}
+			}()
+			])
+		],
+		title: 'Galvanising Holes'
+	};
+};
+var $author$project$Page$Home$GoToGalvHole = {$: 'GoToGalvHole'};
+var $author$project$Page$Home$GoToKFactor = {$: 'GoToKFactor'};
+var $author$project$Page$Home$GoToTriangle = {$: 'GoToTriangle'};
+var $author$project$Page$Home$GoToTruss = {$: 'GoToTruss'};
 var $author$project$Page$Home$view = function (model) {
 	return {
 		body: [
@@ -6258,6 +7004,14 @@ var $author$project$Page$Home$view = function (model) {
 				],
 				[
 					$gren_lang$browser$Html$text('Trusses')
+				]),
+				A2(
+				$gren_lang$browser$Html$button,
+				[
+					$gren_lang$browser$Html$Events$onClick($author$project$Page$Home$GoToGalvHole)
+				],
+				[
+					$gren_lang$browser$Html$text('Galvanising Holes')
 				])
 			])
 		],
@@ -6289,64 +7043,7 @@ var $author$project$Page$KFactor$UpdateThickness = function (a) {
 var $author$project$Page$KFactor$UpdateTy = function (a) {
 	return {$: 'UpdateTy', a: a};
 };
-var $gren_lang$browser$Html$br = $gren_lang$browser$Html$node('br');
-var $gren_lang$browser$VirtualDom$property = F2(
-	function (key, value) {
-		return A2(
-			_VirtualDom_property,
-			_VirtualDom_noInnerHtmlOrFormAction(key),
-			_VirtualDom_noJavaScriptOrHtmlUri(value));
-	});
-var $gren_lang$browser$Html$Attributes$property = $gren_lang$browser$VirtualDom$property;
-var $gren_lang$browser$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			$gren_lang$browser$Html$Attributes$property,
-			key,
-			$gren_lang$core$Json$Encode$string(string));
-	});
-var $gren_lang$browser$Html$Attributes$class = $gren_lang$browser$Html$Attributes$stringProperty('className');
 var $author$project$Page$KFactor$emptyResult = {a: $gren_lang$core$Maybe$Nothing, ba: $gren_lang$core$Maybe$Nothing, k: $gren_lang$core$Maybe$Nothing, r: $gren_lang$core$Maybe$Nothing, t: $gren_lang$core$Maybe$Nothing, xa: $gren_lang$core$Maybe$Nothing};
-var $gren_lang$core$Basics$fdiv = _Basics_fdiv;
-var $gren_lang$core$String$fromFloat = _String_fromNumber;
-var $gren_lang$browser$Html$Attributes$id = $gren_lang$browser$Html$Attributes$stringProperty('id');
-var $gren_lang$browser$Html$input = $gren_lang$browser$Html$node('input');
-var $gren_lang$core$Basics$mul = _Basics_mul;
-var $gren_lang$core$Basics$negate = function (n) {
-	return -n;
-};
-var $gren_lang$browser$Html$Events$alwaysStop = function (msg) {
-	return {message: msg, stopPropagation: true};
-};
-var $gren_lang$browser$VirtualDom$MayStopPropagation = function (a) {
-	return {$: 'MayStopPropagation', a: a};
-};
-var $gren_lang$browser$Html$Events$stopPropagationOn = F2(
-	function (event, decoder) {
-		return A2(
-			$gren_lang$browser$VirtualDom$on,
-			event,
-			$gren_lang$browser$VirtualDom$MayStopPropagation(decoder));
-	});
-var $gren_lang$core$Json$Decode$field = _Json_decodeField;
-var $gren_lang$core$Json$Decode$at = F2(
-	function (fields, decoder) {
-		return A3($gren_lang$core$Array$foldr, $gren_lang$core$Json$Decode$field, decoder, fields);
-	});
-var $gren_lang$browser$Html$Events$targetValue = A2(
-	$gren_lang$core$Json$Decode$at,
-	['target', 'value'],
-	$gren_lang$core$Json$Decode$string);
-var $gren_lang$browser$Html$Events$onInput = function (tagger) {
-	return A2(
-		$gren_lang$browser$Html$Events$stopPropagationOn,
-		'input',
-		A2(
-			$gren_lang$core$Json$Decode$map,
-			$gren_lang$browser$Html$Events$alwaysStop,
-			A2($gren_lang$core$Json$Decode$map, tagger, $gren_lang$browser$Html$Events$targetValue)));
-};
-var $gren_lang$core$String$toFloat = _String_toFloat;
 var $author$project$Page$KFactor$parseModel = function (model) {
 	var xa = $gren_lang$core$String$toFloat(model.xa);
 	var t = $gren_lang$core$String$toFloat(model.t);
@@ -6357,23 +7054,6 @@ var $author$project$Page$KFactor$parseModel = function (model) {
 	return {a: a, ba: ba, k: k, r: r, t: t, ty: model.ty, xa: xa};
 };
 var $gren_lang$core$Math$pi = _Math_pi;
-var $gren_lang$core$Json$Encode$bool = _Json_wrap;
-var $gren_lang$browser$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			$gren_lang$browser$Html$Attributes$property,
-			key,
-			$gren_lang$core$Json$Encode$bool(bool));
-	});
-var $gren_lang$browser$Html$Attributes$readonly = $gren_lang$browser$Html$Attributes$boolProperty('readOnly');
-var $gren_lang$core$Math$round = _Math_round;
-var $gren_lang$browser$Html$Attributes$step = function (n) {
-	return A2($gren_lang$browser$Html$Attributes$stringProperty, 'step', n);
-};
-var $gren_lang$core$Basics$sub = _Basics_sub;
-var $gren_lang$core$Basics$toFloat = _Basics_toFloat;
-var $gren_lang$browser$Html$Attributes$type_ = $gren_lang$browser$Html$Attributes$stringProperty('type');
-var $gren_lang$browser$Html$Attributes$value = $gren_lang$browser$Html$Attributes$stringProperty('value');
 var $author$project$Page$KFactor$view = function (model) {
 	var parsedModel = $author$project$Page$KFactor$parseModel(model);
 	var makeSwapButton = function (updatedTy) {
@@ -6702,13 +7382,6 @@ var $gren_lang$core$Math$cos = _Math_cos;
 var $gren_lang$core$Math$degrees = function (angleInDegrees) {
 	return (angleInDegrees * $gren_lang$core$Math$pi) / 180;
 };
-var $gren_lang$browser$VirtualDom$attribute = F2(
-	function (key, value) {
-		return A2(
-			_VirtualDom_attribute,
-			_VirtualDom_noOnOrFormAction(key),
-			_VirtualDom_noJavaScriptOrHtmlUri(value));
-	});
 var $gren_lang$browser$Svg$Attributes$dx = $gren_lang$browser$VirtualDom$attribute('dx');
 var $gren_lang$browser$Svg$Attributes$dy = $gren_lang$browser$VirtualDom$attribute('dy');
 var $gren_lang$browser$VirtualDom$nodeNS = function (tag) {
@@ -6736,7 +7409,6 @@ var $author$project$Page$Triangle$getButtonExists = F2(
 			return $gren_lang$core$String$isEmpty(currTxt) ? false : true;
 		}
 	});
-var $gren_lang$core$Basics$gt = _Utils_gt;
 var $gren_lang$browser$Svg$Attributes$height = $gren_lang$browser$VirtualDom$attribute('height');
 var $gren_lang$browser$Svg$Attributes$in2 = $gren_lang$browser$VirtualDom$attribute('in2');
 var $gren_lang$browser$Svg$Attributes$in_ = $gren_lang$browser$VirtualDom$attribute('in');
@@ -6745,15 +7417,6 @@ var $author$project$Page$Triangle$DoCopy = function (a) {
 };
 var $gren_lang$browser$Svg$foreignObject = $gren_lang$browser$Svg$trustedNode('foreignObject');
 var $gren_lang$core$Basics$idiv = _Basics_idiv;
-var $gren_lang$browser$VirtualDom$style = _VirtualDom_style;
-var $gren_lang$browser$Html$Attributes$style = $gren_lang$browser$VirtualDom$style;
-var $gren_lang$browser$Html$Attributes$attribute = $gren_lang$browser$VirtualDom$attribute;
-var $gren_lang$browser$Html$Attributes$tabindex = function (n) {
-	return A2(
-		$gren_lang$browser$Html$Attributes$attribute,
-		'tabIndex',
-		$gren_lang$core$String$fromInt(n));
-};
 var $gren_lang$browser$Svg$Attributes$width = $gren_lang$browser$VirtualDom$attribute('width');
 var $gren_lang$browser$Svg$Attributes$x = $gren_lang$browser$VirtualDom$attribute('x');
 var $gren_lang$browser$Svg$Attributes$y = $gren_lang$browser$VirtualDom$attribute('y');
@@ -6884,7 +7547,6 @@ var $gren_lang$browser$Svg$Attributes$points = $gren_lang$browser$VirtualDom$att
 var $gren_lang$browser$Svg$polygon = $gren_lang$browser$Svg$trustedNode('polygon');
 var $gren_lang$browser$Svg$Attributes$result = $gren_lang$browser$VirtualDom$attribute('result');
 var $gren_lang$core$Math$sin = _Math_sin;
-var $gren_lang$core$Math$sqrt = _Math_sqrt;
 var $gren_lang$browser$Svg$Attributes$stdDeviation = $gren_lang$browser$VirtualDom$attribute('stdDeviation');
 var $gren_lang$browser$Svg$Attributes$stroke = $gren_lang$browser$VirtualDom$attribute('stroke');
 var $gren_lang$browser$Svg$Attributes$strokeLinejoin = $gren_lang$browser$VirtualDom$attribute('stroke-linejoin');
@@ -7276,7 +7938,6 @@ var $author$project$Vector2$mul = F2(
 		return A2($author$project$Vector2$scale, a, v);
 	});
 var $gren_lang$core$Basics$neq = _Utils_notEqual;
-var $gren_lang$core$Basics$not = _Basics_not;
 var $gren_lang$core$Array$pushFirst = F2(
 	function (value, array) {
 		return A2(
@@ -7385,12 +8046,6 @@ var $author$project$Vector2$div = F2(
 	function (v, a) {
 		return A2($author$project$Vector2$divideBy, a, v);
 	});
-var $gren_lang$core$Array$last = function (array) {
-	return A2(
-		$gren_lang$core$Array$get,
-		$gren_lang$core$Array$length(array) - 1,
-		array);
-};
 var $author$project$Page$Truss$maybeErr = F3(
 	function (err, useDefault, orig) {
 		if (orig.$ === 'Nothing') {
@@ -7949,7 +8604,6 @@ var $author$project$Page$Truss$doLine = F3(
 			],
 			[]);
 	});
-var $gren_lang$browser$Html$hr = $gren_lang$browser$Html$node('hr');
 var $author$project$Page$Truss$lines = F2(
 	function (sw, linesArr) {
 		return A2(
@@ -8292,6 +8946,12 @@ var $author$project$Main$view = function (model) {
 				$author$project$Main$mapDocument,
 				$author$project$Main$HomeMsg,
 				$author$project$Page$Home$view(m));
+		case 'GalvHoleModel':
+			var m = model.a;
+			return A2(
+				$author$project$Main$mapDocument,
+				$author$project$Main$GalvHoleMsg,
+				$author$project$Page$GalvHole$view(m));
 		case 'KFactorModel':
 			var m = model.a;
 			return A2(
