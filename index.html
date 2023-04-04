@@ -18,26 +18,56 @@
 try {
   var app = Gren.Main.init({ node: document.getElementById("gren"), flags: document.location.hash });
 
-  var timeoutId = undefined;
+  var stateTimeoutId = undefined;
+  var stillTimeoutId = undefined;
+
+  var hasBeenStillForAWhile = false;
 
   function replaceState(hash) {
-    window.history.replaceState({}, "", hash);
-    timeoutId = undefined;
+    // If we've been on this one for a little while, save the page
+    if (hasBeenStillForAWhile)
+      window.history.pushState({}, "", hash);
+    else
+      window.history.replaceState({}, "", hash);
+
+    hasBeenStillForAWhile = false;
+    stateTimeoutId = undefined;
+  }
+
+  function setStill() {
+    console.log("Has been still on " + document.location.hash);
+    hasBeenStillForAWhile = true;
+    stillTimeoutId = undefined;
+  }
+
+  function clearTimeouts() {
+    if (stateTimeoutId != undefined)
+      window.clearTimeout(stateTimeoutId);
+    stateTimeoutId = undefined;
+
+    if (stillTimeoutId != undefined)
+      window.clearTimeout(stillTimeoutId);
+    stillTimeoutId = undefined;
   }
 
   app.ports.changePage.subscribe(function(hash) {
-    if (timeoutId != undefined)
-      window.clearTimeout(timeoutId);
+    clearTimeouts();
 
     window.history.pushState({}, "", hash);
+    hasBeenStillForAWhile = false;
+
+    // Note that it has been still after 5s
+    stillTimeoutId = window.setTimeout(setStill, 5000);
   });
 
   app.ports.updatePage.subscribe(function(hash) {
-    if (timeoutId != undefined)
-      window.clearTimeout(timeoutId);
+    clearTimeouts();
 
-    // Only update in 250ms
-    timeoutId = window.setTimeout(replaceState, 250, hash);
+    // Only update in 250ms to debounce
+    stateTimeoutId = window.setTimeout(replaceState, 250, hash);
+
+    // Note that it has been still after 5s
+    stillTimeoutId = window.setTimeout(setStill, 5000);
   });
 
   app.ports.copyId.subscribe(function(id) {
@@ -56,8 +86,7 @@ try {
   });
 
   window.addEventListener("hashchange", function(event) {
-    if (timeoutId != undefined)
-      window.clearTimeout(timeoutId);
+    clearTimeouts();
 
     app.ports.pageChanged.send(document.location.hash);
   })
