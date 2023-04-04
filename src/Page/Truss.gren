@@ -375,18 +375,22 @@ view model =
                 [ text "Truss"
                 ]
             , br [] []
-            , makeInput "Chord length" "chord-len" 0.5 model.chordLen UpdateChordLen
-            , makeInput "Gap between chords" "chord-gap" 0.5 model.chordGap UpdateChordGap
-            , makeInput "Chord height" "chord-height" 0.5 model.chordHeight UpdateChordHeight
-            , makeInput "Chord doubling count" "chord-doubling" 1 model.chordDoubling UpdateChordDoubling
-            , makeInput "Web profile width" "web" 0.5 model.web UpdateWeb
-            , makeInput "Initial web profile width" "start-web" 0.5 model.startWeb UpdateStartWeb
-            , makeInput "Initial web count" "start-count" 1 model.startCount UpdateStartCount
-            , makeInput "Next web profile width" "next-web" 0.5 model.nextWeb UpdateNextWeb
-            , makeInput "Next web count" "next-count" 1 model.nextCount UpdateNextCount
-            , makeInput "Roof angle" "roof" 0.5 model.roof UpdateRoof
-            , makeInput "Web angle" "web-angle" 0.1 model.webAngle UpdateWebAngle
-            , makeInput "Web start distance" "web-start" 5 model.webStart UpdateWebStart
+            , div
+                [ id "truss-inputs"
+                ]
+                [ makeInput "Chord length" "chord-len" 0.5 model.chordLen UpdateChordLen
+                , makeInput "Gap between chords" "chord-gap" 0.5 model.chordGap UpdateChordGap
+                , makeInput "Chord height" "chord-height" 0.5 model.chordHeight UpdateChordHeight
+                , makeInput "Chord doubling count" "chord-doubling" 1 model.chordDoubling UpdateChordDoubling
+                , makeInput "Roof angle" "roof" 0.5 model.roof UpdateRoof
+                , makeInput "Web start distance" "web-start" 5 model.webStart UpdateWebStart
+                , makeInput "Web profile width" "web" 0.5 model.web UpdateWeb
+                , makeInput "Initial web profile width" "start-web" 0.5 model.startWeb UpdateStartWeb
+                , makeInput "Initial web count" "start-count" 1 model.startCount UpdateStartCount
+                , makeInput "Next web profile width" "next-web" 0.5 model.nextWeb UpdateNextWeb
+                , makeInput "Next web count" "next-count" 1 model.nextCount UpdateNextCount
+                , makeInput "Web angle" "web-angle" 0.1 model.webAngle UpdateWebAngle
+                ]
             , hr [] []
             , case calculateTruss model of
                 Err e ->
