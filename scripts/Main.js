@@ -5549,7 +5549,7 @@ var $author$project$Page$Truss$queryParser = A2(
 																									chordLen: A2($gren_lang$core$Maybe$withDefault, '', chordLen),
 																									nextCount: A2($gren_lang$core$Maybe$withDefault, '', nextCount),
 																									nextWeb: A2($gren_lang$core$Maybe$withDefault, '', nextWeb),
-																									roof: A2($gren_lang$core$Maybe$withDefault, '7.5', roof),
+																									roof: A2($gren_lang$core$Maybe$withDefault, '', roof),
 																									startCount: A2($gren_lang$core$Maybe$withDefault, '', startCount),
 																									startWeb: A2($gren_lang$core$Maybe$withDefault, '', startWeb),
 																									web: A2($gren_lang$core$Maybe$withDefault, '', web),

@@ -37,7 +37,7 @@ queryParser =
             , startCount = Maybe.withDefault "" startCount
             , nextWeb = Maybe.withDefault "" nextWeb
             , nextCount = Maybe.withDefault "" nextCount
-            , roof = Maybe.withDefault "7.5" roof
+            , roof = Maybe.withDefault "" roof
             , webAngle = Maybe.withDefault "45" webAngle
             , webStart = Maybe.withDefault "125" webStart
             }
