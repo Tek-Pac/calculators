@@ -8783,6 +8783,9 @@ var $author$project$Page$Truss$view = function (model) {
 				$gren_lang$browser$Html$div,
 				[
 					$gren_lang$browser$Html$Attributes$id('truss-inputs'),
+					$gren_lang$browser$Html$Attributes$class('center-margin'),
+					$gren_lang$browser$Html$Attributes$class('cols-large'),
+					A2($gren_lang$browser$Html$Attributes$style, 'max-width', '60em')
 				],
 				[
 					A5($author$project$Page$Truss$makeInput, 'Chord length', 'chord-len', 0.5, model.chordLen, $author$project$Page$Truss$UpdateChordLen),

@@ -377,6 +377,9 @@ view model =
             , br [] []
             , div
                 [ id "truss-inputs"
+                , class "center-margin"
+                , class "cols-large"
+                , style "max-width" "60em"
                 ]
                 [ makeInput "Chord length" "chord-len" 0.5 model.chordLen UpdateChordLen
                 , makeInput "Gap between chords" "chord-gap" 0.5 model.chordGap UpdateChordGap
