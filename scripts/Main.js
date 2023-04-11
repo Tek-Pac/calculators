@@ -4498,7 +4498,9 @@ var $gren_lang$core$Platform$Cmd$none = $gren_lang$core$Platform$Cmd$batch(
 var $author$project$Main$GalvHoleModel = function (a) {
 	return {$: 'GalvHoleModel', a: a};
 };
-var $author$project$Main$HomeModel = {$: 'HomeModel'};
+var $author$project$Main$HomeModel = function (a) {
+	return {$: 'HomeModel', a: a};
+};
 var $author$project$Main$KFactorModel = function (a) {
 	return {$: 'KFactorModel', a: a};
 };
@@ -4524,6 +4526,7 @@ var $author$project$Main$hashToUrl = function (str) {
 		{fragment: $gren_lang$core$Maybe$Nothing, host: '', path: '/', port_: $gren_lang$core$Maybe$Nothing, protocol: $gren_lang$url$Url$Http, query: $gren_lang$core$Maybe$Nothing},
 		$gren_lang$url$Url$fromString(trimmedStr));
 };
+var $author$project$Page$Home$init = {showRedir: false};
 var $gren_lang$url$Url$Parser$Parser = function (a) {
 	return {$: 'Parser', a: a};
 };
@@ -5372,6 +5375,25 @@ var $author$project$Page$GalvHole$queryParser = A5(
 	$gren_lang$url$Url$Parser$Query$string('size'),
 	$gren_lang$url$Url$Parser$Query$string('custom'),
 	$gren_lang$url$Url$Parser$Query$string('n'));
+var $gren_lang$url$Url$Parser$Query$map = F2(
+	function (func, _v0) {
+		var a = _v0.a;
+		return $gren_lang$url$Url$Parser$Internal$Parser(
+			function (dict) {
+				return func(
+					a(dict));
+			});
+	});
+var $author$project$Page$Home$queryParser = A2(
+	$gren_lang$url$Url$Parser$Query$map,
+	function (showRedir) {
+		return {
+			showRedir: _Utils_eq(
+				showRedir,
+				$gren_lang$core$Maybe$Just('true'))
+		};
+	},
+	$gren_lang$url$Url$Parser$Query$string('show_redir'));
 var $author$project$Page$KFactor$BendAllowance = {$: 'BendAllowance'};
 var $author$project$Page$KFactor$ExtraAllowance = {$: 'ExtraAllowance'};
 var $gren_lang$url$Url$Parser$Query$enum = F2(
@@ -5467,15 +5489,6 @@ var $author$project$Page$Triangle$queryParser = A5(
 	$gren_lang$url$Url$Parser$Query$string('b'),
 	$gren_lang$url$Url$Parser$Query$string('c'),
 	$gren_lang$url$Url$Parser$Query$string('theta'));
-var $gren_lang$url$Url$Parser$Query$map = F2(
-	function (func, _v0) {
-		var a = _v0.a;
-		return $gren_lang$url$Url$Parser$Internal$Parser(
-			function (dict) {
-				return func(
-					a(dict));
-			});
-	});
 var $gren_lang$url$Url$Parser$Query$map2 = F3(
 	function (func, _v0, _v1) {
 		var a = _v0.a;
@@ -5641,12 +5654,15 @@ var $author$project$Main$urlToModel = function (path) {
 	var url = $author$project$Main$hashToUrl(path);
 	return A2(
 		$gren_lang$core$Maybe$withDefault,
-		$author$project$Main$HomeModel,
+		$author$project$Main$HomeModel($author$project$Page$Home$init),
 		A2(
 			$gren_lang$url$Url$Parser$parse,
 			$gren_lang$url$Url$Parser$oneOf(
 				[
-					A2($gren_lang$url$Url$Parser$map, $author$project$Main$HomeModel, $gren_lang$url$Url$Parser$top),
+					A2(
+					$gren_lang$url$Url$Parser$map,
+					$author$project$Main$HomeModel,
+					A2($gren_lang$url$Url$Parser$questionMark, $gren_lang$url$Url$Parser$top, $author$project$Page$Home$queryParser)),
 					A2(
 					$gren_lang$url$Url$Parser$map,
 					$author$project$Main$GalvHoleModel,
@@ -5693,6 +5709,9 @@ var $author$project$Main$pageChangedSubscription = $author$project$Main$pageChan
 var $author$project$Main$GalvHoleMsg = function (a) {
 	return {$: 'GalvHoleMsg', a: a};
 };
+var $author$project$Main$HomeMsg = function (a) {
+	return {$: 'HomeMsg', a: a};
+};
 var $author$project$Main$KFactorMsg = function (a) {
 	return {$: 'KFactorMsg', a: a};
 };
@@ -5705,27 +5724,6 @@ var $author$project$Main$TrussMsg = function (a) {
 var $gren_lang$core$Json$Encode$string = _Json_wrap;
 var $author$project$Main$changePage = _Platform_outgoingPort('changePage', $gren_lang$core$Json$Encode$string);
 var $author$project$Main$copyId = _Platform_outgoingPort('copyId', $gren_lang$core$Json$Encode$string);
-var $author$project$Main$handleSpaCmd = function (_v0) {
-	var model = _v0.model;
-	var command = _v0.command;
-	switch (command.$) {
-		case 'BaseCmd':
-			var c = command.a;
-			return {command: c, model: model};
-		case 'ChangePage':
-			var url = command.a;
-			return {
-				command: $author$project$Main$changePage(url),
-				model: $author$project$Main$urlToModel(url)
-			};
-		default:
-			var id = command.a;
-			return {
-				command: $author$project$Main$copyId(id),
-				model: model
-			};
-	}
-};
 var $gren_lang$url$Url$Builder$toQueryPair = function (_v0) {
 	var key = _v0.a;
 	var value = _v0.b;
@@ -5859,6 +5857,34 @@ var $author$project$Main$modelToUrl = function (model) {
 			}
 		}());
 };
+var $author$project$Main$redirectToTekPac = _Platform_outgoingPort('redirectToTekPac', $gren_lang$core$Json$Encode$string);
+var $author$project$Main$handleSpaCmd = function (_v0) {
+	var model = _v0.model;
+	var command = _v0.command;
+	switch (command.$) {
+		case 'BaseCmd':
+			var c = command.a;
+			return {command: c, model: model};
+		case 'ChangePage':
+			var url = command.a;
+			return {
+				command: $author$project$Main$changePage(url),
+				model: $author$project$Main$urlToModel(url)
+			};
+		case 'CopyId':
+			var id = command.a;
+			return {
+				command: $author$project$Main$copyId(id),
+				model: model
+			};
+		default:
+			return {
+				command: $author$project$Main$redirectToTekPac(
+					$author$project$Main$modelToUrl(model)),
+				model: model
+			};
+	}
+};
 var $author$project$Main$updatePage = _Platform_outgoingPort('updatePage', $gren_lang$core$Json$Encode$string);
 var $author$project$Main$handleUrlUpdate = F2(
 	function (orig, dat) {
@@ -5881,6 +5907,7 @@ var $author$project$SpaCmd$ChangePage = function (a) {
 var $author$project$SpaCmd$CopyId = function (a) {
 	return {$: 'CopyId', a: a};
 };
+var $author$project$SpaCmd$RedirectToTekPac = {$: 'RedirectToTekPac'};
 var $gren_lang$core$Platform$Cmd$map = _Platform_map;
 var $author$project$SpaCmd$map = F2(
 	function (f, msg) {
@@ -5891,10 +5918,12 @@ var $author$project$SpaCmd$map = F2(
 			case 'CopyId':
 				var id = msg.a;
 				return $author$project$SpaCmd$CopyId(id);
-			default:
+			case 'BaseCmd':
 				var cb = msg.a;
 				return $author$project$SpaCmd$BaseCmd(
 					A2($gren_lang$core$Platform$Cmd$map, f, cb));
+			default:
+				return $author$project$SpaCmd$RedirectToTekPac;
 		}
 	});
 var $author$project$Main$mapPage = F3(
@@ -5981,6 +6010,10 @@ var $author$project$Page$GalvHole$update = F2(
 					model: model
 				};
 		}
+	});
+var $author$project$Page$Home$update = F2(
+	function (msg, model) {
+		return {command: $author$project$SpaCmd$RedirectToTekPac, model: $author$project$Page$Home$init};
 	});
 var $author$project$Page$KFactor$NoOp = {$: 'NoOp'};
 var $author$project$Page$KFactor$attemptFocus = function (id) {
@@ -6245,7 +6278,7 @@ var $author$project$Page$Truss$update = F2(
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		var _v0 = {m: model, v: msg};
-		_v0$5:
+		_v0$6:
 		while (true) {
 			switch (_v0.v.$) {
 				case 'PageChanged':
@@ -6254,6 +6287,22 @@ var $author$project$Main$update = F2(
 						command: $gren_lang$core$Platform$Cmd$none,
 						model: $author$project$Main$urlToModel(str)
 					};
+				case 'HomeMsg':
+					if (_v0.m.$ === 'HomeModel') {
+						var m = _v0.m.a;
+						var v = _v0.v.a;
+						return A2(
+							$author$project$Main$handleUrlUpdate,
+							model,
+							$author$project$Main$handleSpaCmd(
+								A3(
+									$author$project$Main$mapPage,
+									$author$project$Main$HomeModel,
+									$author$project$Main$HomeMsg,
+									A2($author$project$Page$Home$update, v, m))));
+					} else {
+						break _v0$6;
+					}
 				case 'GalvHoleMsg':
 					if (_v0.m.$ === 'GalvHoleModel') {
 						var m = _v0.m.a;
@@ -6268,7 +6317,7 @@ var $author$project$Main$update = F2(
 									$author$project$Main$GalvHoleMsg,
 									A2($author$project$Page$GalvHole$update, v, m))));
 					} else {
-						break _v0$5;
+						break _v0$6;
 					}
 				case 'KFactorMsg':
 					if (_v0.m.$ === 'KFactorModel') {
@@ -6284,7 +6333,7 @@ var $author$project$Main$update = F2(
 									$author$project$Main$KFactorMsg,
 									A2($author$project$Page$KFactor$update, v, m))));
 					} else {
-						break _v0$5;
+						break _v0$6;
 					}
 				case 'TriangleMsg':
 					if (_v0.m.$ === 'TriangleModel') {
@@ -6300,7 +6349,7 @@ var $author$project$Main$update = F2(
 									$author$project$Main$TriangleMsg,
 									A2($author$project$Page$Triangle$update, v, m))));
 					} else {
-						break _v0$5;
+						break _v0$6;
 					}
 				default:
 					if (_v0.m.$ === 'TrussModel') {
@@ -6316,7 +6365,7 @@ var $author$project$Main$update = F2(
 									$author$project$Main$TrussMsg,
 									A2($author$project$Page$Truss$update, v, m))));
 					} else {
-						break _v0$5;
+						break _v0$6;
 					}
 			}
 		}
@@ -6898,58 +6947,73 @@ var $author$project$Page$GalvHole$view = function (model) {
 		title: 'Galvanising Holes'
 	};
 };
-var $author$project$Page$Home$view = {
-	body: [
-		A2(
-		$gren_lang$browser$Html$div,
-		[
-			$gren_lang$browser$Html$Attributes$class('center')
-		],
-		[
+var $author$project$Page$Home$DoRedir = {$: 'DoRedir'};
+var $author$project$Page$Home$view = function (model) {
+	return {
+		body: [
 			A2(
-			$gren_lang$browser$Html$h1,
-			[],
+			$gren_lang$browser$Html$div,
 			[
-				$gren_lang$browser$Html$text('Calculators')
-			]),
-			A2(
-			$gren_lang$browser$Html$a,
-			[
-				$gren_lang$browser$Html$Attributes$href('#/k-factor')
+				$gren_lang$browser$Html$Attributes$class('center')
 			],
 			[
-				$gren_lang$browser$Html$text('K-Factors')
-			]),
-			$gren_lang$browser$Html$text(' '),
-			A2(
-			$gren_lang$browser$Html$a,
-			[
-				$gren_lang$browser$Html$Attributes$href('#/triangle')
-			],
-			[
-				$gren_lang$browser$Html$text('Triangles')
-			]),
-			$gren_lang$browser$Html$text(' '),
-			A2(
-			$gren_lang$browser$Html$a,
-			[
-				$gren_lang$browser$Html$Attributes$href('#/truss')
-			],
-			[
-				$gren_lang$browser$Html$text('Trusses')
-			]),
-			$gren_lang$browser$Html$text(' '),
-			A2(
-			$gren_lang$browser$Html$a,
-			[
-				$gren_lang$browser$Html$Attributes$href('#/galv-hole')
-			],
-			[
-				$gren_lang$browser$Html$text('Galvanising Holes')
+				A2(
+				$gren_lang$browser$Html$h1,
+				[],
+				[
+					$gren_lang$browser$Html$text('Calculators')
+				]),
+				model.showRedir ? A2(
+				$gren_lang$browser$Html$button,
+				[
+					$gren_lang$browser$Html$Events$onClick($author$project$Page$Home$DoRedir)
+				],
+				[
+					$gren_lang$browser$Html$text('Redirect to wiki.tek-pac.com.au')
+				]) : $gren_lang$browser$Html$text(''),
+				model.showRedir ? A2(
+				$gren_lang$browser$Html$br,
+				[],
+				[]) : $gren_lang$browser$Html$text(''),
+				A2(
+				$gren_lang$browser$Html$a,
+				[
+					$gren_lang$browser$Html$Attributes$href('#/k-factor')
+				],
+				[
+					$gren_lang$browser$Html$text('K-Factors')
+				]),
+				$gren_lang$browser$Html$text(' '),
+				A2(
+				$gren_lang$browser$Html$a,
+				[
+					$gren_lang$browser$Html$Attributes$href('#/triangle')
+				],
+				[
+					$gren_lang$browser$Html$text('Triangles')
+				]),
+				$gren_lang$browser$Html$text(' '),
+				A2(
+				$gren_lang$browser$Html$a,
+				[
+					$gren_lang$browser$Html$Attributes$href('#/truss')
+				],
+				[
+					$gren_lang$browser$Html$text('Trusses')
+				]),
+				$gren_lang$browser$Html$text(' '),
+				A2(
+				$gren_lang$browser$Html$a,
+				[
+					$gren_lang$browser$Html$Attributes$href('#/galv-hole')
+				],
+				[
+					$gren_lang$browser$Html$text('Galvanising Holes')
+				])
 			])
-		])
-	],
-	title: 'Calculators'
+		],
+		title: 'Calculators'
+	};
 };
 var $author$project$Page$KFactor$DoCopy = function (a) {
 	return {$: 'DoCopy', a: a};
@@ -8913,7 +8977,11 @@ var $author$project$Page$Truss$view = function (model) {
 var $author$project$Main$view = function (model) {
 	switch (model.$) {
 		case 'HomeModel':
-			return $author$project$Page$Home$view;
+			var m = model.a;
+			return A2(
+				$author$project$Main$mapDocument,
+				$author$project$Main$HomeMsg,
+				$author$project$Page$Home$view(m));
 		case 'GalvHoleModel':
 			var m = model.a;
 			return A2(

@@ -16,7 +16,12 @@
 <script src="scripts/Main.js"></script>
 <script>
 try {
-  var app = Gren.Main.init({ node: document.getElementById("gren"), flags: document.location.hash });
+  // Show a redirect button
+  var initialLocation = document.location.hash;
+  if ((initialLocation == "" || initialLocation == "#/") && document.location.host != "calc.tek-pac.com.au")
+    initialLocation = "#/?show_redir=true";
+
+  var app = Gren.Main.init({ node: document.getElementById("gren"), flags: initialLocation });
 
   var stateTimeoutId = undefined;
   var stillTimeoutId = undefined;
@@ -85,11 +90,15 @@ try {
     }
   });
 
+  app.ports.redirectToTekPac.subscribe(function(hash) {
+    document.location.href = "https://calc.tek-pac.com.au/" + hash;
+  });
+
   window.addEventListener("hashchange", function(event) {
     clearTimeouts();
 
     app.ports.pageChanged.send(document.location.hash);
-  })
+  });
 }
 catch (e)
 {

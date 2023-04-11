@@ -22,11 +22,14 @@ port updatePage : String -> Cmd msg
 port copyId : String -> Cmd msg
 
 
+port redirectToTekPac : String -> Cmd msg
+
+
 port pageChanged : (String -> msg) -> Sub msg
 
 
 type Model
-    = HomeModel
+    = HomeModel Home.Model
     | GalvHoleModel GalvHole.Model
     | KFactorModel KFactor.Model
     | TriangleModel Triangle.Model
@@ -34,7 +37,8 @@ type Model
 
 
 type Msg
-    = GalvHoleMsg GalvHole.Msg
+    = HomeMsg Home.Msg
+    | GalvHoleMsg GalvHole.Msg
     | KFactorMsg KFactor.Msg
     | TriangleMsg Triangle.Msg
     | TrussMsg Truss.Msg
@@ -69,8 +73,9 @@ init path =
 view : Model -> Browser.Document Msg
 view model =
     case model of
-        HomeModel ->
-            Home.view
+        HomeModel m ->
+            Home.view m
+                |> mapDocument HomeMsg
 
         GalvHoleModel m ->
             GalvHole.view m
@@ -114,6 +119,11 @@ update msg model =
             { model = urlToModel str
             , command = Cmd.none
             }
+
+        { m = HomeModel m, v = HomeMsg v } ->
+            mapPage HomeModel HomeMsg (Home.update v m)
+                |> handleSpaCmd
+                |> handleUrlUpdate model
 
         { m = GalvHoleModel m, v = GalvHoleMsg v } ->
             mapPage GalvHoleModel GalvHoleMsg (GalvHole.update v m)
@@ -201,6 +211,11 @@ handleSpaCmd { model, command } =
             , command = copyId id
             }
 
+        RedirectToTekPac ->
+            { model = model
+            , command = redirectToTekPac (modelToUrl model)
+            }
+
 
 hashToUrl : String -> Url
 hashToUrl str =
@@ -232,7 +247,7 @@ urlToModel path =
     in
     Parser.parse
         (Parser.oneOf
-            [ Parser.map HomeModel Parser.top
+            [ Parser.map HomeModel (Parser.top <?> Home.queryParser)
             , Parser.map GalvHoleModel (Parser.s "galv-hole" <?> GalvHole.queryParser)
             , Parser.map KFactorModel (Parser.s "k-factor" <?> KFactor.queryParser)
             , Parser.map TriangleModel (Parser.s "triangle" <?> Triangle.queryParser)
@@ -240,7 +255,7 @@ urlToModel path =
             ]
         )
         url
-        |> Maybe.withDefault HomeModel
+        |> Maybe.withDefault (HomeModel Home.init)
 
 
 modelToUrl : Model -> String
@@ -248,7 +263,7 @@ modelToUrl model =
     "#"
         ++ Builder.absolute
                 (case model of
-                    HomeModel ->
+                    HomeModel _ ->
                         []
 
                     GalvHoleModel _ ->
@@ -268,7 +283,7 @@ modelToUrl model =
                         ]
                 )
                 (case model of
-                    HomeModel ->
+                    HomeModel _ ->
                         []
 
                     GalvHoleModel t ->
