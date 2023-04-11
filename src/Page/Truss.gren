@@ -5,8 +5,8 @@ module Page.Truss exposing ( Model, Msg(..), update, view, queryParser, queryBui
 
 import Browser
 import Browser.Dom as Dom
-import Html exposing ( Html, br, button, div, h1, hr, input, text )
-import Html.Attributes exposing ( class, id, readonly, step, style, tabindex, type_, value )
+import Html exposing ( Html, a, br, button, div, h1, hr, input, text )
+import Html.Attributes exposing ( class, href, id, readonly, step, style, tabindex, type_, value )
 import Html.Events exposing ( onClick, onInput )
 import Math
 import SpaCmd exposing ( SpaCmd(..) )
@@ -96,9 +96,7 @@ type alias Updated =
 
 
 type Msg
-    = HomePage
-    | TrianglePageRoof
-    | UpdateChordLen String
+    = UpdateChordLen String
     | UpdateChordGap String
     | UpdateChordHeight String
     | UpdateChordDoubling String
@@ -132,37 +130,6 @@ update msg model =
         NoOp ->
             { model = model
             , command = SpaCmd.none
-            }
-
-        HomePage ->
-            { model = model
-            , command = ChangePage "#/"
-            }
-
-        TrianglePageRoof ->
-            let
-                roofAngle =
-                    String.toFloat model.roof
-                        |> Maybe.withDefault 7.5
-
-                bStr =
-                    String.toFloat model.chordLen
-                        |> Maybe.map
-                                (\c ->
-                                    let
-                                        b =
-                                            c * Math.cos (Math.degrees roofAngle)
-
-                                        -- 2 d.p.
-                                        roundB =
-                                            toFloat (Math.round (b * 100)) / 100
-                                    in
-                                    String.fromFloat roundB
-                                )
-                        |> Maybe.withDefault ""
-            in
-            { model = model
-            , command = ChangePage ("#/triangle?a=&b=" ++ bStr ++ "&c=&theta=" ++ String.fromFloat roofAngle)
             }
 
         UpdateChordLen c ->
@@ -387,18 +354,39 @@ view : Model -> Browser.Document Msg
 view model =
     { title = "Truss"
     , body =
-        [ button
+        [ a
             [ class "left"
-            , onClick HomePage
+            , href "#/"
             ]
             [ text "Home"
             ]
         , if String.isEmpty model.roof then
             text ""
           else
-            button
+            let
+                roofAngle =
+                    String.toFloat model.roof
+                        |> Maybe.withDefault 7.5
+
+                bStr =
+                    String.toFloat model.chordLen
+                        |> Maybe.map
+                                (\c ->
+                                    let
+                                        b =
+                                            c * Math.cos (Math.degrees roofAngle)
+
+                                        -- 2 d.p.
+                                        roundB =
+                                            toFloat (Math.round (b * 100)) / 100
+                                    in
+                                    String.fromFloat roundB
+                                )
+                        |> Maybe.withDefault ""
+            in
+            a
                 [ class "right"
-                , onClick TrianglePageRoof
+                , href ("#/triangle?a=&b=" ++ bStr ++ "&c=&theta=" ++ String.fromFloat roofAngle)
                 ]
                 [ text "Roof Triangle"
                 ]

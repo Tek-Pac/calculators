@@ -6,8 +6,8 @@ module Page.KFactor exposing ( Model, Msg(..), update, view, queryParser, queryB
 import Browser
 import Browser.Dom as Dom
 import Dict
-import Html exposing ( button, Html, text, input, div, br )
-import Html.Attributes exposing ( class, step, type_, id, value, readonly )
+import Html exposing ( Html, a, br, button, div, input, text )
+import Html.Attributes exposing ( class, href, id, readonly, step, type_, value )
 import Html.Events exposing ( onClick, onInput )
 import Math
 import SpaCmd exposing ( SpaCmd(..) )
@@ -95,8 +95,7 @@ type alias Updated =
 
 
 type Msg
-    = HomePage
-    | UpdateThickness String
+    = UpdateThickness String
     | UpdateRadius String
     | UpdateAllowance String
     | UpdateExtraAllowance String
@@ -119,11 +118,6 @@ update msg model =
         NoOp ->
             { model = model
             , command = SpaCmd.none
-            }
-
-        HomePage ->
-            { model = model
-            , command = ChangePage "#/"
             }
 
         UpdateThickness s ->
@@ -338,9 +332,9 @@ view model =
     in
     { title = "K Factors"
     , body =
-        [ button
+        [ a
             [ class "left"
-            , onClick HomePage
+            , href "#/"
             ]
             [ text "Home"
             ]

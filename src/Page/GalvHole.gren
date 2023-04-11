@@ -5,8 +5,8 @@ module Page.GalvHole exposing ( Model, Msg(..), update, view, queryParser, query
 
 import Browser
 import Browser.Dom as Dom
-import Html exposing ( Html, br, button, div, h1, hr, input, text )
-import Html.Attributes exposing ( class, id, readonly, step, style, tabindex, type_, value )
+import Html exposing ( Html, a, br, button, div, h1, hr, input, text )
+import Html.Attributes exposing ( class, href, id, readonly, step, style, tabindex, type_, value )
 import Html.Events exposing ( onClick, onInput )
 import Math
 import SpaCmd exposing ( SpaCmd(..) )
@@ -141,8 +141,7 @@ type alias Updated =
 
 
 type Msg
-    = HomePage
-    | UpdateTy ModelTy
+    = UpdateTy ModelTy
     | UpdateSizeS String
     | UpdateSizeC String
     | UpdateN String
@@ -156,11 +155,6 @@ update msg model =
         NoOp ->
             { model = model
             , command = SpaCmd.none
-            }
-
-        HomePage ->
-            { model = model
-            , command = ChangePage "#/"
             }
 
         UpdateTy ty ->
@@ -247,9 +241,9 @@ view model =
     in
     { title = "Galvanising Holes"
     , body =
-        [ button
+        [ a
             [ class "left"
-            , onClick HomePage
+            , href "#/"
             ]
             [ text "Home"
             ]

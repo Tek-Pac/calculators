@@ -5947,11 +5947,6 @@ var $author$project$Page$GalvHole$update = F2(
 		switch (msg.$) {
 			case 'NoOp':
 				return {command: $author$project$SpaCmd$none, model: model};
-			case 'HomePage':
-				return {
-					command: $author$project$SpaCmd$ChangePage('#/'),
-					model: model
-				};
 			case 'UpdateTy':
 				var ty = msg.a;
 				return {
@@ -5998,28 +5993,7 @@ var $author$project$Page$GalvHole$update = F2(
 	});
 var $author$project$Page$Home$update = F2(
 	function (msg, model) {
-		switch (msg.$) {
-			case 'GoToKFactor':
-				return {
-					command: $author$project$SpaCmd$ChangePage('#/k-factor'),
-					model: model
-				};
-			case 'GoToTriangle':
-				return {
-					command: $author$project$SpaCmd$ChangePage('#/triangle'),
-					model: model
-				};
-			case 'GoToTruss':
-				return {
-					command: $author$project$SpaCmd$ChangePage('#/truss'),
-					model: model
-				};
-			default:
-				return {
-					command: $author$project$SpaCmd$ChangePage('#/galv-hole'),
-					model: model
-				};
-		}
+		return {command: $author$project$SpaCmd$none, model: model};
 	});
 var $author$project$Page$KFactor$NoOp = {$: 'NoOp'};
 var $author$project$Page$KFactor$attemptFocus = function (id) {
@@ -6036,11 +6010,6 @@ var $author$project$Page$KFactor$update = F2(
 		switch (msg.$) {
 			case 'NoOp':
 				return {command: $author$project$SpaCmd$none, model: model};
-			case 'HomePage':
-				return {
-					command: $author$project$SpaCmd$ChangePage('#/'),
-					model: model
-				};
 			case 'UpdateThickness':
 				var s = msg.a;
 				return {
@@ -6120,11 +6089,6 @@ var $author$project$Page$Triangle$update = F2(
 		switch (msg.$) {
 			case 'NoOp':
 				return {command: $author$project$SpaCmd$none, model: model};
-			case 'HomePage':
-				return {
-					command: $author$project$SpaCmd$ChangePage('#/'),
-					model: model
-				};
 			case 'UpdateA':
 				var s = msg.a;
 				return {
@@ -6165,13 +6129,6 @@ var $author$project$Page$Triangle$update = F2(
 				};
 		}
 	});
-var $gren_lang$core$Math$cos = _Math_cos;
-var $gren_lang$core$Basics$fdiv = _Basics_fdiv;
-var $gren_lang$core$Basics$mul = _Basics_mul;
-var $gren_lang$core$Math$pi = _Math_pi;
-var $gren_lang$core$Math$degrees = function (angleInDegrees) {
-	return (angleInDegrees * $gren_lang$core$Math$pi) / 180;
-};
 var $author$project$Page$Truss$NoOp = {$: 'NoOp'};
 var $author$project$Page$Truss$attemptFocus = function (id) {
 	return $author$project$SpaCmd$BaseCmd(
@@ -6189,52 +6146,11 @@ var $author$project$Page$Truss$doFocus = F2(
 			model: model
 		};
 	});
-var $gren_lang$core$String$fromFloat = _String_fromNumber;
-var $gren_lang$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return $gren_lang$core$Maybe$Just(
-				f(value));
-		} else {
-			return $gren_lang$core$Maybe$Nothing;
-		}
-	});
-var $gren_lang$core$Math$round = _Math_round;
-var $gren_lang$core$Basics$toFloat = _Basics_toFloat;
-var $gren_lang$core$String$toFloat = _String_toFloat;
 var $author$project$Page$Truss$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'NoOp':
 				return {command: $author$project$SpaCmd$none, model: model};
-			case 'HomePage':
-				return {
-					command: $author$project$SpaCmd$ChangePage('#/'),
-					model: model
-				};
-			case 'TrianglePageRoof':
-				var roofAngle = A2(
-					$gren_lang$core$Maybe$withDefault,
-					7.5,
-					$gren_lang$core$String$toFloat(model.roof));
-				var bStr = A2(
-					$gren_lang$core$Maybe$withDefault,
-					'',
-					A2(
-						$gren_lang$core$Maybe$map,
-						function (c) {
-							var b = c * $gren_lang$core$Math$cos(
-								$gren_lang$core$Math$degrees(roofAngle));
-							var roundB = $gren_lang$core$Math$round(b * 100) / 100;
-							return $gren_lang$core$String$fromFloat(roundB);
-						},
-						$gren_lang$core$String$toFloat(model.chordLen)));
-				return {
-					command: $author$project$SpaCmd$ChangePage(
-						'#/triangle?a=&b=' + (bStr + ('&c=&theta=' + $gren_lang$core$String$fromFloat(roofAngle)))),
-					model: model
-				};
 			case 'UpdateChordLen':
 				var c = msg.a;
 				return A2(
@@ -6447,7 +6363,6 @@ var $author$project$Main$mapDocument = F2(
 			title: doc.title
 		};
 	});
-var $author$project$Page$GalvHole$HomePage = {$: 'HomePage'};
 var $author$project$Page$GalvHole$UpdateN = function (a) {
 	return {$: 'UpdateN', a: a};
 };
@@ -6459,8 +6374,9 @@ var $gren_lang$browser$VirtualDom$node = function (tag) {
 		_VirtualDom_noScript(tag));
 };
 var $gren_lang$browser$Html$node = $gren_lang$browser$VirtualDom$node;
+var $gren_lang$browser$Html$a = $gren_lang$browser$Html$node('a');
 var $gren_lang$browser$Html$br = $gren_lang$browser$Html$node('br');
-var $gren_lang$browser$Html$button = $gren_lang$browser$Html$node('button');
+var $gren_lang$core$String$toFloat = _String_toFloat;
 var $author$project$Page$GalvHole$calculateChsDiagonal = function (model) {
 	var _v0 = $gren_lang$core$String$toFloat(model.size);
 	if (_v0.$ === 'Just') {
@@ -6489,6 +6405,7 @@ var $author$project$Page$GalvHole$getRhsVals = function (size) {
 		y: $gren_lang$core$String$toFloat(y)
 	};
 };
+var $gren_lang$core$Basics$mul = _Basics_mul;
 var $gren_lang$core$Math$sqrt = _Math_sqrt;
 var $author$project$Page$GalvHole$calculateRhsDiagonal = function (model) {
 	var _v0 = $author$project$Page$GalvHole$getRhsVals(model.size);
@@ -6524,9 +6441,14 @@ var $gren_lang$browser$Html$Attributes$stringProperty = F2(
 	});
 var $gren_lang$browser$Html$Attributes$class = $gren_lang$browser$Html$Attributes$stringProperty('className');
 var $gren_lang$browser$Html$div = $gren_lang$browser$Html$node('div');
+var $gren_lang$core$Basics$fdiv = _Basics_fdiv;
 var $gren_lang$browser$Html$h1 = $gren_lang$browser$Html$node('h1');
 var $gren_lang$browser$Html$hr = $gren_lang$browser$Html$node('hr');
+var $gren_lang$browser$Html$Attributes$href = function (url) {
+	return A2($gren_lang$browser$Html$Attributes$stringProperty, 'href', url);
+};
 var $gren_lang$browser$Html$Attributes$id = $gren_lang$browser$Html$Attributes$stringProperty('id');
+var $gren_lang$browser$Html$button = $gren_lang$browser$Html$node('button');
 var $gren_lang$browser$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -6573,6 +6495,16 @@ var $gren_lang$core$Array$last = function (array) {
 		$gren_lang$core$Array$length(array) - 1,
 		array);
 };
+var $gren_lang$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $gren_lang$core$Maybe$Just(
+				f(value));
+		} else {
+			return $gren_lang$core$Maybe$Nothing;
+		}
+	});
 var $author$project$Page$GalvHole$makeArraySelector = F2(
 	function (library, val) {
 		var makeArraySelectorInternal = function (idx) {
@@ -6646,6 +6578,7 @@ var $author$project$Page$GalvHole$makeArraySelector = F2(
 		var idxMaybe = getIndex(0);
 		return A2($gren_lang$core$Maybe$map, makeArraySelectorInternal, idxMaybe);
 	});
+var $gren_lang$core$String$fromFloat = _String_fromNumber;
 var $gren_lang$browser$Html$input = $gren_lang$browser$Html$node('input');
 var $gren_lang$core$Basics$negate = function (n) {
 	return -n;
@@ -6868,6 +6801,8 @@ var $gren_lang$core$Basics$max = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) > 0) ? x : y;
 	});
+var $gren_lang$core$Math$round = _Math_round;
+var $gren_lang$core$Basics$toFloat = _Basics_toFloat;
 var $author$project$Page$GalvHole$view = function (model) {
 	var tyInputs = function () {
 		var _v5 = model.ty;
@@ -6916,10 +6851,10 @@ var $author$project$Page$GalvHole$view = function (model) {
 	return {
 		body: [
 			A2(
-			$gren_lang$browser$Html$button,
+			$gren_lang$browser$Html$a,
 			[
 				$gren_lang$browser$Html$Attributes$class('left'),
-				$gren_lang$browser$Html$Events$onClick($author$project$Page$GalvHole$HomePage)
+				$gren_lang$browser$Html$Attributes$href('#/')
 			],
 			[
 				$gren_lang$browser$Html$text('Home')
@@ -6992,10 +6927,6 @@ var $author$project$Page$GalvHole$view = function (model) {
 		title: 'Galvanising Holes'
 	};
 };
-var $author$project$Page$Home$GoToGalvHole = {$: 'GoToGalvHole'};
-var $author$project$Page$Home$GoToKFactor = {$: 'GoToKFactor'};
-var $author$project$Page$Home$GoToTriangle = {$: 'GoToTriangle'};
-var $author$project$Page$Home$GoToTruss = {$: 'GoToTruss'};
 var $author$project$Page$Home$view = function (model) {
 	return {
 		body: [
@@ -7010,33 +6941,33 @@ var $author$project$Page$Home$view = function (model) {
 					$gren_lang$browser$Html$text('Calculators')
 				]),
 				A2(
-				$gren_lang$browser$Html$button,
+				$gren_lang$browser$Html$a,
 				[
-					$gren_lang$browser$Html$Events$onClick($author$project$Page$Home$GoToKFactor)
+					$gren_lang$browser$Html$Attributes$href('#/k-factor')
 				],
 				[
 					$gren_lang$browser$Html$text('K-Factors')
 				]),
 				A2(
-				$gren_lang$browser$Html$button,
+				$gren_lang$browser$Html$a,
 				[
-					$gren_lang$browser$Html$Events$onClick($author$project$Page$Home$GoToTriangle)
+					$gren_lang$browser$Html$Attributes$href('#/triangle')
 				],
 				[
 					$gren_lang$browser$Html$text('Triangles')
 				]),
 				A2(
-				$gren_lang$browser$Html$button,
+				$gren_lang$browser$Html$a,
 				[
-					$gren_lang$browser$Html$Events$onClick($author$project$Page$Home$GoToTruss)
+					$gren_lang$browser$Html$Attributes$href('#/truss')
 				],
 				[
 					$gren_lang$browser$Html$text('Trusses')
 				]),
 				A2(
-				$gren_lang$browser$Html$button,
+				$gren_lang$browser$Html$a,
 				[
-					$gren_lang$browser$Html$Events$onClick($author$project$Page$Home$GoToGalvHole)
+					$gren_lang$browser$Html$Attributes$href('#/galv-hole')
 				],
 				[
 					$gren_lang$browser$Html$text('Galvanising Holes')
@@ -7049,7 +6980,6 @@ var $author$project$Page$Home$view = function (model) {
 var $author$project$Page$KFactor$DoCopy = function (a) {
 	return {$: 'DoCopy', a: a};
 };
-var $author$project$Page$KFactor$HomePage = {$: 'HomePage'};
 var $author$project$Page$KFactor$UpdateAllowance = function (a) {
 	return {$: 'UpdateAllowance', a: a};
 };
@@ -7081,6 +7011,7 @@ var $author$project$Page$KFactor$parseModel = function (model) {
 	var a = $gren_lang$core$String$toFloat(model.a);
 	return {a: a, ba: ba, k: k, r: r, t: t, ty: model.ty, xa: xa};
 };
+var $gren_lang$core$Math$pi = _Math_pi;
 var $author$project$Page$KFactor$view = function (model) {
 	var parsedModel = $author$project$Page$KFactor$parseModel(model);
 	var makeSwapButton = function (updatedTy) {
@@ -7338,10 +7269,10 @@ var $author$project$Page$KFactor$view = function (model) {
 	return {
 		body: [
 			A2(
-			$gren_lang$browser$Html$button,
+			$gren_lang$browser$Html$a,
 			[
 				$gren_lang$browser$Html$Attributes$class('left'),
-				$gren_lang$browser$Html$Events$onClick($author$project$Page$KFactor$HomePage)
+				$gren_lang$browser$Html$Attributes$href('#/')
 			],
 			[
 				$gren_lang$browser$Html$text('Home')
@@ -7379,7 +7310,6 @@ var $author$project$Page$KFactor$view = function (model) {
 		title: 'K Factors'
 	};
 };
-var $author$project$Page$Triangle$HomePage = {$: 'HomePage'};
 var $author$project$Page$Triangle$UpdateA = function (a) {
 	return {$: 'UpdateA', a: a};
 };
@@ -7405,6 +7335,10 @@ var $gren_lang$core$Result$andThen = F2(
 	});
 var $gren_lang$core$Math$asin = _Math_asin;
 var $gren_lang$core$Math$atan = _Math_atan;
+var $gren_lang$core$Math$cos = _Math_cos;
+var $gren_lang$core$Math$degrees = function (angleInDegrees) {
+	return (angleInDegrees * $gren_lang$core$Math$pi) / 180;
+};
 var $gren_lang$browser$Svg$Attributes$dx = $gren_lang$browser$VirtualDom$attribute('dx');
 var $gren_lang$browser$Svg$Attributes$dy = $gren_lang$browser$VirtualDom$attribute('dy');
 var $gren_lang$browser$VirtualDom$nodeNS = function (tag) {
@@ -7758,10 +7692,10 @@ var $author$project$Page$Triangle$view = function (model) {
 	return {
 		body: [
 			A2(
-			$gren_lang$browser$Html$button,
+			$gren_lang$browser$Html$a,
 			[
 				$gren_lang$browser$Html$Attributes$class('left'),
-				$gren_lang$browser$Html$Events$onClick($author$project$Page$Triangle$HomePage)
+				$gren_lang$browser$Html$Attributes$href('#/')
 			],
 			[
 				$gren_lang$browser$Html$text('Home')
@@ -7886,8 +7820,6 @@ var $author$project$Page$Triangle$view = function (model) {
 		title: 'Triangles'
 	};
 };
-var $author$project$Page$Truss$HomePage = {$: 'HomePage'};
-var $author$project$Page$Truss$TrianglePageRoof = {$: 'TrianglePageRoof'};
 var $author$project$Page$Truss$UpdateChordDoubling = function (a) {
 	return {$: 'UpdateChordDoubling', a: a};
 };
@@ -8777,23 +8709,46 @@ var $author$project$Page$Truss$view = function (model) {
 	return {
 		body: [
 			A2(
-			$gren_lang$browser$Html$button,
+			$gren_lang$browser$Html$a,
 			[
 				$gren_lang$browser$Html$Attributes$class('left'),
-				$gren_lang$browser$Html$Events$onClick($author$project$Page$Truss$HomePage)
+				$gren_lang$browser$Html$Attributes$href('#/')
 			],
 			[
 				$gren_lang$browser$Html$text('Home')
 			]),
-			$gren_lang$core$String$isEmpty(model.roof) ? $gren_lang$browser$Html$text('') : A2(
-			$gren_lang$browser$Html$button,
-			[
-				$gren_lang$browser$Html$Attributes$class('right'),
-				$gren_lang$browser$Html$Events$onClick($author$project$Page$Truss$TrianglePageRoof)
-			],
-			[
-				$gren_lang$browser$Html$text('Roof Triangle')
-			]),
+			function () {
+			if ($gren_lang$core$String$isEmpty(model.roof)) {
+				return $gren_lang$browser$Html$text('');
+			} else {
+				var roofAngle = A2(
+					$gren_lang$core$Maybe$withDefault,
+					7.5,
+					$gren_lang$core$String$toFloat(model.roof));
+				var bStr = A2(
+					$gren_lang$core$Maybe$withDefault,
+					'',
+					A2(
+						$gren_lang$core$Maybe$map,
+						function (c) {
+							var b = c * $gren_lang$core$Math$cos(
+								$gren_lang$core$Math$degrees(roofAngle));
+							var roundB = $gren_lang$core$Math$round(b * 100) / 100;
+							return $gren_lang$core$String$fromFloat(roundB);
+						},
+						$gren_lang$core$String$toFloat(model.chordLen)));
+				return A2(
+					$gren_lang$browser$Html$a,
+					[
+						$gren_lang$browser$Html$Attributes$class('right'),
+						$gren_lang$browser$Html$Attributes$href(
+						'#/triangle?a=&b=' + (bStr + ('&c=&theta=' + $gren_lang$core$String$fromFloat(roofAngle))))
+					],
+					[
+						$gren_lang$browser$Html$text('Roof Triangle')
+					]);
+			}
+		}(),
 			A2(
 			$gren_lang$browser$Html$div,
 			[

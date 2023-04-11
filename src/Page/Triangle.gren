@@ -5,13 +5,13 @@ module Page.Triangle exposing ( Model, Msg(..), update, view, queryParser, query
 
 import Browser
 import Browser.Dom as Dom
-import Html exposing ( Html, br, button, div, h1, input, text )
-import Html.Attributes exposing ( class, id, readonly, step, style, tabindex, type_, value )
+import Html exposing ( Html, a, br, button, div, h1, input, text )
+import Html.Attributes exposing ( class, href, id, readonly, step, style, tabindex, type_, value )
 import Html.Events exposing ( onClick, onInput )
 import Math
 import SpaCmd exposing ( SpaCmd(..) )
-import Svg exposing ( Svg, foreignObject, polygon, svg, filter, feGaussianBlur, feComposite, feFlood, feOffset )
-import Svg.Attributes exposing ( fill, height, points, stroke, viewBox, width, x, y, in_, in2, operator, result, strokeWidth, strokeLinejoin, floodOpacity, floodColor, stdDeviation, dx, dy )
+import Svg exposing ( Svg, feComposite, feFlood, feGaussianBlur, feOffset, filter, foreignObject, polygon, svg )
+import Svg.Attributes exposing ( dx, dy, fill, floodColor, floodOpacity, height, in2, in_, operator, points, result, stdDeviation, stroke, strokeLinejoin, strokeWidth, viewBox, width, x, y )
 import Task
 import Url.Builder as Builder
 import Url.Parser.Query as Query
@@ -55,8 +55,7 @@ type alias Updated =
 
 
 type Msg
-    = HomePage
-    | UpdateA String
+    = UpdateA String
     | UpdateB String
     | UpdateC String
     | UpdateTheta String
@@ -76,11 +75,6 @@ update msg model =
         NoOp ->
             { model = model
             , command = SpaCmd.none
-            }
-
-        HomePage ->
-            { model = model
-            , command = ChangePage "#/"
             }
 
         UpdateA s ->
@@ -293,9 +287,9 @@ view model =
     in
     { title = "Triangles"
     , body =
-        [ button
+        [ a
             [ class "left"
-            , onClick HomePage
+            , href "#/"
             ]
             [ text "Home"
             ]

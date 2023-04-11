@@ -4,9 +4,8 @@ module Page.Home exposing ( Model, Msg, init, update, view )
 -}
 
 import Browser
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html exposing ( a, div, h1, text )
+import Html.Attributes exposing ( href )
 import SpaCmd exposing ( SpaCmd(..) )
 
 
@@ -35,23 +34,23 @@ view model =
                 []
                 [ text "Calculators"
                 ]
-            , button
-                [ onClick GoToKFactor
+            , a
+                [ href "#/k-factor"
                 ]
                 [ text "K-Factors"
                 ]
-            , button
-                [ onClick GoToTriangle
+            , a
+                [ href "#/triangle"
                 ]
                 [ text "Triangles"
                 ]
-            , button
-                [ onClick GoToTruss
+            , a
+                [ href "#/truss"
                 ]
                 [ text "Trusses"
                 ]
-            , button
-                [ onClick GoToGalvHole
+            , a
+                [ href "#/galv-hole"
                 ]
                 [ text "Galvanising Holes"
                 ]
@@ -61,31 +60,13 @@ view model =
 
 
 type Msg
-    = GoToKFactor
-    | GoToTriangle
-    | GoToTruss
-    | GoToGalvHole
+    = NoOp
 
 
 update : Msg -> Model -> Updated
 update msg model =
     case msg of
-        GoToKFactor ->
+        NoOp ->
             { model = model
-            , command = ChangePage "#/k-factor"
-            }
-
-        GoToTriangle ->
-            { model = model
-            , command = ChangePage "#/triangle"
-            }
-
-        GoToTruss ->
-            { model = model
-            , command = ChangePage "#/truss"
-            }
-
-        GoToGalvHole ->
-            { model = model
-            , command = ChangePage "#/galv-hole"
+            , command = SpaCmd.none
             }
