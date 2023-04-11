@@ -4498,9 +4498,7 @@ var $gren_lang$core$Platform$Cmd$none = $gren_lang$core$Platform$Cmd$batch(
 var $author$project$Main$GalvHoleModel = function (a) {
 	return {$: 'GalvHoleModel', a: a};
 };
-var $author$project$Main$HomeModel = function (a) {
-	return {$: 'HomeModel', a: a};
-};
+var $author$project$Main$HomeModel = {$: 'HomeModel'};
 var $author$project$Main$KFactorModel = function (a) {
 	return {$: 'KFactorModel', a: a};
 };
@@ -4526,7 +4524,6 @@ var $author$project$Main$hashToUrl = function (str) {
 		{fragment: $gren_lang$core$Maybe$Nothing, host: '', path: '/', port_: $gren_lang$core$Maybe$Nothing, protocol: $gren_lang$url$Url$Http, query: $gren_lang$core$Maybe$Nothing},
 		$gren_lang$url$Url$fromString(trimmedStr));
 };
-var $author$project$Page$Home$init = {};
 var $gren_lang$url$Url$Parser$Parser = function (a) {
 	return {$: 'Parser', a: a};
 };
@@ -5644,15 +5641,12 @@ var $author$project$Main$urlToModel = function (path) {
 	var url = $author$project$Main$hashToUrl(path);
 	return A2(
 		$gren_lang$core$Maybe$withDefault,
-		$author$project$Main$HomeModel($author$project$Page$Home$init),
+		$author$project$Main$HomeModel,
 		A2(
 			$gren_lang$url$Url$Parser$parse,
 			$gren_lang$url$Url$Parser$oneOf(
 				[
-					A2(
-					$gren_lang$url$Url$Parser$map,
-					$author$project$Main$HomeModel($author$project$Page$Home$init),
-					$gren_lang$url$Url$Parser$top),
+					A2($gren_lang$url$Url$Parser$map, $author$project$Main$HomeModel, $gren_lang$url$Url$Parser$top),
 					A2(
 					$gren_lang$url$Url$Parser$map,
 					$author$project$Main$GalvHoleModel,
@@ -5698,9 +5692,6 @@ var $author$project$Main$pageChanged = _Platform_incomingPort('pageChanged', $gr
 var $author$project$Main$pageChangedSubscription = $author$project$Main$pageChanged($author$project$Main$PageChanged);
 var $author$project$Main$GalvHoleMsg = function (a) {
 	return {$: 'GalvHoleMsg', a: a};
-};
-var $author$project$Main$HomeMsg = function (a) {
-	return {$: 'HomeMsg', a: a};
 };
 var $author$project$Main$KFactorMsg = function (a) {
 	return {$: 'KFactorMsg', a: a};
@@ -5991,10 +5982,6 @@ var $author$project$Page$GalvHole$update = F2(
 				};
 		}
 	});
-var $author$project$Page$Home$update = F2(
-	function (msg, model) {
-		return {command: $author$project$SpaCmd$none, model: model};
-	});
 var $author$project$Page$KFactor$NoOp = {$: 'NoOp'};
 var $author$project$Page$KFactor$attemptFocus = function (id) {
 	return $author$project$SpaCmd$BaseCmd(
@@ -6258,7 +6245,7 @@ var $author$project$Page$Truss$update = F2(
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		var _v0 = {m: model, v: msg};
-		_v0$6:
+		_v0$5:
 		while (true) {
 			switch (_v0.v.$) {
 				case 'PageChanged':
@@ -6267,22 +6254,6 @@ var $author$project$Main$update = F2(
 						command: $gren_lang$core$Platform$Cmd$none,
 						model: $author$project$Main$urlToModel(str)
 					};
-				case 'HomeMsg':
-					if (_v0.m.$ === 'HomeModel') {
-						var m = _v0.m.a;
-						var v = _v0.v.a;
-						return A2(
-							$author$project$Main$handleUrlUpdate,
-							model,
-							$author$project$Main$handleSpaCmd(
-								A3(
-									$author$project$Main$mapPage,
-									$author$project$Main$HomeModel,
-									$author$project$Main$HomeMsg,
-									A2($author$project$Page$Home$update, v, m))));
-					} else {
-						break _v0$6;
-					}
 				case 'GalvHoleMsg':
 					if (_v0.m.$ === 'GalvHoleModel') {
 						var m = _v0.m.a;
@@ -6297,7 +6268,7 @@ var $author$project$Main$update = F2(
 									$author$project$Main$GalvHoleMsg,
 									A2($author$project$Page$GalvHole$update, v, m))));
 					} else {
-						break _v0$6;
+						break _v0$5;
 					}
 				case 'KFactorMsg':
 					if (_v0.m.$ === 'KFactorModel') {
@@ -6313,7 +6284,7 @@ var $author$project$Main$update = F2(
 									$author$project$Main$KFactorMsg,
 									A2($author$project$Page$KFactor$update, v, m))));
 					} else {
-						break _v0$6;
+						break _v0$5;
 					}
 				case 'TriangleMsg':
 					if (_v0.m.$ === 'TriangleModel') {
@@ -6329,7 +6300,7 @@ var $author$project$Main$update = F2(
 									$author$project$Main$TriangleMsg,
 									A2($author$project$Page$Triangle$update, v, m))));
 					} else {
-						break _v0$6;
+						break _v0$5;
 					}
 				default:
 					if (_v0.m.$ === 'TrussModel') {
@@ -6345,7 +6316,7 @@ var $author$project$Main$update = F2(
 									$author$project$Main$TrussMsg,
 									A2($author$project$Page$Truss$update, v, m))));
 					} else {
-						break _v0$6;
+						break _v0$5;
 					}
 			}
 		}
@@ -6927,55 +6898,53 @@ var $author$project$Page$GalvHole$view = function (model) {
 		title: 'Galvanising Holes'
 	};
 };
-var $author$project$Page$Home$view = function (model) {
-	return {
-		body: [
+var $author$project$Page$Home$view = {
+	body: [
+		A2(
+		$gren_lang$browser$Html$div,
+		[],
+		[
 			A2(
-			$gren_lang$browser$Html$div,
+			$gren_lang$browser$Html$h1,
 			[],
 			[
-				A2(
-				$gren_lang$browser$Html$h1,
-				[],
-				[
-					$gren_lang$browser$Html$text('Calculators')
-				]),
-				A2(
-				$gren_lang$browser$Html$a,
-				[
-					$gren_lang$browser$Html$Attributes$href('#/k-factor')
-				],
-				[
-					$gren_lang$browser$Html$text('K-Factors')
-				]),
-				A2(
-				$gren_lang$browser$Html$a,
-				[
-					$gren_lang$browser$Html$Attributes$href('#/triangle')
-				],
-				[
-					$gren_lang$browser$Html$text('Triangles')
-				]),
-				A2(
-				$gren_lang$browser$Html$a,
-				[
-					$gren_lang$browser$Html$Attributes$href('#/truss')
-				],
-				[
-					$gren_lang$browser$Html$text('Trusses')
-				]),
-				A2(
-				$gren_lang$browser$Html$a,
-				[
-					$gren_lang$browser$Html$Attributes$href('#/galv-hole')
-				],
-				[
-					$gren_lang$browser$Html$text('Galvanising Holes')
-				])
+				$gren_lang$browser$Html$text('Calculators')
+			]),
+			A2(
+			$gren_lang$browser$Html$a,
+			[
+				$gren_lang$browser$Html$Attributes$href('#/k-factor')
+			],
+			[
+				$gren_lang$browser$Html$text('K-Factors')
+			]),
+			A2(
+			$gren_lang$browser$Html$a,
+			[
+				$gren_lang$browser$Html$Attributes$href('#/triangle')
+			],
+			[
+				$gren_lang$browser$Html$text('Triangles')
+			]),
+			A2(
+			$gren_lang$browser$Html$a,
+			[
+				$gren_lang$browser$Html$Attributes$href('#/truss')
+			],
+			[
+				$gren_lang$browser$Html$text('Trusses')
+			]),
+			A2(
+			$gren_lang$browser$Html$a,
+			[
+				$gren_lang$browser$Html$Attributes$href('#/galv-hole')
+			],
+			[
+				$gren_lang$browser$Html$text('Galvanising Holes')
 			])
-		],
-		title: 'Calculators'
-	};
+		])
+	],
+	title: 'Calculators'
 };
 var $author$project$Page$KFactor$DoCopy = function (a) {
 	return {$: 'DoCopy', a: a};
@@ -8939,11 +8908,7 @@ var $author$project$Page$Truss$view = function (model) {
 var $author$project$Main$view = function (model) {
 	switch (model.$) {
 		case 'HomeModel':
-			var m = model.a;
-			return A2(
-				$author$project$Main$mapDocument,
-				$author$project$Main$HomeMsg,
-				$author$project$Page$Home$view(m));
+			return $author$project$Page$Home$view;
 		case 'GalvHoleModel':
 			var m = model.a;
 			return A2(

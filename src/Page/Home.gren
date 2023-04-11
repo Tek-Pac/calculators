@@ -1,4 +1,4 @@
-module Page.Home exposing ( Model, Msg, init, update, view )
+module Page.Home exposing ( view )
 
 {-| The homepage
 -}
@@ -6,26 +6,10 @@ module Page.Home exposing ( Model, Msg, init, update, view )
 import Browser
 import Html exposing ( a, div, h1, text )
 import Html.Attributes exposing ( href )
-import SpaCmd exposing ( SpaCmd(..) )
 
 
-type alias Model =
-    {}
-
-
-type alias Updated =
-    { model : Model
-    , command : SpaCmd Msg
-    }
-
-
-init : Model
-init =
-    {}
-
-
-view : Model -> Browser.Document Msg
-view model =
+view : Browser.Document a
+view =
     { title = "Calculators"
     , body =
         [ div
@@ -57,16 +41,3 @@ view model =
             ]
         ]
     }
-
-
-type Msg
-    = NoOp
-
-
-update : Msg -> Model -> Updated
-update msg model =
-    case msg of
-        NoOp ->
-            { model = model
-            , command = SpaCmd.none
-            }
