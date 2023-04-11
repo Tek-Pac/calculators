@@ -5,7 +5,7 @@ module Page.Home exposing ( view )
 
 import Browser
 import Html exposing ( a, div, h1, text )
-import Html.Attributes exposing ( href )
+import Html.Attributes exposing ( class, href )
 
 
 view : Browser.Document a
@@ -13,7 +13,8 @@ view =
     { title = "Calculators"
     , body =
         [ div
-            []
+            [ class "center"
+            ]
             [ h1
                 []
                 [ text "Calculators"
@@ -23,16 +24,19 @@ view =
                 ]
                 [ text "K-Factors"
                 ]
+            , text " "
             , a
                 [ href "#/triangle"
                 ]
                 [ text "Triangles"
                 ]
+            , text " "
             , a
                 [ href "#/truss"
                 ]
                 [ text "Trusses"
                 ]
+            , text " "
             , a
                 [ href "#/galv-hole"
                 ]

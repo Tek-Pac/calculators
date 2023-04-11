@@ -6902,7 +6902,9 @@ var $author$project$Page$Home$view = {
 	body: [
 		A2(
 		$gren_lang$browser$Html$div,
-		[],
+		[
+			$gren_lang$browser$Html$Attributes$class('center')
+		],
 		[
 			A2(
 			$gren_lang$browser$Html$h1,
@@ -6918,6 +6920,7 @@ var $author$project$Page$Home$view = {
 			[
 				$gren_lang$browser$Html$text('K-Factors')
 			]),
+			$gren_lang$browser$Html$text(' '),
 			A2(
 			$gren_lang$browser$Html$a,
 			[
@@ -6926,6 +6929,7 @@ var $author$project$Page$Home$view = {
 			[
 				$gren_lang$browser$Html$text('Triangles')
 			]),
+			$gren_lang$browser$Html$text(' '),
 			A2(
 			$gren_lang$browser$Html$a,
 			[
@@ -6934,6 +6938,7 @@ var $author$project$Page$Home$view = {
 			[
 				$gren_lang$browser$Html$text('Trusses')
 			]),
+			$gren_lang$browser$Html$text(' '),
 			A2(
 			$gren_lang$browser$Html$a,
 			[
