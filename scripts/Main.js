@@ -6165,6 +6165,13 @@ var $author$project$Page$Triangle$update = F2(
 				};
 		}
 	});
+var $gren_lang$core$Math$cos = _Math_cos;
+var $gren_lang$core$Basics$fdiv = _Basics_fdiv;
+var $gren_lang$core$Basics$mul = _Basics_mul;
+var $gren_lang$core$Math$pi = _Math_pi;
+var $gren_lang$core$Math$degrees = function (angleInDegrees) {
+	return (angleInDegrees * $gren_lang$core$Math$pi) / 180;
+};
 var $author$project$Page$Truss$NoOp = {$: 'NoOp'};
 var $author$project$Page$Truss$attemptFocus = function (id) {
 	return $author$project$SpaCmd$BaseCmd(
@@ -6182,6 +6189,20 @@ var $author$project$Page$Truss$doFocus = F2(
 			model: model
 		};
 	});
+var $gren_lang$core$String$fromFloat = _String_fromNumber;
+var $gren_lang$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $gren_lang$core$Maybe$Just(
+				f(value));
+		} else {
+			return $gren_lang$core$Maybe$Nothing;
+		}
+	});
+var $gren_lang$core$Math$round = _Math_round;
+var $gren_lang$core$Basics$toFloat = _Basics_toFloat;
+var $gren_lang$core$String$toFloat = _String_toFloat;
 var $author$project$Page$Truss$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -6190,6 +6211,28 @@ var $author$project$Page$Truss$update = F2(
 			case 'HomePage':
 				return {
 					command: $author$project$SpaCmd$ChangePage('#/'),
+					model: model
+				};
+			case 'TrianglePageRoof':
+				var roofAngle = A2(
+					$gren_lang$core$Maybe$withDefault,
+					7.5,
+					$gren_lang$core$String$toFloat(model.roof));
+				var bStr = A2(
+					$gren_lang$core$Maybe$withDefault,
+					'',
+					A2(
+						$gren_lang$core$Maybe$map,
+						function (c) {
+							var b = c * $gren_lang$core$Math$cos(
+								$gren_lang$core$Math$degrees(roofAngle));
+							var roundB = $gren_lang$core$Math$round(b * 100) / 100;
+							return $gren_lang$core$String$fromFloat(roundB);
+						},
+						$gren_lang$core$String$toFloat(model.chordLen)));
+				return {
+					command: $author$project$SpaCmd$ChangePage(
+						'#/triangle?a=&b=' + (bStr + ('&c=&theta=' + $gren_lang$core$String$fromFloat(roofAngle)))),
 					model: model
 				};
 			case 'UpdateChordLen':
@@ -6418,7 +6461,6 @@ var $gren_lang$browser$VirtualDom$node = function (tag) {
 var $gren_lang$browser$Html$node = $gren_lang$browser$VirtualDom$node;
 var $gren_lang$browser$Html$br = $gren_lang$browser$Html$node('br');
 var $gren_lang$browser$Html$button = $gren_lang$browser$Html$node('button');
-var $gren_lang$core$String$toFloat = _String_toFloat;
 var $author$project$Page$GalvHole$calculateChsDiagonal = function (model) {
 	var _v0 = $gren_lang$core$String$toFloat(model.size);
 	if (_v0.$ === 'Just') {
@@ -6447,7 +6489,6 @@ var $author$project$Page$GalvHole$getRhsVals = function (size) {
 		y: $gren_lang$core$String$toFloat(y)
 	};
 };
-var $gren_lang$core$Basics$mul = _Basics_mul;
 var $gren_lang$core$Math$sqrt = _Math_sqrt;
 var $author$project$Page$GalvHole$calculateRhsDiagonal = function (model) {
 	var _v0 = $author$project$Page$GalvHole$getRhsVals(model.size);
@@ -6483,7 +6524,6 @@ var $gren_lang$browser$Html$Attributes$stringProperty = F2(
 	});
 var $gren_lang$browser$Html$Attributes$class = $gren_lang$browser$Html$Attributes$stringProperty('className');
 var $gren_lang$browser$Html$div = $gren_lang$browser$Html$node('div');
-var $gren_lang$core$Basics$fdiv = _Basics_fdiv;
 var $gren_lang$browser$Html$h1 = $gren_lang$browser$Html$node('h1');
 var $gren_lang$browser$Html$hr = $gren_lang$browser$Html$node('hr');
 var $gren_lang$browser$Html$Attributes$id = $gren_lang$browser$Html$Attributes$stringProperty('id');
@@ -6533,16 +6573,6 @@ var $gren_lang$core$Array$last = function (array) {
 		$gren_lang$core$Array$length(array) - 1,
 		array);
 };
-var $gren_lang$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return $gren_lang$core$Maybe$Just(
-				f(value));
-		} else {
-			return $gren_lang$core$Maybe$Nothing;
-		}
-	});
 var $author$project$Page$GalvHole$makeArraySelector = F2(
 	function (library, val) {
 		var makeArraySelectorInternal = function (idx) {
@@ -6616,7 +6646,6 @@ var $author$project$Page$GalvHole$makeArraySelector = F2(
 		var idxMaybe = getIndex(0);
 		return A2($gren_lang$core$Maybe$map, makeArraySelectorInternal, idxMaybe);
 	});
-var $gren_lang$core$String$fromFloat = _String_fromNumber;
 var $gren_lang$browser$Html$input = $gren_lang$browser$Html$node('input');
 var $gren_lang$core$Basics$negate = function (n) {
 	return -n;
@@ -6839,8 +6868,6 @@ var $gren_lang$core$Basics$max = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) > 0) ? x : y;
 	});
-var $gren_lang$core$Math$round = _Math_round;
-var $gren_lang$core$Basics$toFloat = _Basics_toFloat;
 var $author$project$Page$GalvHole$view = function (model) {
 	var tyInputs = function () {
 		var _v5 = model.ty;
@@ -7054,7 +7081,6 @@ var $author$project$Page$KFactor$parseModel = function (model) {
 	var a = $gren_lang$core$String$toFloat(model.a);
 	return {a: a, ba: ba, k: k, r: r, t: t, ty: model.ty, xa: xa};
 };
-var $gren_lang$core$Math$pi = _Math_pi;
 var $author$project$Page$KFactor$view = function (model) {
 	var parsedModel = $author$project$Page$KFactor$parseModel(model);
 	var makeSwapButton = function (updatedTy) {
@@ -7379,10 +7405,6 @@ var $gren_lang$core$Result$andThen = F2(
 	});
 var $gren_lang$core$Math$asin = _Math_asin;
 var $gren_lang$core$Math$atan = _Math_atan;
-var $gren_lang$core$Math$cos = _Math_cos;
-var $gren_lang$core$Math$degrees = function (angleInDegrees) {
-	return (angleInDegrees * $gren_lang$core$Math$pi) / 180;
-};
 var $gren_lang$browser$Svg$Attributes$dx = $gren_lang$browser$VirtualDom$attribute('dx');
 var $gren_lang$browser$Svg$Attributes$dy = $gren_lang$browser$VirtualDom$attribute('dy');
 var $gren_lang$browser$VirtualDom$nodeNS = function (tag) {
@@ -7865,6 +7887,7 @@ var $author$project$Page$Triangle$view = function (model) {
 	};
 };
 var $author$project$Page$Truss$HomePage = {$: 'HomePage'};
+var $author$project$Page$Truss$TrianglePageRoof = {$: 'TrianglePageRoof'};
 var $author$project$Page$Truss$UpdateChordDoubling = function (a) {
 	return {$: 'UpdateChordDoubling', a: a};
 };
@@ -8761,6 +8784,15 @@ var $author$project$Page$Truss$view = function (model) {
 			],
 			[
 				$gren_lang$browser$Html$text('Home')
+			]),
+			$gren_lang$core$String$isEmpty(model.roof) ? $gren_lang$browser$Html$text('') : A2(
+			$gren_lang$browser$Html$button,
+			[
+				$gren_lang$browser$Html$Attributes$class('right'),
+				$gren_lang$browser$Html$Events$onClick($author$project$Page$Truss$TrianglePageRoof)
+			],
+			[
+				$gren_lang$browser$Html$text('Roof Triangle')
 			]),
 			A2(
 			$gren_lang$browser$Html$div,

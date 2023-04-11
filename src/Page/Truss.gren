@@ -97,6 +97,7 @@ type alias Updated =
 
 type Msg
     = HomePage
+    | TrianglePageRoof
     | UpdateChordLen String
     | UpdateChordGap String
     | UpdateChordHeight String
@@ -136,6 +137,32 @@ update msg model =
         HomePage ->
             { model = model
             , command = ChangePage "#/"
+            }
+
+        TrianglePageRoof ->
+            let
+                roofAngle =
+                    String.toFloat model.roof
+                        |> Maybe.withDefault 7.5
+
+                bStr =
+                    String.toFloat model.chordLen
+                        |> Maybe.map
+                                (\c ->
+                                    let
+                                        b =
+                                            c * Math.cos (Math.degrees roofAngle)
+
+                                        -- 2 d.p.
+                                        roundB =
+                                            toFloat (Math.round (b * 100)) / 100
+                                    in
+                                    String.fromFloat roundB
+                                )
+                        |> Maybe.withDefault ""
+            in
+            { model = model
+            , command = ChangePage ("#/triangle?a=&b=" ++ bStr ++ "&c=&theta=" ++ String.fromFloat roofAngle)
             }
 
         UpdateChordLen c ->
@@ -366,6 +393,15 @@ view model =
             ]
             [ text "Home"
             ]
+        , if String.isEmpty model.roof then
+            text ""
+          else
+            button
+                [ class "right"
+                , onClick TrianglePageRoof
+                ]
+                [ text "Roof Triangle"
+                ]
         , div
             [ id "truss"
             , class "center"
