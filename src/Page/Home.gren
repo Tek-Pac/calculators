@@ -67,7 +67,7 @@ view model =
                 button
                     [ onClick DoRedir
                     ]
-                    [ text "Redirect to wiki.tek-pac.com.au"
+                    [ text "Redirect to calc.tek-pac.com.au"
                     ]
               else
                 text ""

@@ -6969,7 +6969,7 @@ var $author$project$Page$Home$view = function (model) {
 					$gren_lang$browser$Html$Events$onClick($author$project$Page$Home$DoRedir)
 				],
 				[
-					$gren_lang$browser$Html$text('Redirect to wiki.tek-pac.com.au')
+					$gren_lang$browser$Html$text('Redirect to calc.tek-pac.com.au')
 				]) : $gren_lang$browser$Html$text(''),
 				model.showRedir ? A2(
 				$gren_lang$browser$Html$br,
