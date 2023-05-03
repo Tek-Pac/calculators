@@ -17,8 +17,8 @@ import Url.Parser.Query as Query
 
 queryParser : Query.Parser Model
 queryParser =
-    Query.map4
-        (\profileTypeMaybe sizeMaybe cMaybe nMaybe ->
+    Query.map3
+        (\profileTypeMaybe sizeMaybe nMaybe ->
             let
                 profileType =
                     Maybe.withDefault "" profileTypeMaybe
@@ -26,33 +26,24 @@ queryParser =
                 size =
                     Maybe.withDefault "" sizeMaybe
 
-                c =
-                    case Maybe.withDefault "" cMaybe of
-                        "true" ->
-                            True
-
-                        _ ->
-                            False
-
                 n =
                     Maybe.withDefault "4" nMaybe
             in
             case profileType of
                 "RHS" ->
-                    makeRhsModel n c size
+                    makeRhsModel n False size
 
                 "SHS" ->
-                    makeRhsModel n c size
+                    makeRhsModel n False size
 
                 "CHS" ->
-                    makeChsModel n c size
+                    makeChsModel n False size
 
                 _ ->
-                    makeRhsModel n c size
+                    makeRhsModel n False size
         )
         (Query.string "profileType")
         (Query.string "size")
-        (Query.string "custom")
         (Query.string "n")
 
 
@@ -68,13 +59,6 @@ queryBuilder model =
                 "RHS"
         )
     , Builder.string "size" model.size
-    , Builder.string
-        "custom"
-        (if model.c then
-            "true"
-         else
-            "false"
-        )
     , Builder.string "n" model.n
     ]
 

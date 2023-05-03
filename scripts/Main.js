@@ -5305,20 +5305,18 @@ var $author$project$Page$GalvHole$makeRhsModel = F3(
 var $gren_lang$url$Url$Parser$Internal$Parser = function (a) {
 	return {$: 'Parser', a: a};
 };
-var $gren_lang$url$Url$Parser$Query$map4 = F5(
-	function (func, _v0, _v1, _v2, _v3) {
+var $gren_lang$url$Url$Parser$Query$map3 = F4(
+	function (func, _v0, _v1, _v2) {
 		var a = _v0.a;
 		var b = _v1.a;
 		var c = _v2.a;
-		var d = _v3.a;
 		return $gren_lang$url$Url$Parser$Internal$Parser(
 			function (dict) {
-				return A4(
+				return A3(
 					func,
 					a(dict),
 					b(dict),
-					c(dict),
-					d(dict));
+					c(dict));
 			});
 	});
 var $gren_lang$url$Url$Parser$Query$custom = F2(
@@ -5345,35 +5343,26 @@ var $gren_lang$url$Url$Parser$Query$string = function (key) {
 			}
 		});
 };
-var $author$project$Page$GalvHole$queryParser = A5(
-	$gren_lang$url$Url$Parser$Query$map4,
-	F4(
-		function (profileTypeMaybe, sizeMaybe, cMaybe, nMaybe) {
+var $author$project$Page$GalvHole$queryParser = A4(
+	$gren_lang$url$Url$Parser$Query$map3,
+	F3(
+		function (profileTypeMaybe, sizeMaybe, nMaybe) {
 			var size = A2($gren_lang$core$Maybe$withDefault, '', sizeMaybe);
 			var profileType = A2($gren_lang$core$Maybe$withDefault, '', profileTypeMaybe);
 			var n = A2($gren_lang$core$Maybe$withDefault, '4', nMaybe);
-			var c = function () {
-				var _v1 = A2($gren_lang$core$Maybe$withDefault, '', cMaybe);
-				if (_v1 === 'true') {
-					return true;
-				} else {
-					return false;
-				}
-			}();
 			switch (profileType) {
 				case 'RHS':
-					return A3($author$project$Page$GalvHole$makeRhsModel, n, c, size);
+					return A3($author$project$Page$GalvHole$makeRhsModel, n, false, size);
 				case 'SHS':
-					return A3($author$project$Page$GalvHole$makeRhsModel, n, c, size);
+					return A3($author$project$Page$GalvHole$makeRhsModel, n, false, size);
 				case 'CHS':
-					return A3($author$project$Page$GalvHole$makeChsModel, n, c, size);
+					return A3($author$project$Page$GalvHole$makeChsModel, n, false, size);
 				default:
-					return A3($author$project$Page$GalvHole$makeRhsModel, n, c, size);
+					return A3($author$project$Page$GalvHole$makeRhsModel, n, false, size);
 			}
 		}),
 	$gren_lang$url$Url$Parser$Query$string('profileType'),
 	$gren_lang$url$Url$Parser$Query$string('size'),
-	$gren_lang$url$Url$Parser$Query$string('custom'),
 	$gren_lang$url$Url$Parser$Query$string('n'));
 var $gren_lang$url$Url$Parser$Query$map = F2(
 	function (func, _v0) {
@@ -5481,6 +5470,22 @@ var $author$project$Page$Triangle$finishParse = F4(
 			c: A2($gren_lang$core$Maybe$withDefault, '', c),
 			theta: A2($gren_lang$core$Maybe$withDefault, '', theta)
 		};
+	});
+var $gren_lang$url$Url$Parser$Query$map4 = F5(
+	function (func, _v0, _v1, _v2, _v3) {
+		var a = _v0.a;
+		var b = _v1.a;
+		var c = _v2.a;
+		var d = _v3.a;
+		return $gren_lang$url$Url$Parser$Internal$Parser(
+			function (dict) {
+				return A4(
+					func,
+					a(dict),
+					b(dict),
+					c(dict),
+					d(dict));
+			});
 	});
 var $author$project$Page$Triangle$queryParser = A5(
 	$gren_lang$url$Url$Parser$Query$map4,
@@ -5776,10 +5781,6 @@ var $author$project$Page$GalvHole$queryBuilder = function (model) {
 			}
 		}()),
 		A2($gren_lang$url$Url$Builder$string, 'size', model.size),
-		A2(
-		$gren_lang$url$Url$Builder$string,
-		'custom',
-		model.c ? 'true' : 'false'),
 		A2($gren_lang$url$Url$Builder$string, 'n', model.n)
 	];
 };
