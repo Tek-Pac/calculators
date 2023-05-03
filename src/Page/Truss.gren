@@ -27,7 +27,7 @@ queryParser : Query.Parser Model
 queryParser =
     -- We can't do any more than map8
     Query.map
-        (\chordLen chordGap chordHeight chordDoubling web startWeb startCount nextWeb nextCount roof webAngle webStart ->
+        (\chordLen chordGap chordHeight chordDoubling web startWeb startCount nextWeb nextCount roof webAngle webStart title ->
             { chordLen = Maybe.withDefault "" chordLen
             , chordGap = Maybe.withDefault "" chordGap
             , chordHeight = Maybe.withDefault "" chordHeight
@@ -40,6 +40,8 @@ queryParser =
             , roof = Maybe.withDefault "" roof
             , webAngle = Maybe.withDefault "45" webAngle
             , webStart = Maybe.withDefault "125" webStart
+            , title = Maybe.withDefault "Truss" title
+            , titleEdit = False
             }
         )
         (Query.string "chordLen")
@@ -54,6 +56,7 @@ queryParser =
         |> qApply (Query.string "roof")
         |> qApply (Query.string "webAngle")
         |> qApply (Query.string "webStart")
+        |> qApply (Query.string "title")
 
 
 builderStr : String -> String -> String -> Maybe Builder.QueryParameter
@@ -78,6 +81,7 @@ queryBuilder model =
     , builderStr "" "roof" model.roof
     , builderStr "45" "webAngle" model.webAngle
     , builderStr "125" "webStart" model.webStart
+    , builderStr "Truss" "title" model.title
     ]
         |> Array.filterMap identity
 
@@ -95,6 +99,8 @@ type alias Model =
     , roof : String
     , webAngle : String
     , webStart : String
+    , title : String
+    , titleEdit : Bool
     }
 
 
@@ -117,6 +123,8 @@ type Msg
     | UpdateRoof String
     | UpdateWebAngle String
     | UpdateWebStart String
+    | UpdateTitle String
+    | ToggleTitleEdit
     | DoCopy String
     | NoOp
 
@@ -176,6 +184,20 @@ update msg model =
 
         UpdateWebStart w ->
             doFocus { model | webStart = w } "web-start"
+
+        UpdateTitle w ->
+            { model = { model | title = w }
+            , command = SpaCmd.none
+            }
+
+        ToggleTitleEdit ->
+            { model = { model | titleEdit = not model.titleEdit }
+            , command =
+                if not model.titleEdit then
+                    attemptFocus "title"
+                else
+                    SpaCmd.none
+            }
 
         DoCopy id ->
             { model = model
@@ -361,7 +383,7 @@ calculateTruss model =
 
 view : Model -> Browser.Document Msg
 view model =
-    { title = "Truss"
+    { title = model.title
     , body =
         [ a
             [ class "left"
@@ -405,7 +427,21 @@ view model =
             ]
             [ h1
                 []
-                [ text "Truss"
+                [ if model.titleEdit then
+                    input
+                        [ value model.title
+                        , onInput UpdateTitle
+                        , id "title"
+                        ]
+                        []
+                  else
+                    text model.title
+                , text " "
+                , button
+                    [ onClick ToggleTitleEdit
+                    ]
+                    [ text "✏️"
+                    ]
                 ]
             , br [] []
             , div
