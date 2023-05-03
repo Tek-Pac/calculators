@@ -56,21 +56,30 @@ queryParser =
         |> qApply (Query.string "webStart")
 
 
+builderStr : String -> String -> String -> Maybe Builder.QueryParameter
+builderStr default key val =
+    if val == default then
+        Nothing
+    else
+        Just (Builder.string key val)
+
+
 queryBuilder : Model -> Array Builder.QueryParameter
 queryBuilder model =
-    [ Builder.string "chordLen" model.chordLen
-    , Builder.string "chordGap" model.chordGap
-    , Builder.string "chordHeight" model.chordHeight
-    , Builder.string "chordDoubling" model.chordDoubling
-    , Builder.string "web" model.web
-    , Builder.string "startWeb" model.startWeb
-    , Builder.string "startCount" model.startCount
-    , Builder.string "nextWeb" model.nextWeb
-    , Builder.string "nextCount" model.nextCount
-    , Builder.string "roof" model.roof
-    , Builder.string "webAngle" model.webAngle
-    , Builder.string "webStart" model.webStart
+    [ builderStr "" "chordLen" model.chordLen
+    , builderStr "" "chordGap" model.chordGap
+    , builderStr "" "chordHeight" model.chordHeight
+    , builderStr "" "chordDoubling" model.chordDoubling
+    , builderStr "" "web" model.web
+    , builderStr "" "startWeb" model.startWeb
+    , builderStr "" "startCount" model.startCount
+    , builderStr "" "nextWeb" model.nextWeb
+    , builderStr "" "nextCount" model.nextCount
+    , builderStr "" "roof" model.roof
+    , builderStr "45" "webAngle" model.webAngle
+    , builderStr "125" "webStart" model.webStart
     ]
+        |> Array.filterMap identity
 
 
 type alias Model =
@@ -386,7 +395,7 @@ view model =
             in
             a
                 [ class "right"
-                , href ("#/triangle?a=&b=" ++ bStr ++ "&c=&theta=" ++ String.fromFloat roofAngle)
+                , href ("#/triangle?b=" ++ bStr ++ "&theta=" ++ String.fromFloat roofAngle)
                 ]
                 [ text "Roof Triangle"
                 ]

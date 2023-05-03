@@ -52,24 +52,35 @@ finishParse t r ba a k xa ty =
     }
 
 
+builderStr : String -> String -> String -> Maybe Builder.QueryParameter
+builderStr default key val =
+    if val == default then
+        Nothing
+    else
+        Just (Builder.string key val)
+
+
 queryBuilder : Model -> Array Builder.QueryParameter
 queryBuilder model =
-    [ Builder.string "t" model.t
-    , Builder.string "r" model.r
-    , Builder.string "ba" model.ba
-    , Builder.string "a" model.a
-    , Builder.string "k" model.k
-    , Builder.string "xa" model.xa
-    , Builder.string
-        "ty"
-        (case model.ty of
-            BendAllowance ->
-                "ba"
+    [ builderStr "" "t" model.t
+    , builderStr "" "r" model.r
+    , builderStr "" "ba" model.ba
+    , builderStr "90" "a" model.a
+    , builderStr "" "k" model.k
+    , builderStr "" "xa" model.xa
+    , Just
+        (Builder.string
+            "ty"
+            (case model.ty of
+                BendAllowance ->
+                    "ba"
 
-            ExtraAllowance ->
-                "xa"
+                ExtraAllowance ->
+                    "xa"
+            )
         )
     ]
+        |> Array.filterMap identity
 
 
 type alias Model =

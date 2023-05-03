@@ -31,13 +31,22 @@ finishParse a b c theta =
     }
 
 
+builderStr : String -> String -> String -> Maybe Builder.QueryParameter
+builderStr default key val =
+    if val == default then
+        Nothing
+    else
+        Just (Builder.string key val)
+
+
 queryBuilder : Model -> Array Builder.QueryParameter
 queryBuilder model =
-    [ Builder.string "a" model.a
-    , Builder.string "b" model.b
-    , Builder.string "c" model.c
-    , Builder.string "theta" model.theta
+    [ builderStr "" "a" model.a
+    , builderStr "" "b" model.b
+    , builderStr "" "c" model.c
+    , builderStr "" "theta" model.theta
     ]
+        |> Array.filterMap identity
 
 
 type alias Model =

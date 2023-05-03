@@ -5776,50 +5776,92 @@ var $author$project$Page$GalvHole$queryBuilder = function (model) {
 		A2($gren_lang$url$Url$Builder$string, 'n', model.n)
 	];
 };
+var $author$project$Page$KFactor$builderStr = F3(
+	function (_default, key, val) {
+		return _Utils_eq(val, _default) ? $gren_lang$core$Maybe$Nothing : $gren_lang$core$Maybe$Just(
+			A2($gren_lang$url$Url$Builder$string, key, val));
+	});
+var $gren_lang$core$Array$filterMap = F2(
+	function (mapper, array) {
+		return A3(
+			$gren_lang$core$Array$foldl,
+			F2(
+				function (v, acc) {
+					var _v0 = mapper(v);
+					if (_v0.$ === 'Just') {
+						var newValue = _v0.a;
+						return A2($gren_lang$core$Array$pushLast, newValue, acc);
+					} else {
+						return acc;
+					}
+				}),
+			[],
+			array);
+	});
 var $author$project$Page$KFactor$queryBuilder = function (model) {
-	return [
-		A2($gren_lang$url$Url$Builder$string, 't', model.t),
-		A2($gren_lang$url$Url$Builder$string, 'r', model.r),
-		A2($gren_lang$url$Url$Builder$string, 'ba', model.ba),
-		A2($gren_lang$url$Url$Builder$string, 'a', model.a),
-		A2($gren_lang$url$Url$Builder$string, 'k', model.k),
-		A2($gren_lang$url$Url$Builder$string, 'xa', model.xa),
-		A2(
-		$gren_lang$url$Url$Builder$string,
-		'ty',
-		function () {
-			var _v0 = model.ty;
-			if (_v0.$ === 'BendAllowance') {
-				return 'ba';
-			} else {
-				return 'xa';
-			}
-		}())
-	];
+	return A2(
+		$gren_lang$core$Array$filterMap,
+		$gren_lang$core$Basics$identity,
+		[
+			A3($author$project$Page$KFactor$builderStr, '', 't', model.t),
+			A3($author$project$Page$KFactor$builderStr, '', 'r', model.r),
+			A3($author$project$Page$KFactor$builderStr, '', 'ba', model.ba),
+			A3($author$project$Page$KFactor$builderStr, '90', 'a', model.a),
+			A3($author$project$Page$KFactor$builderStr, '', 'k', model.k),
+			A3($author$project$Page$KFactor$builderStr, '', 'xa', model.xa),
+			$gren_lang$core$Maybe$Just(
+			A2(
+				$gren_lang$url$Url$Builder$string,
+				'ty',
+				function () {
+					var _v0 = model.ty;
+					if (_v0.$ === 'BendAllowance') {
+						return 'ba';
+					} else {
+						return 'xa';
+					}
+				}()))
+		]);
 };
+var $author$project$Page$Triangle$builderStr = F3(
+	function (_default, key, val) {
+		return _Utils_eq(val, _default) ? $gren_lang$core$Maybe$Nothing : $gren_lang$core$Maybe$Just(
+			A2($gren_lang$url$Url$Builder$string, key, val));
+	});
 var $author$project$Page$Triangle$queryBuilder = function (model) {
-	return [
-		A2($gren_lang$url$Url$Builder$string, 'a', model.a),
-		A2($gren_lang$url$Url$Builder$string, 'b', model.b),
-		A2($gren_lang$url$Url$Builder$string, 'c', model.c),
-		A2($gren_lang$url$Url$Builder$string, 'theta', model.theta)
-	];
+	return A2(
+		$gren_lang$core$Array$filterMap,
+		$gren_lang$core$Basics$identity,
+		[
+			A3($author$project$Page$Triangle$builderStr, '', 'a', model.a),
+			A3($author$project$Page$Triangle$builderStr, '', 'b', model.b),
+			A3($author$project$Page$Triangle$builderStr, '', 'c', model.c),
+			A3($author$project$Page$Triangle$builderStr, '', 'theta', model.theta)
+		]);
 };
+var $author$project$Page$Truss$builderStr = F3(
+	function (_default, key, val) {
+		return _Utils_eq(val, _default) ? $gren_lang$core$Maybe$Nothing : $gren_lang$core$Maybe$Just(
+			A2($gren_lang$url$Url$Builder$string, key, val));
+	});
 var $author$project$Page$Truss$queryBuilder = function (model) {
-	return [
-		A2($gren_lang$url$Url$Builder$string, 'chordLen', model.chordLen),
-		A2($gren_lang$url$Url$Builder$string, 'chordGap', model.chordGap),
-		A2($gren_lang$url$Url$Builder$string, 'chordHeight', model.chordHeight),
-		A2($gren_lang$url$Url$Builder$string, 'chordDoubling', model.chordDoubling),
-		A2($gren_lang$url$Url$Builder$string, 'web', model.web),
-		A2($gren_lang$url$Url$Builder$string, 'startWeb', model.startWeb),
-		A2($gren_lang$url$Url$Builder$string, 'startCount', model.startCount),
-		A2($gren_lang$url$Url$Builder$string, 'nextWeb', model.nextWeb),
-		A2($gren_lang$url$Url$Builder$string, 'nextCount', model.nextCount),
-		A2($gren_lang$url$Url$Builder$string, 'roof', model.roof),
-		A2($gren_lang$url$Url$Builder$string, 'webAngle', model.webAngle),
-		A2($gren_lang$url$Url$Builder$string, 'webStart', model.webStart)
-	];
+	return A2(
+		$gren_lang$core$Array$filterMap,
+		$gren_lang$core$Basics$identity,
+		[
+			A3($author$project$Page$Truss$builderStr, '', 'chordLen', model.chordLen),
+			A3($author$project$Page$Truss$builderStr, '', 'chordGap', model.chordGap),
+			A3($author$project$Page$Truss$builderStr, '', 'chordHeight', model.chordHeight),
+			A3($author$project$Page$Truss$builderStr, '', 'chordDoubling', model.chordDoubling),
+			A3($author$project$Page$Truss$builderStr, '', 'web', model.web),
+			A3($author$project$Page$Truss$builderStr, '', 'startWeb', model.startWeb),
+			A3($author$project$Page$Truss$builderStr, '', 'startCount', model.startCount),
+			A3($author$project$Page$Truss$builderStr, '', 'nextWeb', model.nextWeb),
+			A3($author$project$Page$Truss$builderStr, '', 'nextCount', model.nextCount),
+			A3($author$project$Page$Truss$builderStr, '', 'roof', model.roof),
+			A3($author$project$Page$Truss$builderStr, '45', 'webAngle', model.webAngle),
+			A3($author$project$Page$Truss$builderStr, '125', 'webStart', model.webStart)
+		]);
 };
 var $author$project$Main$modelToUrl = function (model) {
 	return '#' + A2(
@@ -8780,7 +8822,7 @@ var $author$project$Page$Truss$view = function (model) {
 					[
 						$gren_lang$browser$Html$Attributes$class('right'),
 						$gren_lang$browser$Html$Attributes$href(
-						'#/triangle?a=&b=' + (bStr + ('&c=&theta=' + $gren_lang$core$String$fromFloat(roofAngle))))
+						'#/triangle?b=' + (bStr + ('&theta=' + $gren_lang$core$String$fromFloat(roofAngle))))
 					],
 					[
 						$gren_lang$browser$Html$text('Roof Triangle')
