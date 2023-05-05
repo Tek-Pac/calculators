@@ -8001,7 +8001,6 @@ var $author$project$Vector2$mul = F2(
 	function (v, a) {
 		return A2($author$project$Vector2$scale, a, v);
 	});
-var $gren_lang$core$Basics$neq = _Utils_notEqual;
 var $gren_lang$core$Array$pushFirst = F2(
 	function (value, array) {
 		return A2(
@@ -8016,7 +8015,7 @@ var $author$project$Vector2$v2 = F2(
 var $author$project$Page$Truss$calcWebPoints = F3(
 	function (dat, currWeb, index) {
 		var _v0 = dat;
-		var endPointX = _v0.endPointX;
+		var endPoint = _v0.endPoint;
 		var webs = _v0.webs;
 		var chordDoubling = _v0.chordDoubling;
 		var chordVert = _v0.chordVert;
@@ -8035,10 +8034,10 @@ var $author$project$Page$Truss$calcWebPoints = F3(
 		var webOffsetDn = _v2.webOffsetDn;
 		var webOffsetDnCd = _v2.webOffsetDnCd;
 		var webOffsetVec = _v2.webOffsetVec;
-		if (_Utils_cmp(currWeb.x, endPointX) > 0) {
+		if (_Utils_cmp(currWeb.x, endPoint.x) > 0) {
 			return {
 				chordDoublingRes: $gren_lang$core$Maybe$Nothing,
-				totals: {chord: mainChordLen * 2, mainWeb: 0, nextWeb: 0, startWeb: 0},
+				totals: {chord: mainChordLen * 2, chordDoubleLen: 0, mainWeb: 0, nextWeb: 0, startWeb: 0},
 				webLines: [],
 				webPoints: []
 			};
@@ -8076,14 +8075,18 @@ var $author$project$Page$Truss$calcWebPoints = F3(
 						start: A2($author$project$Vector2$add, currWeb, webStartGraphicalOffset)
 					},
 					nextDat.webLines)) : [];
-			var chordDoublingRes = ((!(!index)) && _Utils_eq(index, (chordDoubling * 2) - 1)) ? $gren_lang$core$Maybe$Just(
+			var chordDoublingRes = ((!isNextWeb) && (_Utils_cmp(index, (chordDoubling * 2) - 1) < 1)) ? $gren_lang$core$Maybe$Just(
+				{
+					end: A2($author$project$Vector2$add, chordVert, endPoint),
+					start: chordVert
+				}) : (_Utils_eq(index, (chordDoubling * 2) - 1) ? $gren_lang$core$Maybe$Just(
 				{
 					end: A2($author$project$Vector2$add, currWeb, webOffsetDnCd),
 					start: chordVert
-				}) : nextDat.chordDoublingRes;
-			var chordDoubleLen = ((!(!index)) && _Utils_eq(index, (chordDoubling * 2) - 1)) ? $author$project$Vector2$length(
-				A2($author$project$Vector2$add, currWeb, webOffsetDir)) : 0;
-			var totals = {chord: nextTotals.chord + chordDoubleLen, mainWeb: nextTotals.mainWeb + mainWebLen, nextWeb: nextTotals.nextWeb + nextWebLen, startWeb: nextTotals.startWeb + startWebLen};
+				}) : nextDat.chordDoublingRes);
+			var chordDoubleLen = ((!isNextWeb) && (_Utils_cmp(index, (chordDoubling * 2) - 1) < 1)) ? mainChordLen : (_Utils_eq(index, (chordDoubling * 2) - 1) ? $author$project$Vector2$length(
+				A2($author$project$Vector2$add, currWeb, webOffsetDir)) : nextTotals.chordDoubleLen);
+			var totals = {chord: nextTotals.chord, chordDoubleLen: chordDoubleLen, mainWeb: nextTotals.mainWeb + mainWebLen, nextWeb: nextTotals.nextWeb + nextWebLen, startWeb: nextTotals.startWeb + startWebLen};
 			return {chordDoublingRes: chordDoublingRes, totals: totals, webLines: webLines, webPoints: webPoints};
 		}
 	});
@@ -8235,7 +8238,7 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 		{
 			chordDoubling: chordDoubling,
 			chordVert: chordVert,
-			endPointX: endPointLower.x,
+			endPoint: endPointLower,
 			mainChordLen: mainChordLen,
 			webs: {
 				mainWebWidth: web,
@@ -8278,7 +8281,7 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 				lowerChordEnd: endPointLower,
 				lowerChordStart: {x: 0.0, y: 0.0},
 				totals: {
-					chord: formatF(dat.totals.chord),
+					chord: formatF(dat.totals.chord + dat.totals.chordDoubleLen),
 					mainWeb: formatF(dat.totals.mainWeb),
 					nextWeb: formatF(dat.totals.nextWeb),
 					startWeb: formatF(dat.totals.startWeb)
@@ -8812,6 +8815,7 @@ var $author$project$Page$Truss$makeOutputLine = F3(
 				])
 			]);
 	});
+var $gren_lang$core$Basics$neq = _Utils_notEqual;
 var $gren_lang$browser$Svg$Attributes$viewBox = $gren_lang$browser$VirtualDom$attribute('viewBox');
 var $author$project$Page$Truss$view = function (model) {
 	return {

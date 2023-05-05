@@ -732,7 +732,7 @@ makeOutputLine label idTxt { x, y } =
 
 
 type alias WebData =
-    { endPointX : Float
+    { endPoint : Float2
     , webs :
         { offsets :
             { webOffsetUp : Float2
@@ -770,11 +770,12 @@ calcWebPoints :
             , nextWeb : Float
             , mainWeb : Float
             , chord : Float
+            , chordDoubleLen : Float
             }
        }
 calcWebPoints dat currWeb index =
     let
-        { endPointX, webs, chordDoubling, chordVert, mainChordLen } =
+        { endPoint, webs, chordDoubling, chordVert, mainChordLen } =
             dat
 
         { offsets, mainWebWidth, startWebWidth, nextWebWidth, startCount, nextCount, webWidthToLenMul } =
@@ -783,7 +784,7 @@ calcWebPoints dat currWeb index =
         { webOffsetUp, webOffsetUpCd, webOffsetDn, webOffsetDnCd, webOffsetVec } =
             offsets
     in
-    if currWeb.x > endPointX then
+    if currWeb.x > endPoint.x then
         { webPoints = []
         , webLines = []
         , chordDoublingRes = Nothing
@@ -792,10 +793,13 @@ calcWebPoints dat currWeb index =
             , nextWeb = 0
             , mainWeb = 0
             , chord = mainChordLen * 2
+            , chordDoubleLen = 0
             }
         }
     else
         let
+            -- even => up web
+            -- odd => down web
             isTop =
                 Math.modBy 2 index == 1
 
@@ -867,14 +871,26 @@ calcWebPoints dat currWeb index =
                     []
 
             chordDoubleLen =
-                if index /= 0 && index == chordDoubling * 2 - 1 then
+                if not isNextWeb && index <= chordDoubling * 2 - 1 then
+                    -- chord doubling the whole length
+                    mainChordLen
+                else if index == chordDoubling * 2 - 1 then
+                    -- chord doubling ends at this web
+                    -- index is the down web
                     V2.length (V2.add currWeb webOffsetDir)
                 else
-                    0
+                    nextTotals.chordDoubleLen
 
             chordDoublingRes =
-                if index /= 0 && index == chordDoubling * 2 - 1 then
-                    -- the down chord
+                if not isNextWeb && index <= chordDoubling * 2 - 1 then
+                    -- chord doubling the whole length
+                    Just
+                        { start = chordVert
+                        , end = V2.add chordVert endPoint
+                        }
+                else if index == chordDoubling * 2 - 1 then
+                    -- chord doubling ends at this web
+                    -- index is the down web
                     Just
                         { start = chordVert
                         , end = V2.add currWeb webOffsetDnCd
@@ -907,7 +923,8 @@ calcWebPoints dat currWeb index =
                 { startWeb = nextTotals.startWeb + startWebLen
                 , nextWeb = nextTotals.nextWeb + nextWebLen
                 , mainWeb = nextTotals.mainWeb + mainWebLen
-                , chord = nextTotals.chord + chordDoubleLen
+                , chord = nextTotals.chord
+                , chordDoubleLen = chordDoubleLen
                 }
         in
         { webPoints = webPoints
@@ -1027,7 +1044,7 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
 
         dat =
             calcWebPoints
-                { endPointX = endPointLower.x
+                { endPoint = endPointLower
                 , webs =
                     { offsets =
                         { webOffsetUp = webOffsetUp
@@ -1114,6 +1131,6 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
                     { startWeb = formatF dat.totals.startWeb
                     , nextWeb = formatF dat.totals.nextWeb
                     , mainWeb = formatF dat.totals.mainWeb
-                    , chord = formatF dat.totals.chord
+                    , chord = formatF (dat.totals.chord + dat.totals.chordDoubleLen)
                     }
                 }
