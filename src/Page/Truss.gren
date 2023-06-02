@@ -5,7 +5,7 @@ module Page.Truss exposing ( Model, Msg(..), update, view, queryParser, queryBui
 
 import Browser
 import Browser.Dom as Dom
-import Html exposing ( Html, a, br, button, div, h1, hr, input, text )
+import Html exposing ( Html, a, br, button, div, h1, hr, input, table, tbody, td, text, th, thead, tr )
 import Html.Attributes exposing ( class, href, id, readonly, step, style, tabindex, type_, value )
 import Html.Events exposing ( onClick, onInput )
 import Math
@@ -472,7 +472,7 @@ view model =
                         [ text e
                         ]
 
-                Ok { endDistance, webPoints, webLines, lowerChordStart, upperChordStart, lowerChordEnd, upperChordEnd, webOffsetDn, webOffsetUp, chordDoublingRes, chordVert, totals } ->
+                Ok { endDistance, webPoints, webLines, lowerChordStart, upperChordStart, lowerChordEnd, upperChordEnd, webOffsetDn, webOffsetUp, chordDoublingRes, chordVert, members } ->
                     let
                         trussWidth =
                             upperChordEnd.x
@@ -524,16 +524,7 @@ view model =
                         [ makeOutput "End distance" "end-distance" endDistance
                         , makeOutputLine "Up distance" "up-distance" webOffsetUp
                         , makeOutputLine "Dn distance" "dn-distance" webOffsetDn
-                        , if totals.startWeb /= 0 then
-                            makeOutput "Total initial web length" "total-start-web-len" totals.startWeb
-                          else
-                            text ""
-                        , if totals.nextWeb /= 0 then
-                            makeOutput "Total next web length" "total-next-web-len" totals.nextWeb
-                          else
-                            text ""
-                        , makeOutput "Total main web length" "total-main-web-len" totals.mainWeb
-                        , makeOutput "Total chord length" "total-chord-len" totals.chord
+                        , makeOutputTable members
                         , svg
                             [ -- fill the screen when it is small
                               style "width" "clamp(75%, 1000px, 100%)"
@@ -727,6 +718,56 @@ makeOutputLine label idTxt { x, y } =
         ]
 
 
+makeOutputTable : MemberList -> Html Msg
+makeOutputTable members =
+    table
+        [ style "margin-left" "auto"
+        , style "margin-right" "auto"
+        ]
+        [ thead
+            []
+            [ tr
+                []
+                [ th
+                    []
+                    [ text "Member Type"
+                    ]
+                , th
+                    []
+                    [ text "Length"
+                    ]
+                , th
+                    []
+                    [ text "Qty"
+                    ]
+                ]
+            ]
+        , tbody
+            []
+            (members
+                |> Array.sortWith compareMembers
+                |> Array.map
+                        (\{ name, length, qty } ->
+                            tr
+                                []
+                                [ td
+                                    []
+                                    [ text name
+                                    ]
+                                , td
+                                    []
+                                    [ text (String.fromFloat (formatFs length))
+                                    ]
+                                , td
+                                    []
+                                    [ text (String.fromInt qty)
+                                    ]
+                                ]
+                        )
+            )
+        ]
+
+
 
 -- chordHeight is 90 degrees to the chord
 
@@ -754,6 +795,77 @@ type alias WebData =
     }
 
 
+type alias Member =
+    { name : String
+    , length : Float
+    , qty : Int
+    }
+
+
+type alias MemberList =
+    Array Member
+
+
+memberToNum : Member -> Int
+memberToNum member =
+    case member.name of
+        "Chord" ->
+            0
+
+        "Initial Web" ->
+            1
+
+        "Next Web" ->
+            2
+
+        "Main Web" ->
+            3
+
+        _ ->
+            4
+
+
+compareMembers : Member -> Member -> Order
+compareMembers a b =
+    case compare (memberToNum a) (memberToNum b) of
+        EQ ->
+            compare b.length a.length
+            -- length largest to smallest
+
+        LT ->
+            LT
+
+        GT ->
+            GT
+
+
+canCombineMembers : String -> Float -> Member -> Bool
+canCombineMembers name length =
+    \member -> member.name == name && (Math.abs (member.length - length) < 1)
+
+
+addMember : String -> Float -> MemberList -> MemberList
+addMember name length existing =
+    case Array.findFirst (canCombineMembers name length) existing of
+        Just existingMember ->
+            existing
+                |> Array.map
+                        (\member ->
+                            if existingMember == member then
+                                { member | qty = member.qty + 1 }
+                            else
+                                member
+                        )
+
+        Nothing ->
+            existing
+                |> Array.pushLast
+                        { name = name
+                        , length = length
+                        , qty = 1
+                        }
+
+
 calcWebPoints :
     WebData
     -> Float2
@@ -765,13 +877,7 @@ calcWebPoints :
                 { start : Float2
                 , end : Float2
                 }
-       , totals :
-            { startWeb : Float
-            , nextWeb : Float
-            , mainWeb : Float
-            , chord : Float
-            , chordDoubleLen : Float
-            }
+       , members : MemberList
        }
 calcWebPoints dat currWeb index =
     let
@@ -788,13 +894,10 @@ calcWebPoints dat currWeb index =
         { webPoints = []
         , webLines = []
         , chordDoublingRes = Nothing
-        , totals =
-            { startWeb = 0
-            , nextWeb = 0
-            , mainWeb = 0
-            , chord = mainChordLen * 2
-            , chordDoubleLen = 0
-            }
+        , members =
+            []
+                |> addMember "Chord" mainChordLen
+                |> addMember "Chord" mainChordLen
         }
     else
         let
@@ -870,16 +973,37 @@ calcWebPoints dat currWeb index =
                 else
                     []
 
-            chordDoubleLen =
+            addedChordDouble =
                 if not isNextWeb && index <= chordDoubling * 2 - 1 then
                     -- chord doubling the whole length
-                    mainChordLen
+                    addMember "Chord" mainChordLen nextDat.members
                 else if index == chordDoubling * 2 - 1 then
                     -- chord doubling ends at this web
                     -- index is the down web
-                    V2.length (V2.add currWeb webOffsetDir)
+                    addMember "Chord" (V2.length (V2.add currWeb webOffsetDir)) nextDat.members
                 else
-                    nextTotals.chordDoubleLen
+                    nextDat.members
+
+            addedStartWeb =
+                if index < startCount && isNextWeb then
+                    addMember "Initial Web" webLen addedChordDouble
+                else
+                    addedChordDouble
+
+            addedNextWeb =
+                if index >= startCount && index < startCount + nextCount && isNextWeb then
+                    addMember "Next Web" webLen addedStartWeb
+                else
+                    addedStartWeb
+
+            addedMainWeb =
+                if index >= startCount + nextCount && isNextWeb then
+                    addMember "Main Web" webLen addedNextWeb
+                else
+                    addedNextWeb
+
+            members =
+                addedMainWeb
 
             chordDoublingRes =
                 if not isNextWeb && index <= chordDoubling * 2 - 1 then
@@ -897,40 +1021,11 @@ calcWebPoints dat currWeb index =
                         }
                 else
                     nextDat.chordDoublingRes
-
-            nextTotals =
-                nextDat.totals
-
-            startWebLen =
-                if index < startCount && isNextWeb then
-                    webLen
-                else
-                    0
-
-            nextWebLen =
-                if index >= startCount && index < startCount + nextCount && isNextWeb then
-                    webLen
-                else
-                    0
-
-            mainWebLen =
-                if index >= startCount + nextCount && isNextWeb then
-                    webLen
-                else
-                    0
-
-            totals =
-                { startWeb = nextTotals.startWeb + startWebLen
-                , nextWeb = nextTotals.nextWeb + nextWebLen
-                , mainWeb = nextTotals.mainWeb + mainWebLen
-                , chord = nextTotals.chord
-                , chordDoubleLen = chordDoubleLen
-                }
         in
         { webPoints = webPoints
         , webLines = webLines
         , chordDoublingRes = chordDoublingRes
-        , totals = totals
+        , members = members
         }
 
 
@@ -972,12 +1067,7 @@ type alias TrussCalc =
     , webOffsetUp : Float2
     , webOffsetDn : Float2
     , chordVert : Float2
-    , totals :
-        { startWeb : Float
-        , nextWeb : Float
-        , mainWeb : Float
-        , chord : Float
-        }
+    , members : MemberList
     }
 
 
@@ -1076,18 +1166,6 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
                         V2.distance endPointUpper
                     )
 
-        -- 6 dp
-        formatF : Float -> Float
-        formatF value =
-            toFloat (Math.round (value * 1000000)) / 1000000
-
-        -- 6 dp
-        formatF2 : Float2 -> Float2
-        formatF2 { x, y } =
-            { x = formatF x
-            , y = formatF y
-            }
-
         webMax =
             90 - Math.abs roof
 
@@ -1113,7 +1191,7 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
 
         Nothing ->
             Ok
-                { endDistance = formatF endDistance
+                { endDistance = formatFs endDistance
                 , webPoints = dat.webPoints
                 , webLines = dat.webLines
                 , lowerChordStart =
@@ -1127,10 +1205,25 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
                 , webOffsetUp = formatF2 webOffsetUp
                 , webOffsetDn = formatF2 webOffsetDn
                 , chordVert = chordVert
-                , totals =
-                    { startWeb = formatF dat.totals.startWeb
-                    , nextWeb = formatF dat.totals.nextWeb
-                    , mainWeb = formatF dat.totals.mainWeb
-                    , chord = formatF (dat.totals.chord + dat.totals.chordDoubleLen)
-                    }
+                , members = dat.members
                 }
+
+
+
+-- 6 dp
+
+
+formatF2 : Float2 -> Float2
+formatF2 { x, y } =
+    { x = toFloat (Math.round (x * 1000000)) / 1000000
+    , y = toFloat (Math.round (y * 1000000)) / 1000000
+    }
+
+
+
+-- 2 dp
+
+
+formatFs : Float -> Float
+formatFs value =
+    toFloat (Math.round (value * 100)) / 100
