@@ -27,10 +27,40 @@ queryParser : Query.Parser Model
 queryParser =
     -- We can't do any more than map8
     Query.map
-        (\chordLen chordGap chordHeight chordDoubling web startWeb startCount nextWeb nextCount roof webAngle webStart title ->
+        (\chordLen chordGap chordOutside chordHeight chordDoubling web startWeb startCount nextWeb nextCount roof webAngle webStart title ->
+            let
+                -- compatibility with old urls that include a gap rather than outside
+                chordGapFM =
+                    String.toFloat (Maybe.withDefault "" chordGap)
+
+                chordHeightOriginalS =
+                    Maybe.withDefault "" chordHeight
+
+                chordHeightF =
+                    Maybe.withDefault 0.0 (String.toFloat chordHeightOriginalS)
+
+                chordOutsideS =
+                    case chordGapFM of
+                        Just chordGapF ->
+                            String.fromFloat (chordGapF + chordHeightF * 2)
+
+                        Nothing ->
+                            Maybe.withDefault "" chordOutside
+
+                chordHeightS =
+                    case chordGapFM of
+                        Just _ ->
+                            if String.isEmpty chordHeightOriginalS then
+                                "0"
+                            else
+                                chordHeightOriginalS
+
+                        Nothing ->
+                            chordHeightOriginalS
+            in
             { chordLen = Maybe.withDefault "" chordLen
-            , chordGap = Maybe.withDefault "" chordGap
-            , chordHeight = Maybe.withDefault "" chordHeight
+            , chordOutside = chordOutsideS
+            , chordHeight = chordHeightS
             , chordDoubling = Maybe.withDefault "" chordDoubling
             , web = Maybe.withDefault "" web
             , startWeb = Maybe.withDefault "" startWeb
@@ -46,6 +76,7 @@ queryParser =
         )
         (Query.string "chordLen")
         |> qApply (Query.string "chordGap")
+        |> qApply (Query.string "chordOutside")
         |> qApply (Query.string "chordHeight")
         |> qApply (Query.string "chordDoubling")
         |> qApply (Query.string "web")
@@ -70,7 +101,7 @@ builderStr default key val =
 queryBuilder : Model -> Array Builder.QueryParameter
 queryBuilder model =
     [ builderStr "" "chordLen" model.chordLen
-    , builderStr "" "chordGap" model.chordGap
+    , builderStr "" "chordOutside" model.chordOutside
     , builderStr "" "chordHeight" model.chordHeight
     , builderStr "" "chordDoubling" model.chordDoubling
     , builderStr "" "web" model.web
@@ -88,7 +119,7 @@ queryBuilder model =
 
 type alias Model =
     { chordLen : String
-    , chordGap : String
+    , chordOutside : String
     , chordHeight : String
     , chordDoubling : String
     , web : String
@@ -112,7 +143,7 @@ type alias Updated =
 
 type Msg
     = UpdateChordLen String
-    | UpdateChordGap String
+    | UpdateChordOutside String
     | UpdateChordHeight String
     | UpdateChordDoubling String
     | UpdateWeb String
@@ -152,8 +183,8 @@ update msg model =
         UpdateChordLen c ->
             doFocus { model | chordLen = c } "chord-len"
 
-        UpdateChordGap c ->
-            doFocus { model | chordGap = c } "chord-gap"
+        UpdateChordOutside c ->
+            doFocus { model | chordOutside = c } "chord-outside"
 
         UpdateChordHeight c ->
             doFocus { model | chordHeight = c } "chord-height"
@@ -210,7 +241,7 @@ calculateTruss model =
     let
         parsedModel =
             { chordLen = String.toFloat model.chordLen
-            , chordGap = String.toFloat model.chordGap
+            , chordOutside = String.toFloat model.chordOutside
             , chordHeight = String.toFloat model.chordHeight
             , chordDoubling = String.toInt model.chordDoubling
             , web = String.toFloat model.web
@@ -224,14 +255,13 @@ calculateTruss model =
             }
     in
     case parsedModel of
-        { chordLen = Just chordLen, chordGap = Just chordGap, chordDoubling = Nothing, web = Just web, startWeb = Nothing, startCount = Nothing, nextWeb = Nothing, nextCount = Nothing, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
+        -- same webs all through
+        { chordLen = Just chordLen, chordOutside = Just chordOutside, chordHeight = Just chordHeight, web = Just web, startWeb = Nothing, startCount = Nothing, nextWeb = Nothing, nextCount = Nothing, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
             finishTrussCalc
                 { chordLen = chordLen
-                , chordGap = chordGap
-                , chordHeight =
-                    parsedModel.chordHeight
-                        |> Maybe.withDefault 0
-                , chordDoubling = 0
+                , chordGap = chordOutside - chordHeight * 2
+                , chordHeight = chordHeight
+                , chordDoubling = Maybe.withDefault 0 parsedModel.chordDoubling
                 , web = web
                 , startWeb = 0
                 , startCount = 0
@@ -242,30 +272,13 @@ calculateTruss model =
                 , webStart = webStart
                 }
 
-        { chordLen = Just chordLen, chordGap = Just chordGap, chordHeight = Just chordHeight, chordDoubling = Just chordDoubling, web = Just web, startWeb = Nothing, startCount = Nothing, nextWeb = Nothing, nextCount = Nothing, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
+        -- two sorts of webs
+        { chordLen = Just chordLen, chordOutside = Just chordOutside, chordHeight = Just chordHeight, web = Just web, startWeb = Just startWeb, startCount = Just startCount, nextWeb = Nothing, nextCount = Nothing, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
             finishTrussCalc
                 { chordLen = chordLen
-                , chordGap = chordGap
+                , chordGap = chordOutside - chordHeight * 2
                 , chordHeight = chordHeight
-                , chordDoubling = chordDoubling
-                , web = web
-                , startWeb = 0
-                , startCount = 0
-                , nextWeb = 0
-                , nextCount = 0
-                , roof = roof
-                , webAngle = webAngle
-                , webStart = webStart
-                }
-
-        { chordLen = Just chordLen, chordGap = Just chordGap, chordDoubling = Nothing, web = Just web, startWeb = Just startWeb, startCount = Just startCount, nextWeb = Nothing, nextCount = Nothing, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
-            finishTrussCalc
-                { chordLen = chordLen
-                , chordGap = chordGap
-                , chordHeight =
-                    parsedModel.chordHeight
-                        |> Maybe.withDefault 0
-                , chordDoubling = 0
+                , chordDoubling = Maybe.withDefault 0 parsedModel.chordDoubling
                 , web = web
                 , startWeb = startWeb
                 , startCount = startCount
@@ -276,46 +289,13 @@ calculateTruss model =
                 , webStart = webStart
                 }
 
-        { chordLen = Just chordLen, chordGap = Just chordGap, chordHeight = Just chordHeight, chordDoubling = Just chordDoubling, web = Just web, startWeb = Just startWeb, startCount = Just startCount, nextWeb = Nothing, nextCount = Nothing, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
+        -- three sorts of webs
+        { chordLen = Just chordLen, chordOutside = Just chordOutside, chordHeight = Just chordHeight, web = Just web, startWeb = Just startWeb, startCount = Just startCount, nextWeb = Just nextWeb, nextCount = Just nextCount, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
             finishTrussCalc
                 { chordLen = chordLen
-                , chordGap = chordGap
+                , chordGap = chordOutside - chordHeight * 2
                 , chordHeight = chordHeight
-                , chordDoubling = chordDoubling
-                , web = web
-                , startWeb = startWeb
-                , startCount = startCount
-                , nextWeb = 0
-                , nextCount = 0
-                , roof = roof
-                , webAngle = webAngle
-                , webStart = webStart
-                }
-
-        { chordLen = Just chordLen, chordGap = Just chordGap, chordDoubling = Nothing, web = Just web, startWeb = Just startWeb, startCount = Just startCount, nextWeb = Just nextWeb, nextCount = Just nextCount, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
-            finishTrussCalc
-                { chordLen = chordLen
-                , chordGap = chordGap
-                , chordHeight =
-                    parsedModel.chordHeight
-                        |> Maybe.withDefault 0
-                , chordDoubling = 0
-                , web = web
-                , startWeb = startWeb
-                , startCount = startCount
-                , nextWeb = nextWeb
-                , nextCount = nextCount
-                , roof = roof
-                , webAngle = webAngle
-                , webStart = webStart
-                }
-
-        { chordLen = Just chordLen, chordGap = Just chordGap, chordHeight = Just chordHeight, chordDoubling = Just chordDoubling, web = Just web, startWeb = Just startWeb, startCount = Just startCount, nextWeb = Just nextWeb, nextCount = Just nextCount, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
-            finishTrussCalc
-                { chordLen = chordLen
-                , chordGap = chordGap
-                , chordHeight = chordHeight
-                , chordDoubling = chordDoubling
+                , chordDoubling = Maybe.withDefault 0 parsedModel.chordDoubling
                 , web = web
                 , startWeb = startWeb
                 , startCount = startCount
@@ -329,8 +309,11 @@ calculateTruss model =
         { chordLen = Nothing } ->
             Err "enter the length of the chord"
 
-        { chordGap = Nothing } ->
-            Err "enter the gap between the chords"
+        { chordOutside = Nothing } ->
+            Err "enter the truss depth"
+
+        { chordHeight = Nothing } ->
+            Err "enter the height of the chord profile"
 
         { web = Nothing } ->
             Err "enter the width of the web profile"
@@ -343,10 +326,6 @@ calculateTruss model =
 
         { webStart = Nothing } ->
             Err "enter the web start distance"
-
-        -- The user has entered a chord doubling, but not set the chord height
-        { chordHeight = Nothing } ->
-            Err "enter the height of the chord profile too"
 
         -- Check the initial webs
         -- The user has entered an initial web width, but not a valid count
@@ -451,7 +430,7 @@ view model =
                 , style "max-width" "60em"
                 ]
                 [ makeInput "Chord length" "chord-len" 0.5 model.chordLen UpdateChordLen
-                , makeInput "Gap between chords" "chord-gap" 0.5 model.chordGap UpdateChordGap
+                , makeInput "Truss depth" "chord-outside" 0.5 model.chordOutside UpdateChordOutside
                 , makeInput "Chord height" "chord-height" 0.5 model.chordHeight UpdateChordHeight
                 , makeInput "Chord doubling count" "chord-doubling" 1 model.chordDoubling UpdateChordDoubling
                 , makeInput "Roof angle" "roof" 0.5 model.roof UpdateRoof
