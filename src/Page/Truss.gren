@@ -898,6 +898,7 @@ calcWebPoints :
             Maybe
                 { start : Float2
                 , end : Float2
+                , wholeLength : Bool
                 }
        , members : MemberList
        }
@@ -1053,6 +1054,7 @@ calcWebPoints dat currWeb index =
                     Just
                         { start = chordVert
                         , end = V2.add chordVert endPoint
+                        , wholeLength = True
                         }
                 else if index == chordDoublingEndIndex then
                     -- chord doubling ends at this web
@@ -1060,6 +1062,7 @@ calcWebPoints dat currWeb index =
                     Just
                         { start = chordVert
                         , end = V2.add currWeb webOffsetDnCd
+                        , wholeLength = False
                         }
                 else
                     nextDat.chordDoublingRes
@@ -1106,6 +1109,7 @@ type alias TrussCalc =
         Maybe
             { start : Float2
             , end : Float2
+            , wholeLength : Bool
             }
     , webOffsetUp : Float2
     , webOffsetDn : Float2
@@ -1215,7 +1219,12 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
                                     1
                                 )
                      then
-                        V2.distance endPointLower
+                        case dat.chordDoublingRes of
+                            Just { end, wholeLength = True } ->
+                                V2.distance end
+
+                            _ ->
+                                V2.distance endPointLower
                      else
                         V2.distance endPointUpper
                     )

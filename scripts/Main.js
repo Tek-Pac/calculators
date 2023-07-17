@@ -8150,11 +8150,13 @@ var $author$project$Page$Truss$calcWebPoints = F3(
 			var chordDoublingRes = ((!isNextWeb) && (_Utils_cmp(index, chordDoublingEndIndex) < 1)) ? $gren_lang$core$Maybe$Just(
 				{
 					end: A2($author$project$Vector2$add, chordVert, endPoint),
-					start: chordVert
+					start: chordVert,
+					wholeLength: true
 				}) : (_Utils_eq(index, chordDoublingEndIndex) ? $gren_lang$core$Maybe$Just(
 				{
 					end: A2($author$project$Vector2$add, currWeb, webOffsetDnCd),
-					start: chordVert
+					start: chordVert,
+					wholeLength: false
 				}) : nextDat.chordDoublingRes);
 			var webPoints = A2($gren_lang$core$Array$pushFirst, currWeb, nextDat.webPoints);
 			var webLines = isNextWeb ? A2(
@@ -8362,12 +8364,25 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 		},
 		webStartV,
 		0);
-	var endDistance = (_Utils_eq(
-		A2(
-			$gren_lang$core$Math$modBy,
-			2,
-			$gren_lang$core$Array$length(dat.webPoints)),
-		webStartTop ? 0 : 1) ? $author$project$Vector2$distance(endPointLower) : $author$project$Vector2$distance(endPointUpper))(
+	var endDistance = function () {
+		if (_Utils_eq(
+			A2(
+				$gren_lang$core$Math$modBy,
+				2,
+				$gren_lang$core$Array$length(dat.webPoints)),
+			webStartTop ? 0 : 1)) {
+			var _v2 = dat.chordDoublingRes;
+			if ((_v2.$ === 'Just') && _v2.a.wholeLength) {
+				var _v3 = _v2.a;
+				var end = _v3.end;
+				return $author$project$Vector2$distance(end);
+			} else {
+				return $author$project$Vector2$distance(endPointLower);
+			}
+		} else {
+			return $author$project$Vector2$distance(endPointUpper);
+		}
+	}()(
 		A2(
 			$gren_lang$core$Maybe$withDefault,
 			A2($author$project$Vector2$v2, 0, 9999),
