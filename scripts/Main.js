@@ -8211,7 +8211,7 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 	var nextCount = _v0.nextCount;
 	var roof = _v0.roof;
 	var webAngle = _v0.webAngle;
-	var webDist = _v0.webStart;
+	var webStart = _v0.webStart;
 	var webRad = $gren_lang$core$Math$degrees(webAngle);
 	var webMax = 90 - $gren_lang$core$Math$abs(roof);
 	var roofRad = $gren_lang$core$Math$degrees(roof);
@@ -8219,7 +8219,7 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 		$author$project$Vector2$v2,
 		$gren_lang$core$Math$cos(roofRad),
 		$gren_lang$core$Math$sin(roofRad));
-	var webStart = A2($author$project$Vector2$mul, trussAlong, webDist);
+	var webStartV = A2($author$project$Vector2$mul, trussAlong, webStart);
 	var vertGapDist = A2(
 		$author$project$Vector2$v2,
 		0,
@@ -8252,7 +8252,7 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 	var error = A3(
 		$author$project$Page$Truss$maybeErr,
 		'web start distance should be positive',
-		webDist < 0,
+		webStart < 0,
 		A3(
 			$author$project$Page$Truss$maybeErr,
 			'web angle should be positive',
@@ -8326,7 +8326,7 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 				webWidthToLenMul: 1 / $gren_lang$core$Math$tan(webRad)
 			}
 		},
-		webStart,
+		webStartV,
 		0);
 	var endDistance = ((A2(
 		$gren_lang$core$Math$modBy,

@@ -1064,7 +1064,7 @@ maybeErr err useDefault orig =
 
 
 finishTrussCalc : FilledModel -> Result String TrussCalc
-finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb, startCount, nextWeb, nextCount, roof, webAngle, webStart = webDist } =
+finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb, startCount, nextWeb, nextCount, roof, webAngle, webStart } =
     let
         roofRad =
             Math.degrees roof
@@ -1090,8 +1090,8 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
         endPointUpper =
             V2.add endPointLower vertGapDist
 
-        webStart =
-            V2.mul trussAlong webDist
+        webStartV =
+            V2.mul trussAlong webStart
 
         webOffsetUp =
             V2.div (V2.mul webAlongUp chordGap) (Math.sin webRad)
@@ -1133,7 +1133,7 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
                 , chordVert = chordVert
                 , mainChordLen = mainChordLen
                 }
-                webStart
+                webStartV
                 0
 
         endDistance =
@@ -1148,7 +1148,7 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
         webMax =
             90 - Math.abs roof
 
-        -- chordLen, chordGap, chordHeight, chordDoubling, web, startWeb, startCount, nextWeb, nextCount, roof, webAngle, webStart = webDist
+        -- chordLen, chordGap, chordHeight, chordDoubling, web, startWeb, startCount, nextWeb, nextCount, roof, webAngle, webStart
         error =
             Nothing
                 |> maybeErr "chord length should be positive" (chordLen < 0)
@@ -1162,7 +1162,7 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
                 |> maybeErr "next web count should be positive" (nextCount < 0)
                 |> maybeErr ("web angle should be less than " ++ String.fromFloat webMax ++ " degrees") (webAngle > webMax)
                 |> maybeErr "web angle should be positive" (webAngle < 0)
-                |> maybeErr "web start distance should be positive" (webDist < 0)
+                |> maybeErr "web start distance should be positive" (webStart < 0)
     in
     case error of
         Just e ->
