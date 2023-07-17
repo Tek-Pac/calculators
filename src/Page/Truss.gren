@@ -933,6 +933,16 @@ calcWebPoints dat currWeb index =
                     -- index is odd  && not webStartTop -> true
                     Math.modBy 2 index == 1
 
+            chordDoublingEndIndex =
+                chordDoubling
+                    * 2
+                    - 1
+                    + (if webStartTop then
+                            -1
+                         else
+                            0
+                        )
+
             webWidth =
                 if index < startCount then
                     startWebWidth
@@ -945,24 +955,29 @@ calcWebPoints dat currWeb index =
                 V2.mul webOffsetVec webWidth
 
             webLen =
-                if index < chordDoubling * 2 - 1 then
+                if index < chordDoublingEndIndex then
                     V2.length webOffsetDnCd + webWidthToLenMul * webWidth
                 else
                     V2.length webOffsetDn + webWidthToLenMul * webWidth
 
             webStartGraphicalOffset =
-                if index == 0 && chordDoubling > 0 then
+                if index == 0 && chordDoubling > 0 && not webStartTop then
                     chordVert
                 else
                     v2 0 0
 
             webOffsetDir =
-                if index < chordDoubling * 2 - 1 then
-                    -- 1 goes to just before the second web
-                    -- 2 goes to just before the fourth web
+                if index < chordDoublingEndIndex then
+                    -- if webStartTop == true
+                    --  1 goes to just before the first web
+                    --  2 goes to just before the third web
+                    -- else (webStartTop == false)
+                    --  1 goes to just before the second web
+                    --  2 goes to just before the fourth web
                     if isTop then
                         webOffsetDnCd
                     else if index == 0 then
+                        -- never hit if webStartTop == true
                         V2.add webOffsetUpCd chordVert
                     else
                         webOffsetUpCd
@@ -1001,10 +1016,10 @@ calcWebPoints dat currWeb index =
                     []
 
             addedChordDouble =
-                if not isNextWeb && index <= chordDoubling * 2 - 1 then
+                if not isNextWeb && index <= chordDoublingEndIndex then
                     -- chord doubling the whole length
                     addMember "Chord" mainChordLen nextDat.members
-                else if index == chordDoubling * 2 - 1 then
+                else if index == chordDoublingEndIndex then
                     -- chord doubling ends at this web
                     -- index is the down web
                     addMember "Chord" (V2.length (V2.add currWeb webOffsetDir)) nextDat.members
@@ -1033,13 +1048,13 @@ calcWebPoints dat currWeb index =
                 addedMainWeb
 
             chordDoublingRes =
-                if not isNextWeb && index <= chordDoubling * 2 - 1 then
+                if not isNextWeb && index <= chordDoublingEndIndex then
                     -- chord doubling the whole length
                     Just
                         { start = chordVert
                         , end = V2.add chordVert endPoint
                         }
-                else if index == chordDoubling * 2 - 1 then
+                else if index == chordDoublingEndIndex then
                     -- chord doubling ends at this web
                     -- index is the down web
                     Just
