@@ -5518,93 +5518,111 @@ var $author$project$Page$Truss$queryParser = A2(
 	$gren_lang$url$Url$Parser$Query$string('title'),
 	A2(
 		$author$project$Page$Truss$qApply,
-		$gren_lang$url$Url$Parser$Query$string('webStart'),
+		$gren_lang$url$Url$Parser$Query$string('webStartTop'),
 		A2(
 			$author$project$Page$Truss$qApply,
-			$gren_lang$url$Url$Parser$Query$string('webAngle'),
+			$gren_lang$url$Url$Parser$Query$string('webStart'),
 			A2(
 				$author$project$Page$Truss$qApply,
-				$gren_lang$url$Url$Parser$Query$string('roof'),
+				$gren_lang$url$Url$Parser$Query$string('webAngle'),
 				A2(
 					$author$project$Page$Truss$qApply,
-					$gren_lang$url$Url$Parser$Query$string('nextCount'),
+					$gren_lang$url$Url$Parser$Query$string('roof'),
 					A2(
 						$author$project$Page$Truss$qApply,
-						$gren_lang$url$Url$Parser$Query$string('nextWeb'),
+						$gren_lang$url$Url$Parser$Query$string('nextCount'),
 						A2(
 							$author$project$Page$Truss$qApply,
-							$gren_lang$url$Url$Parser$Query$string('startCount'),
+							$gren_lang$url$Url$Parser$Query$string('nextWeb'),
 							A2(
 								$author$project$Page$Truss$qApply,
-								$gren_lang$url$Url$Parser$Query$string('startWeb'),
+								$gren_lang$url$Url$Parser$Query$string('startCount'),
 								A2(
 									$author$project$Page$Truss$qApply,
-									$gren_lang$url$Url$Parser$Query$string('web'),
+									$gren_lang$url$Url$Parser$Query$string('startWeb'),
 									A2(
 										$author$project$Page$Truss$qApply,
-										$gren_lang$url$Url$Parser$Query$string('chordDoubling'),
+										$gren_lang$url$Url$Parser$Query$string('web'),
 										A2(
 											$author$project$Page$Truss$qApply,
-											$gren_lang$url$Url$Parser$Query$string('chordHeight'),
+											$gren_lang$url$Url$Parser$Query$string('chordDoubling'),
 											A2(
 												$author$project$Page$Truss$qApply,
-												$gren_lang$url$Url$Parser$Query$string('chordOutside'),
+												$gren_lang$url$Url$Parser$Query$string('chordHeight'),
 												A2(
 													$author$project$Page$Truss$qApply,
-													$gren_lang$url$Url$Parser$Query$string('chordGap'),
+													$gren_lang$url$Url$Parser$Query$string('chordOutside'),
 													A2(
-														$gren_lang$url$Url$Parser$Query$map,
-														function (chordLen) {
-															return function (chordGap) {
-																return function (chordOutside) {
-																	return function (chordHeight) {
-																		return function (chordDoubling) {
-																			return function (web) {
-																				return function (startWeb) {
-																					return function (startCount) {
-																						return function (nextWeb) {
-																							return function (nextCount) {
-																								return function (roof) {
-																									return function (webAngle) {
-																										return function (webStart) {
-																											return function (title) {
-																												var chordHeightOriginalS = A2($gren_lang$core$Maybe$withDefault, '', chordHeight);
-																												var chordHeightF = A2(
-																													$gren_lang$core$Maybe$withDefault,
-																													0.0,
-																													$gren_lang$core$String$toFloat(chordHeightOriginalS));
-																												var chordGapFM = $gren_lang$core$String$toFloat(
-																													A2($gren_lang$core$Maybe$withDefault, '', chordGap));
-																												var chordHeightS = function () {
-																													if (chordGapFM.$ === 'Just') {
-																														return $gren_lang$core$String$isEmpty(chordHeightOriginalS) ? '0' : chordHeightOriginalS;
-																													} else {
-																														return chordHeightOriginalS;
-																													}
-																												}();
-																												var chordOutsideS = function () {
-																													if (chordGapFM.$ === 'Just') {
-																														var chordGapF = chordGapFM.a;
-																														return $gren_lang$core$String$fromFloat(chordGapF + (chordHeightF * 2));
-																													} else {
-																														return A2($gren_lang$core$Maybe$withDefault, '', chordOutside);
-																													}
-																												}();
-																												return {
-																													chordDoubling: A2($gren_lang$core$Maybe$withDefault, '', chordDoubling),
-																													chordHeight: chordHeightS,
-																													chordLen: A2($gren_lang$core$Maybe$withDefault, '', chordLen),
-																													chordOutside: chordOutsideS,
-																													nextCount: A2($gren_lang$core$Maybe$withDefault, '', nextCount),
-																													nextWeb: A2($gren_lang$core$Maybe$withDefault, '', nextWeb),
-																													roof: A2($gren_lang$core$Maybe$withDefault, '', roof),
-																													startCount: A2($gren_lang$core$Maybe$withDefault, '', startCount),
-																													startWeb: A2($gren_lang$core$Maybe$withDefault, '', startWeb),
-																													title: A2($gren_lang$core$Maybe$withDefault, 'Truss', title),
-																													titleEdit: false,
-																													web: A2($gren_lang$core$Maybe$withDefault, '', web),
-																													webAngle: A2($gren_lang$core$Maybe$withDefault, '45', webAngle),
-																													webStart: A2($gren_lang$core$Maybe$withDefault, '125', webStart)
+														$author$project$Page$Truss$qApply,
+														$gren_lang$url$Url$Parser$Query$string('chordGap'),
+														A2(
+															$gren_lang$url$Url$Parser$Query$map,
+															function (chordLen) {
+																return function (chordGap) {
+																	return function (chordOutside) {
+																		return function (chordHeight) {
+																			return function (chordDoubling) {
+																				return function (web) {
+																					return function (startWeb) {
+																						return function (startCount) {
+																							return function (nextWeb) {
+																								return function (nextCount) {
+																									return function (roof) {
+																										return function (webAngle) {
+																											return function (webStart) {
+																												return function (webStartTop) {
+																													return function (title) {
+																														var webStartTopB = function () {
+																															if (webStartTop.$ === 'Nothing') {
+																																return false;
+																															} else {
+																																if (webStartTop.a === 'no') {
+																																	return false;
+																																} else {
+																																	return true;
+																																}
+																															}
+																														}();
+																														var chordHeightOriginalS = A2($gren_lang$core$Maybe$withDefault, '', chordHeight);
+																														var chordHeightF = A2(
+																															$gren_lang$core$Maybe$withDefault,
+																															0.0,
+																															$gren_lang$core$String$toFloat(chordHeightOriginalS));
+																														var chordGapFM = $gren_lang$core$String$toFloat(
+																															A2($gren_lang$core$Maybe$withDefault, '', chordGap));
+																														var chordHeightS = function () {
+																															if (chordGapFM.$ === 'Just') {
+																																return $gren_lang$core$String$isEmpty(chordHeightOriginalS) ? '0' : chordHeightOriginalS;
+																															} else {
+																																return chordHeightOriginalS;
+																															}
+																														}();
+																														var chordOutsideS = function () {
+																															if (chordGapFM.$ === 'Just') {
+																																var chordGapF = chordGapFM.a;
+																																return $gren_lang$core$String$fromFloat(chordGapF + (chordHeightF * 2));
+																															} else {
+																																return A2($gren_lang$core$Maybe$withDefault, '', chordOutside);
+																															}
+																														}();
+																														return {
+																															chordDoubling: A2($gren_lang$core$Maybe$withDefault, '', chordDoubling),
+																															chordHeight: chordHeightS,
+																															chordLen: A2($gren_lang$core$Maybe$withDefault, '', chordLen),
+																															chordOutside: chordOutsideS,
+																															nextCount: A2($gren_lang$core$Maybe$withDefault, '', nextCount),
+																															nextWeb: A2($gren_lang$core$Maybe$withDefault, '', nextWeb),
+																															roof: A2($gren_lang$core$Maybe$withDefault, '', roof),
+																															startCount: A2($gren_lang$core$Maybe$withDefault, '', startCount),
+																															startWeb: A2($gren_lang$core$Maybe$withDefault, '', startWeb),
+																															title: A2($gren_lang$core$Maybe$withDefault, 'Truss', title),
+																															titleEdit: false,
+																															web: A2($gren_lang$core$Maybe$withDefault, '', web),
+																															webAngle: A2($gren_lang$core$Maybe$withDefault, '45', webAngle),
+																															webStart: A2($gren_lang$core$Maybe$withDefault, '125', webStart),
+																															webStartTop: webStartTopB
+																														};
+																													};
 																												};
 																											};
 																										};
@@ -5618,9 +5636,8 @@ var $author$project$Page$Truss$queryParser = A2(
 																		};
 																	};
 																};
-															};
-														},
-														$gren_lang$url$Url$Parser$Query$string('chordLen')))))))))))))));
+															},
+															$gren_lang$url$Url$Parser$Query$string('chordLen'))))))))))))))));
 var $gren_lang$url$Url$Parser$query = function (_v0) {
 	var queryParser = _v0.a;
 	return $gren_lang$url$Url$Parser$Parser(
@@ -5899,6 +5916,8 @@ var $author$project$Page$Truss$queryBuilder = function (model) {
 			A3($author$project$Page$Truss$builderStr, '', 'roof', model.roof),
 			A3($author$project$Page$Truss$builderStr, '45', 'webAngle', model.webAngle),
 			A3($author$project$Page$Truss$builderStr, '125', 'webStart', model.webStart),
+			model.webStartTop ? $gren_lang$core$Maybe$Just(
+			A2($gren_lang$url$Url$Builder$string, 'webStartTop', 'yes')) : $gren_lang$core$Maybe$Nothing,
 			A3($author$project$Page$Truss$builderStr, 'Truss', 'title', model.title)
 		]);
 };
@@ -6348,6 +6367,13 @@ var $author$project$Page$Truss$update = F2(
 						model,
 						{webStart: w}),
 					'web-start');
+			case 'ToggleWebStartTop':
+				return {
+					command: $author$project$SpaCmd$none,
+					model: _Utils_update(
+						model,
+						{webStartTop: !model.webStartTop})
+				};
 			case 'UpdateTitle':
 				var w = msg.a;
 				return {
@@ -7952,6 +7978,7 @@ var $author$project$Page$Triangle$view = function (model) {
 	};
 };
 var $author$project$Page$Truss$ToggleTitleEdit = {$: 'ToggleTitleEdit'};
+var $author$project$Page$Truss$ToggleWebStartTop = {$: 'ToggleWebStartTop'};
 var $author$project$Page$Truss$UpdateChordDoubling = function (a) {
 	return {$: 'UpdateChordDoubling', a: a};
 };
@@ -8084,6 +8111,7 @@ var $author$project$Page$Truss$calcWebPoints = F3(
 		var startCount = _v1.startCount;
 		var nextCount = _v1.nextCount;
 		var webWidthToLenMul = _v1.webWidthToLenMul;
+		var webStartTop = _v1.webStartTop;
 		var _v2 = offsets;
 		var webOffsetUp = _v2.webOffsetUp;
 		var webOffsetUpCd = _v2.webOffsetUpCd;
@@ -8110,7 +8138,7 @@ var $author$project$Page$Truss$calcWebPoints = F3(
 			var webStartGraphicalOffset = ((!index) && (chordDoubling > 0)) ? chordVert : A2($author$project$Vector2$v2, 0, 0);
 			var webOffset = A2($author$project$Vector2$mul, webOffsetVec, webWidth);
 			var webLen = (_Utils_cmp(index, (chordDoubling * 2) - 1) < 0) ? ($author$project$Vector2$length(webOffsetDnCd) + (webWidthToLenMul * webWidth)) : ($author$project$Vector2$length(webOffsetDn) + (webWidthToLenMul * webWidth));
-			var isTop = A2($gren_lang$core$Math$modBy, 2, index) === 1;
+			var isTop = webStartTop ? (!A2($gren_lang$core$Math$modBy, 2, index)) : (A2($gren_lang$core$Math$modBy, 2, index) === 1);
 			var webOffsetDir = (_Utils_cmp(index, (chordDoubling * 2) - 1) < 0) ? (isTop ? webOffsetDnCd : ((!index) ? A2($author$project$Vector2$add, webOffsetUpCd, chordVert) : webOffsetUpCd)) : (isTop ? webOffsetDn : webOffsetUp);
 			var nextCurrWeb = A2(
 				$author$project$Vector2$add,
@@ -8212,6 +8240,7 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 	var roof = _v0.roof;
 	var webAngle = _v0.webAngle;
 	var webStart = _v0.webStart;
+	var webStartTop = _v0.webStartTop;
 	var webRad = $gren_lang$core$Math$degrees(webAngle);
 	var webMax = 90 - $gren_lang$core$Math$abs(roof);
 	var roofRad = $gren_lang$core$Math$degrees(roof);
@@ -8219,11 +8248,14 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 		$author$project$Vector2$v2,
 		$gren_lang$core$Math$cos(roofRad),
 		$gren_lang$core$Math$sin(roofRad));
-	var webStartV = A2($author$project$Vector2$mul, trussAlong, webStart);
 	var vertGapDist = A2(
 		$author$project$Vector2$v2,
 		0,
 		chordGap / $gren_lang$core$Math$cos(roofRad));
+	var webStartV = webStartTop ? A2(
+		$author$project$Vector2$add,
+		A2($author$project$Vector2$mul, trussAlong, webStart),
+		vertGapDist) : A2($author$project$Vector2$mul, trussAlong, webStart);
 	var webAlongDn = A2(
 		$author$project$Vector2$v2,
 		$gren_lang$core$Math$cos(roofRad - webRad),
@@ -8323,15 +8355,18 @@ var $author$project$Page$Truss$finishTrussCalc = function (_v0) {
 				},
 				startCount: startCount,
 				startWebWidth: startWeb,
+				webStartTop: webStartTop,
 				webWidthToLenMul: 1 / $gren_lang$core$Math$tan(webRad)
 			}
 		},
 		webStartV,
 		0);
-	var endDistance = ((A2(
-		$gren_lang$core$Math$modBy,
-		2,
-		$gren_lang$core$Array$length(dat.webPoints)) === 1) ? $author$project$Vector2$distance(endPointLower) : $author$project$Vector2$distance(endPointUpper))(
+	var endDistance = (_Utils_eq(
+		A2(
+			$gren_lang$core$Math$modBy,
+			2,
+			$gren_lang$core$Array$length(dat.webPoints)),
+		webStartTop ? 0 : 1) ? $author$project$Vector2$distance(endPointLower) : $author$project$Vector2$distance(endPointUpper))(
 		A2(
 			$gren_lang$core$Maybe$withDefault,
 			A2($author$project$Vector2$v2, 0, 9999),
@@ -8415,7 +8450,8 @@ var $author$project$Page$Truss$calculateTruss = function (model) {
 																		startWeb: startWeb,
 																		web: web,
 																		webAngle: webAngle,
-																		webStart: webStart
+																		webStart: webStart,
+																		webStartTop: model.webStartTop
 																	});
 															} else {
 																break _v0$9;
@@ -8476,7 +8512,8 @@ var $author$project$Page$Truss$calculateTruss = function (model) {
 																		startWeb: startWeb,
 																		web: web,
 																		webAngle: webAngle,
-																		webStart: webStart
+																		webStart: webStart,
+																		webStartTop: model.webStartTop
 																	});
 															} else {
 																break _v0$9;
@@ -8549,7 +8586,8 @@ var $author$project$Page$Truss$calculateTruss = function (model) {
 																	startWeb: 0,
 																	web: web,
 																	webAngle: webAngle,
-																	webStart: webStart
+																	webStart: webStart,
+																	webStartTop: model.webStartTop
 																});
 														} else {
 															break _v0$9;
@@ -8999,6 +9037,22 @@ var $author$project$Page$Truss$view = function (model) {
 					A5($author$project$Page$Truss$makeInput, 'Chord doubling count', 'chord-doubling', 1, model.chordDoubling, $author$project$Page$Truss$UpdateChordDoubling),
 					A5($author$project$Page$Truss$makeInput, 'Roof angle', 'roof', 0.5, model.roof, $author$project$Page$Truss$UpdateRoof),
 					A5($author$project$Page$Truss$makeInput, 'Web start distance', 'web-start', 5, model.webStart, $author$project$Page$Truss$UpdateWebStart),
+					A2(
+					$gren_lang$browser$Html$div,
+					[],
+					[
+						$gren_lang$browser$Html$text('Webs start at '),
+						A2(
+						$gren_lang$browser$Html$button,
+						[
+							$gren_lang$browser$Html$Events$onClick($author$project$Page$Truss$ToggleWebStartTop),
+							$gren_lang$browser$Html$Attributes$id('web-start-top')
+						],
+						[
+							$gren_lang$browser$Html$text(
+							model.webStartTop ? 'top' : 'bottom')
+						])
+					]),
 					A5($author$project$Page$Truss$makeInput, 'Web profile width', 'web', 0.5, model.web, $author$project$Page$Truss$UpdateWeb),
 					A5($author$project$Page$Truss$makeInput, 'Initial web profile width', 'start-web', 0.5, model.startWeb, $author$project$Page$Truss$UpdateStartWeb),
 					A5($author$project$Page$Truss$makeInput, 'Initial web count', 'start-count', 1, model.startCount, $author$project$Page$Truss$UpdateStartCount),

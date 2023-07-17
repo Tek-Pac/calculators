@@ -27,7 +27,7 @@ queryParser : Query.Parser Model
 queryParser =
     -- We can't do any more than map8
     Query.map
-        (\chordLen chordGap chordOutside chordHeight chordDoubling web startWeb startCount nextWeb nextCount roof webAngle webStart title ->
+        (\chordLen chordGap chordOutside chordHeight chordDoubling web startWeb startCount nextWeb nextCount roof webAngle webStart webStartTop title ->
             let
                 -- compatibility with old urls that include a gap rather than outside
                 chordGapFM =
@@ -57,6 +57,17 @@ queryParser =
 
                         Nothing ->
                             chordHeightOriginalS
+
+                webStartTopB =
+                    case webStartTop of
+                        Nothing ->
+                            False
+
+                        Just "no" ->
+                            False
+
+                        Just _ ->
+                            True
             in
             { chordLen = Maybe.withDefault "" chordLen
             , chordOutside = chordOutsideS
@@ -70,6 +81,7 @@ queryParser =
             , roof = Maybe.withDefault "" roof
             , webAngle = Maybe.withDefault "45" webAngle
             , webStart = Maybe.withDefault "125" webStart
+            , webStartTop = webStartTopB
             , title = Maybe.withDefault "Truss" title
             , titleEdit = False
             }
@@ -87,6 +99,7 @@ queryParser =
         |> qApply (Query.string "roof")
         |> qApply (Query.string "webAngle")
         |> qApply (Query.string "webStart")
+        |> qApply (Query.string "webStartTop")
         |> qApply (Query.string "title")
 
 
@@ -112,6 +125,10 @@ queryBuilder model =
     , builderStr "" "roof" model.roof
     , builderStr "45" "webAngle" model.webAngle
     , builderStr "125" "webStart" model.webStart
+    , if model.webStartTop then
+        Just (Builder.string "webStartTop" "yes")
+      else
+        Nothing
     , builderStr "Truss" "title" model.title
     ]
         |> Array.filterMap identity
@@ -130,6 +147,7 @@ type alias Model =
     , roof : String
     , webAngle : String
     , webStart : String
+    , webStartTop : Bool
     , title : String
     , titleEdit : Bool
     }
@@ -154,6 +172,7 @@ type Msg
     | UpdateRoof String
     | UpdateWebAngle String
     | UpdateWebStart String
+    | ToggleWebStartTop
     | UpdateTitle String
     | ToggleTitleEdit
     | DoCopy String
@@ -216,6 +235,11 @@ update msg model =
         UpdateWebStart w ->
             doFocus { model | webStart = w } "web-start"
 
+        ToggleWebStartTop ->
+            { model = { model | webStartTop = not model.webStartTop }
+            , command = SpaCmd.none
+            }
+
         UpdateTitle w ->
             { model = { model | title = w }
             , command = SpaCmd.none
@@ -270,6 +294,7 @@ calculateTruss model =
                 , roof = roof
                 , webAngle = webAngle
                 , webStart = webStart
+                , webStartTop = model.webStartTop
                 }
 
         -- two sorts of webs
@@ -287,6 +312,7 @@ calculateTruss model =
                 , roof = roof
                 , webAngle = webAngle
                 , webStart = webStart
+                , webStartTop = model.webStartTop
                 }
 
         -- three sorts of webs
@@ -304,6 +330,7 @@ calculateTruss model =
                 , roof = roof
                 , webAngle = webAngle
                 , webStart = webStart
+                , webStartTop = model.webStartTop
                 }
 
         { chordLen = Nothing } ->
@@ -435,6 +462,21 @@ view model =
                 , makeInput "Chord doubling count" "chord-doubling" 1 model.chordDoubling UpdateChordDoubling
                 , makeInput "Roof angle" "roof" 0.5 model.roof UpdateRoof
                 , makeInput "Web start distance" "web-start" 5 model.webStart UpdateWebStart
+                , div
+                    []
+                    [ text "Webs start at "
+                    , button
+                        [ onClick ToggleWebStartTop
+                        , id "web-start-top"
+                        ]
+                        [ text
+                            (if model.webStartTop then
+                                "top"
+                             else
+                                "bottom"
+                            )
+                        ]
+                    ]
                 , makeInput "Web profile width" "web" 0.5 model.web UpdateWeb
                 , makeInput "Initial web profile width" "start-web" 0.5 model.startWeb UpdateStartWeb
                 , makeInput "Initial web count" "start-count" 1 model.startCount UpdateStartCount
@@ -767,6 +809,7 @@ type alias WebData =
         , startCount : Int
         , nextCount : Int
         , webWidthToLenMul : Float
+        , webStartTop : Bool
         }
     , chordDoubling : Int
     , chordVert : Float2
@@ -863,7 +906,7 @@ calcWebPoints dat currWeb index =
         { endPoint, webs, chordDoubling, chordVert, mainChordLen } =
             dat
 
-        { offsets, mainWebWidth, startWebWidth, nextWebWidth, startCount, nextCount, webWidthToLenMul } =
+        { offsets, mainWebWidth, startWebWidth, nextWebWidth, startCount, nextCount, webWidthToLenMul, webStartTop } =
             webs
 
         { webOffsetUp, webOffsetUpCd, webOffsetDn, webOffsetDnCd, webOffsetVec } =
@@ -880,10 +923,15 @@ calcWebPoints dat currWeb index =
         }
     else
         let
-            -- even => up web
-            -- odd => down web
             isTop =
-                Math.modBy 2 index == 1
+                if webStartTop then
+                    -- index is even && webStartTop -> true
+                    -- index is odd  && webStartTop -> false
+                    Math.modBy 2 index == 0
+                else
+                    -- index is even && not webStartTop -> false
+                    -- index is odd  && not webStartTop -> true
+                    Math.modBy 2 index == 1
 
             webWidth =
                 if index < startCount then
@@ -1021,6 +1069,7 @@ type alias FilledModel =
     , roof : Float
     , webAngle : Float
     , webStart : Float
+    , webStartTop : Bool
     }
 
 
@@ -1064,7 +1113,7 @@ maybeErr err useDefault orig =
 
 
 finishTrussCalc : FilledModel -> Result String TrussCalc
-finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb, startCount, nextWeb, nextCount, roof, webAngle, webStart } =
+finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb, startCount, nextWeb, nextCount, roof, webAngle, webStart, webStartTop } =
     let
         roofRad =
             Math.degrees roof
@@ -1091,7 +1140,10 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
             V2.add endPointLower vertGapDist
 
         webStartV =
-            V2.mul trussAlong webStart
+            if webStartTop then
+                V2.add (V2.mul trussAlong webStart) vertGapDist
+            else
+                V2.mul trussAlong webStart
 
         webOffsetUp =
             V2.div (V2.mul webAlongUp chordGap) (Math.sin webRad)
@@ -1128,6 +1180,7 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
                     , startCount = startCount
                     , nextCount = nextCount
                     , webWidthToLenMul = 1 / Math.tan webRad
+                    , webStartTop = webStartTop
                     }
                 , chordDoubling = chordDoubling
                 , chordVert = chordVert
@@ -1139,7 +1192,14 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
         endDistance =
             Array.last dat.webPoints
                 |> Maybe.withDefault (v2 0 9999)
-                |> (if Math.modBy 2 (Array.length dat.webPoints) == 1 then
+                |> (if
+                        Math.modBy 2 (Array.length dat.webPoints)
+                            == (if webStartTop then
+                                    0
+                                 else
+                                    1
+                                )
+                     then
                         V2.distance endPointLower
                      else
                         V2.distance endPointUpper
