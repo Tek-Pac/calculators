@@ -244,7 +244,7 @@ view model =
             , hr [] []
             , tyInputs
             , hr [] []
-            , makeInput "No. of Holes" "n" 1 model.n UpdateN
+            , makeInput "Total no. of holes in void" "n" 1 model.n UpdateN
             , hr [] []
             , case tyCalc of
                 Err e ->
@@ -256,23 +256,32 @@ view model =
 
                 Ok { diagonal, n } ->
                     let
-                        -- if n == 2, then a quarter of the diagonal
-                        -- otherwise, it uses the equivalent cross sectional area
-                        basisHole =
-                            diagonal / (4 * Math.sqrt (toFloat n / 2))
+                        -- equivalent area to two holes with a diameter of a quarter of the diagonal
+                        totalAreaDividedByPi =
+                            (diagonal / 8) * (diagonal / 8) * 2
+
+                        -- we skip an extra multiply and divide by pi
+                        basisHoleRadius =
+                            Math.sqrt (totalAreaDividedByPi / toFloat n)
+
+                        finalHoleDiameter =
+                            max 10 (basisHoleRadius * 2)
+
+                        finalTotalArea =
+                            (finalHoleDiameter / 2) * (finalHoleDiameter / 2) * Math.pi * toFloat n
 
                         -- 2 dp
                         formatF : Float -> Float
                         formatF value =
                             toFloat (Math.round (value * 100)) / 100
-
-                        dia =
-                            formatF (max 10 basisHole)
                     in
                     div
                         [ class "center"
                         ]
-                        [ makeOutput "Min diameter" "dia" dia
+                        [ makeOutput "Diagonal (mm)" "diagonal" (formatF diagonal)
+                        , makeOutput "Required total area (mm²)" "totalArea" (formatF (totalAreaDividedByPi * Math.pi))
+                        , makeOutput "Min diameter (mm)" "dia" (formatF finalHoleDiameter)
+                        , makeOutput "Final total area (mm²)" "finalTotalArea" (formatF finalTotalArea)
                         ]
             ]
         ]

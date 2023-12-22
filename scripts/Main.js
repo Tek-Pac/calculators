@@ -6940,6 +6940,7 @@ var $gren_lang$core$Basics$max = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) > 0) ? x : y;
 	});
+var $gren_lang$core$Math$pi = _Math_pi;
 var $gren_lang$core$Math$round = _Math_round;
 var $gren_lang$core$Basics$toFloat = _Basics_toFloat;
 var $author$project$Page$GalvHole$view = function (model) {
@@ -7025,7 +7026,7 @@ var $author$project$Page$GalvHole$view = function (model) {
 				$gren_lang$browser$Html$hr,
 				[],
 				[]),
-				A5($author$project$Page$GalvHole$makeInput, 'No. of Holes', 'n', 1, model.n, $author$project$Page$GalvHole$UpdateN),
+				A5($author$project$Page$GalvHole$makeInput, 'Total no. of holes in void', 'n', 1, model.n, $author$project$Page$GalvHole$UpdateN),
 				A2(
 				$gren_lang$browser$Html$hr,
 				[],
@@ -7045,19 +7046,39 @@ var $author$project$Page$GalvHole$view = function (model) {
 					var _v1 = tyCalc.a;
 					var diagonal = _v1.diagonal;
 					var n = _v1.n;
+					var totalAreaDividedByPi = ((diagonal / 8) * (diagonal / 8)) * 2;
 					var formatF = function (value) {
 						return $gren_lang$core$Math$round(value * 100) / 100;
 					};
-					var basisHole = diagonal / (4 * $gren_lang$core$Math$sqrt(n / 2));
-					var dia = formatF(
-						A2($gren_lang$core$Basics$max, 10, basisHole));
+					var basisHoleRadius = $gren_lang$core$Math$sqrt(totalAreaDividedByPi / n);
+					var finalHoleDiameter = A2($gren_lang$core$Basics$max, 10, basisHoleRadius * 2);
+					var finalTotalArea = (((finalHoleDiameter / 2) * (finalHoleDiameter / 2)) * $gren_lang$core$Math$pi) * n;
 					return A2(
 						$gren_lang$browser$Html$div,
 						[
 							$gren_lang$browser$Html$Attributes$class('center')
 						],
 						[
-							A3($author$project$Page$GalvHole$makeOutput, 'Min diameter', 'dia', dia)
+							A3(
+							$author$project$Page$GalvHole$makeOutput,
+							'Diagonal (mm)',
+							'diagonal',
+							formatF(diagonal)),
+							A3(
+							$author$project$Page$GalvHole$makeOutput,
+							'Required total area (mm²)',
+							'totalArea',
+							formatF(totalAreaDividedByPi * $gren_lang$core$Math$pi)),
+							A3(
+							$author$project$Page$GalvHole$makeOutput,
+							'Min diameter (mm)',
+							'dia',
+							formatF(finalHoleDiameter)),
+							A3(
+							$author$project$Page$GalvHole$makeOutput,
+							'Final total area (mm²)',
+							'finalTotalArea',
+							formatF(finalTotalArea))
 						]);
 				}
 			}()
@@ -7168,7 +7189,6 @@ var $author$project$Page$KFactor$parseModel = function (model) {
 	var a = $gren_lang$core$String$toFloat(model.a);
 	return {a: a, ba: ba, k: k, r: r, t: t, ty: model.ty, xa: xa};
 };
-var $gren_lang$core$Math$pi = _Math_pi;
 var $author$project$Page$KFactor$view = function (model) {
 	var parsedModel = $author$project$Page$KFactor$parseModel(model);
 	var makeSwapButton = function (updatedTy) {
