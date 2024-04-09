@@ -1,3 +1,3 @@
 # Calculators
 
-[Clicky](https://mbartlett21.github.io/calculators).
+[Clicky](https://tek-pac.github.io/calculators).
