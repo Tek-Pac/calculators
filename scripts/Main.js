@@ -5645,6 +5645,196 @@ var $author$project$Page$Truss$doFocus$ = function(model, id) {
 	return { command: $author$project$Page$Truss$attemptFocus(id), model: model };
 };
 var $author$project$Page$Truss$doFocus = F2($author$project$Page$Truss$doFocus$);
+
+
+// DECODER
+
+var _File_decoder = _Json_decodePrim(function (value) {
+  // NOTE: checks if `File` exists in case this is run on node
+  return typeof File !== "undefined" && value instanceof File
+    ? $gren_lang$core$Result$Ok(value)
+    : _Json_expecting("a FILE", value);
+});
+
+// METADATA
+
+function _File_name(file) {
+  return file.name;
+}
+function _File_mime(file) {
+  return file.type;
+}
+function _File_size(file) {
+  return file.size;
+}
+
+function _File_lastModified(file) {
+  return $gren_lang$core$Time$millisToPosix(file.lastModified);
+}
+
+// DOWNLOAD
+
+var _File_downloadNode;
+
+function _File_getDownloadNode() {
+  return (
+    _File_downloadNode || (_File_downloadNode = document.createElement("a"))
+  );
+}
+
+var _File_download = F3(function (name, mime, content) {
+  return _Scheduler_binding(function (callback) {
+    var blob = new Blob([content], { type: mime });
+
+    // for IE10+
+    if (navigator.msSaveOrOpenBlob) {
+      navigator.msSaveOrOpenBlob(blob, name);
+      return;
+    }
+
+    // for HTML5
+    var node = _File_getDownloadNode();
+    var objectUrl = URL.createObjectURL(blob);
+    node.href = objectUrl;
+    node.download = name;
+    _File_click(node);
+    URL.revokeObjectURL(objectUrl);
+  });
+});
+
+function _File_downloadUrl(href) {
+  return _Scheduler_binding(function (callback) {
+    var node = _File_getDownloadNode();
+    node.href = href;
+    node.download = "";
+    node.origin === location.origin || (node.target = "_blank");
+    _File_click(node);
+  });
+}
+
+// IE COMPATIBILITY
+
+function _File_makeBytesSafeForInternetExplorer(bytes) {
+  // only needed by IE10 and IE11 to fix https://github.com/gren/file/issues/10
+  // all other browsers can just run `new Blob([bytes])` directly with no problem
+  //
+  return new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+}
+
+function _File_click(node) {
+  // only needed by IE10 and IE11 to fix https://github.com/gren/file/issues/11
+  // all other browsers have MouseEvent and do not need this conditional stuff
+  //
+  if (typeof MouseEvent === "function") {
+    node.dispatchEvent(new MouseEvent("click"));
+  } else {
+    var event = document.createEvent("MouseEvents");
+    event.initMouseEvent(
+      "click",
+      true,
+      true,
+      window,
+      0,
+      0,
+      0,
+      0,
+      0,
+      false,
+      false,
+      false,
+      false,
+      0,
+      null
+    );
+    document.body.appendChild(node);
+    node.dispatchEvent(event);
+    document.body.removeChild(node);
+  }
+}
+
+// UPLOAD
+
+var _File_node;
+
+function _File_uploadOne(mimes) {
+  return _Scheduler_binding(function (callback) {
+    _File_node = document.createElement("input");
+    _File_node.type = "file";
+    _File_node.accept = A2($gren_lang$core$String$join, ",", mimes);
+    _File_node.addEventListener("change", function (event) {
+      callback(_Scheduler_succeed(event.target.files[0]));
+    });
+    _File_click(_File_node);
+  });
+}
+
+function _File_uploadOneOrMore(mimes) {
+  return _Scheduler_binding(function (callback) {
+    _File_node = document.createElement("input");
+    _File_node.type = "file";
+    _File_node.multiple = true;
+    _File_node.accept = A2($gren_lang$core$String$join, ",", mimes);
+    _File_node.addEventListener("change", function (event) {
+      var grenFiles = event.target.files;
+      var first = grenFiles[0];
+      var rest = [];
+      for (var i = 1; i < grenFiles.length; i++) {
+        rest.push(grenFiles[i]);
+      }
+      callback(_Scheduler_succeed({ f: first, fs: rest }));
+    });
+    _File_click(_File_node);
+  });
+}
+
+// CONTENT
+
+function _File_toString(blob) {
+  return _Scheduler_binding(function (callback) {
+    var reader = new FileReader();
+    reader.addEventListener("loadend", function () {
+      callback(_Scheduler_succeed(reader.result));
+    });
+    reader.readAsText(blob);
+    return function () {
+      reader.abort();
+    };
+  });
+}
+
+function _File_toBytes(blob) {
+  return _Scheduler_binding(function (callback) {
+    var reader = new FileReader();
+    reader.addEventListener("loadend", function () {
+      callback(_Scheduler_succeed(new DataView(reader.result)));
+    });
+    reader.readAsArrayBuffer(blob);
+    return function () {
+      reader.abort();
+    };
+  });
+}
+
+function _File_toUrl(blob) {
+  return _Scheduler_binding(function (callback) {
+    var reader = new FileReader();
+    reader.addEventListener("loadend", function () {
+      callback(_Scheduler_succeed(reader.result));
+    });
+    reader.readAsDataURL(blob);
+    return function () {
+      reader.abort();
+    };
+  });
+}
+var $gren_lang$core$Time$Posix = function (a) {
+	return { $: 'Posix', a: a };
+};
+var $gren_lang$core$Time$millisToPosix = $gren_lang$core$Time$Posix;
+var $gren_lang$browser$File$Download$string$ = function(name, mime, content) {
+	return $gren_lang$core$Task$perform$($gren_lang$core$Basics$never, A3(_File_download, name, mime, content));
+};
+var $gren_lang$browser$File$Download$string = F3($gren_lang$browser$File$Download$string$);
 var $author$project$Page$Truss$update$ = function(msg, model) {
 	switch (msg.$) {
 		case 'NoOp':
@@ -5692,9 +5882,12 @@ var $author$project$Page$Truss$update$ = function(msg, model) {
 			return { command: $author$project$SpaCmd$none, model: _Utils_update(model, { title: w }) };
 		case 'ToggleTitleEdit':
 			return { command: (!model.titleEdit) ? $author$project$Page$Truss$attemptFocus('title') : $author$project$SpaCmd$none, model: _Utils_update(model, { titleEdit: !model.titleEdit }) };
-		default:
+		case 'DoCopy':
 			var id = msg.a;
 			return { command: $author$project$SpaCmd$CopyId(id), model: model };
+		default:
+			var data = msg.a;
+			return { command: $author$project$SpaCmd$BaseCmd($gren_lang$browser$File$Download$string$(model.title + '.dxf', 'application/dxf', data)), model: model };
 	}
 };
 var $author$project$Page$Truss$update = F2($author$project$Page$Truss$update$);
@@ -7041,21 +7234,33 @@ var $author$project$Page$Truss$calculateTruss = function(model) {
 	var _v11 = parsedModel.roof;
 	return $gren_lang$core$Result$Err('enter the angle of the roof');
 };
-var $gren_lang$browser$Svg$line = $gren_lang$browser$Svg$trustedNode('line');
-var $gren_lang$browser$Svg$Attributes$x1 = $gren_lang$browser$VirtualDom$attribute('x1');
-var $gren_lang$browser$Svg$Attributes$x2 = $gren_lang$browser$VirtualDom$attribute('x2');
-var $gren_lang$browser$Svg$Attributes$y1 = $gren_lang$browser$VirtualDom$attribute('y1');
-var $gren_lang$browser$Svg$Attributes$y2 = $gren_lang$browser$VirtualDom$attribute('y2');
-var $author$project$Page$Truss$doLine$ = function(sw, start, end) {
-	return A2($gren_lang$browser$Svg$line, [ $gren_lang$browser$Svg$Attributes$x1($gren_lang$core$String$fromFloat(start.x)), $gren_lang$browser$Svg$Attributes$y1($gren_lang$core$String$fromFloat(start.y)), $gren_lang$browser$Svg$Attributes$x2($gren_lang$core$String$fromFloat(end.x)), $gren_lang$browser$Svg$Attributes$y2($gren_lang$core$String$fromFloat(end.y)), $gren_lang$browser$Svg$Attributes$stroke('var(--text)'), $gren_lang$browser$Svg$Attributes$strokeWidth($gren_lang$core$String$fromFloat(sw)) ], [  ]);
+var $author$project$Page$Truss$dxfData$ = function(n, v) {
+	return $gren_lang$core$String$fromInt(n) + ('\n' + (v + '\n'));
 };
-var $author$project$Page$Truss$doLine = F3($author$project$Page$Truss$doLine$);
-var $author$project$Page$Truss$lines$ = function(sw, linesArr) {
-	return A2($gren_lang$core$Array$map, function(ls) {
-			return $author$project$Page$Truss$doLine$(sw, ls.start, ls.end);
-		}, linesArr);
+var $author$project$Page$Truss$dxfData = F2($author$project$Page$Truss$dxfData$);
+var $gren_lang$core$Array$flatten = _Array_flat;
+var $gren_lang$core$Array$foldl = _Array_foldl;
+var $author$project$Page$Truss$foldlineseg$ = function(cmp, dat, vec) {
+	return { x: A2(cmp, A2(cmp, vec.x, dat.start.x), dat.end.x), y: A2(cmp, A2(cmp, vec.y, dat.start.y), dat.end.y) };
 };
-var $author$project$Page$Truss$lines = F2($author$project$Page$Truss$lines$);
+var $author$project$Page$Truss$foldlineseg = F3($author$project$Page$Truss$foldlineseg$);
+var $gren_lang$core$Basics$min$ = function(x, y) {
+	return (_Utils_cmp(x, y) < 0) ? x : y;
+};
+var $gren_lang$core$Basics$min = F2($gren_lang$core$Basics$min$);
+var $author$project$Page$Truss$dxfEncodeLines = function(linesArr) {
+	var minCorner = A3($gren_lang$core$Array$foldl, $author$project$Page$Truss$foldlineseg($gren_lang$core$Basics$min), { x: 0, y: 0 }, linesArr);
+	var maxCorner = A3($gren_lang$core$Array$foldl, $author$project$Page$Truss$foldlineseg($gren_lang$core$Basics$max), { x: 0, y: 0 }, linesArr);
+	var dxfStartData = [ $author$project$Page$Truss$dxfData$(999, 'Created with TrussGen from calc.tek-pac.com.au'), $author$project$Page$Truss$dxfData$(0, 'SECTION'), $author$project$Page$Truss$dxfData$(2, 'HEADER'), $author$project$Page$Truss$dxfData$(9, '$EXTMIN'), $author$project$Page$Truss$dxfData$(10, $gren_lang$core$String$fromFloat(minCorner.x)), $author$project$Page$Truss$dxfData$(20, $gren_lang$core$String$fromFloat(minCorner.y)), $author$project$Page$Truss$dxfData$(30, '0'), $author$project$Page$Truss$dxfData$(9, '$EXTMAX'), $author$project$Page$Truss$dxfData$(10, $gren_lang$core$String$fromFloat(maxCorner.x)), $author$project$Page$Truss$dxfData$(20, $gren_lang$core$String$fromFloat(maxCorner.y)), $author$project$Page$Truss$dxfData$(30, '100'), $author$project$Page$Truss$dxfData$(9, '$LIMMIN'), $author$project$Page$Truss$dxfData$(10, $gren_lang$core$String$fromFloat(minCorner.x)), $author$project$Page$Truss$dxfData$(20, $gren_lang$core$String$fromFloat(minCorner.y)), $author$project$Page$Truss$dxfData$(9, '$LIMMAX'), $author$project$Page$Truss$dxfData$(10, $gren_lang$core$String$fromFloat(maxCorner.x)), $author$project$Page$Truss$dxfData$(20, $gren_lang$core$String$fromFloat(maxCorner.y)), $author$project$Page$Truss$dxfData$(9, '$MEASUREMENT'), $author$project$Page$Truss$dxfData$(70, '1'), $author$project$Page$Truss$dxfData$(9, '$INSUNITS'), $author$project$Page$Truss$dxfData$(70, '4'), $author$project$Page$Truss$dxfData$(0, 'ENDSEC'), $author$project$Page$Truss$dxfData$(0, 'SECTION'), $author$project$Page$Truss$dxfData$(2, 'TABLES'), $author$project$Page$Truss$dxfData$(0, 'TABLE'), $author$project$Page$Truss$dxfData$(2, 'LAYER'), $author$project$Page$Truss$dxfData$(70, '1'), $author$project$Page$Truss$dxfData$(0, 'LAYER'), $author$project$Page$Truss$dxfData$(2, '0'), $author$project$Page$Truss$dxfData$(70, '0'), $author$project$Page$Truss$dxfData$(62, '7'), $author$project$Page$Truss$dxfData$(0, 'ENDTAB'), $author$project$Page$Truss$dxfData$(0, 'ENDSEC'), $author$project$Page$Truss$dxfData$(0, 'SECTION'), $author$project$Page$Truss$dxfData$(2, 'ENTITIES') ];
+	var dxfLineData = $gren_lang$core$Array$flatten(A2($gren_lang$core$Array$map, function(_v0) {
+				var start = _v0.start;
+				var end = _v0.end;
+				return [ $author$project$Page$Truss$dxfData$(0, 'LINE'), $author$project$Page$Truss$dxfData$(8, '0'), $author$project$Page$Truss$dxfData$(10, $gren_lang$core$String$fromFloat(start.x)), $author$project$Page$Truss$dxfData$(20, $gren_lang$core$String$fromFloat(start.y)), $author$project$Page$Truss$dxfData$(11, $gren_lang$core$String$fromFloat(end.x)), $author$project$Page$Truss$dxfData$(21, $gren_lang$core$String$fromFloat(end.y)) ];
+			}, linesArr));
+	var dxfEndData = [ $author$project$Page$Truss$dxfData$(0, 'ENDSEC'), $author$project$Page$Truss$dxfData$(0, 'EOF') ];
+	var dxfFinData = A2($gren_lang$core$String$join, '', $gren_lang$core$Array$flatten([ dxfStartData, dxfLineData, dxfEndData ]));
+	return dxfFinData;
+};
 var $author$project$Page$Truss$makeInput$ = function(label, idTxt, stepV, currTxt, updateMsg) {
 	return A2($gren_lang$browser$Html$div, [  ], [ $gren_lang$browser$Html$text(label), A2($gren_lang$browser$Html$br, [  ], [  ]), $gren_lang$browser$Html$text('         '), A2($gren_lang$browser$Html$input, [ $gren_lang$browser$Html$Attributes$value(currTxt), $gren_lang$browser$Html$Events$onInput(updateMsg), $gren_lang$browser$Html$Attributes$id(idTxt), $gren_lang$browser$Html$Attributes$type_('number'), $gren_lang$browser$Html$Attributes$step($gren_lang$core$String$fromFloat(stepV)) ], [  ]), $gren_lang$core$String$isEmpty(currTxt) ? A2($gren_lang$browser$Html$button, [ A2($gren_lang$browser$Html$Attributes$style, 'pointer-events', 'none'), A2($gren_lang$browser$Html$Attributes$style, 'opacity', '0'), $gren_lang$browser$Html$Attributes$tabindex(-1) ], [ $gren_lang$browser$Html$text('❌') ]) : A2($gren_lang$browser$Html$button, [ $gren_lang$browser$Html$Events$onClick(updateMsg('')) ], [ $gren_lang$browser$Html$text('❌') ]) ]);
 };
@@ -7067,6 +7272,12 @@ var $author$project$Page$Truss$makeOutput$ = function(label, idTxt, calc) {
 	return A2($gren_lang$browser$Html$div, [  ], [ $gren_lang$browser$Html$text(label), A2($gren_lang$browser$Html$br, [  ], [  ]), $gren_lang$browser$Html$text('         '), A2($gren_lang$browser$Html$input, [ $gren_lang$browser$Html$Attributes$value($gren_lang$core$String$fromFloat(calc)), $gren_lang$browser$Html$Attributes$readonly(true), $gren_lang$browser$Html$Attributes$id(idTxt), $gren_lang$browser$Html$Attributes$type_('number') ], [  ]), A2($gren_lang$browser$Html$button, [ $gren_lang$browser$Html$Events$onClick($author$project$Page$Truss$DoCopy(idTxt)) ], [ $gren_lang$browser$Html$text('📋') ]) ]);
 };
 var $author$project$Page$Truss$makeOutput = F3($author$project$Page$Truss$makeOutput$);
+var $author$project$Page$Truss$DoDownload = function (a) {
+	return { $: 'DoDownload', a: a };
+};
+var $author$project$Page$Truss$makeOutputDxf = function(data) {
+	return A2($gren_lang$browser$Html$div, [  ], [ A2($gren_lang$browser$Html$button, [ $gren_lang$browser$Html$Events$onClick($author$project$Page$Truss$DoDownload(data)) ], [ $gren_lang$browser$Html$text('Download DXF') ]) ]);
+};
 var $author$project$Page$Truss$makeOutputLine$ = function(label, idTxt, _v0) {
 	var x = _v0.x;
 	var y = _v0.y;
@@ -7117,6 +7328,21 @@ var $author$project$Page$Truss$makeOutputTable = function(members) {
 					return A2($gren_lang$browser$Html$tr, [  ], [ A2($gren_lang$browser$Html$td, [  ], [ $gren_lang$browser$Html$text(name) ]), A2($gren_lang$browser$Html$td, [  ], [ $gren_lang$browser$Html$text($gren_lang$core$String$fromFloat($author$project$Page$Truss$formatFs(length))) ]), A2($gren_lang$browser$Html$td, [  ], [ $gren_lang$browser$Html$text($gren_lang$core$String$fromInt(qty)) ]) ]);
 				}, A2($gren_lang$core$Array$sortWith, $author$project$Page$Truss$compareMembers, members))) ]);
 };
+var $gren_lang$browser$Svg$line = $gren_lang$browser$Svg$trustedNode('line');
+var $gren_lang$browser$Svg$Attributes$x1 = $gren_lang$browser$VirtualDom$attribute('x1');
+var $gren_lang$browser$Svg$Attributes$x2 = $gren_lang$browser$VirtualDom$attribute('x2');
+var $gren_lang$browser$Svg$Attributes$y1 = $gren_lang$browser$VirtualDom$attribute('y1');
+var $gren_lang$browser$Svg$Attributes$y2 = $gren_lang$browser$VirtualDom$attribute('y2');
+var $author$project$Page$Truss$doSvgLine$ = function(sw, start, end) {
+	return A2($gren_lang$browser$Svg$line, [ $gren_lang$browser$Svg$Attributes$x1($gren_lang$core$String$fromFloat(start.x)), $gren_lang$browser$Svg$Attributes$y1($gren_lang$core$String$fromFloat(start.y)), $gren_lang$browser$Svg$Attributes$x2($gren_lang$core$String$fromFloat(end.x)), $gren_lang$browser$Svg$Attributes$y2($gren_lang$core$String$fromFloat(end.y)), $gren_lang$browser$Svg$Attributes$stroke('var(--text)'), $gren_lang$browser$Svg$Attributes$strokeWidth($gren_lang$core$String$fromFloat(sw)) ], [  ]);
+};
+var $author$project$Page$Truss$doSvgLine = F3($author$project$Page$Truss$doSvgLine$);
+var $author$project$Page$Truss$svgLines$ = function(changeCoords, sw, linesArr) {
+	return A2($gren_lang$core$Array$map, function(ls) {
+			return $author$project$Page$Truss$doSvgLine$(sw, changeCoords(ls.start), changeCoords(ls.end));
+		}, linesArr);
+};
+var $author$project$Page$Truss$svgLines = F3($author$project$Page$Truss$svgLines$);
 var $gren_lang$browser$Svg$Attributes$viewBox = $gren_lang$browser$VirtualDom$attribute('viewBox');
 var $author$project$Page$Truss$view = function(model) {
 	return { body: [ A2($gren_lang$browser$Html$a, [ $gren_lang$browser$Html$Attributes$class('left'), $gren_lang$browser$Html$Attributes$href('#/') ], [ $gren_lang$browser$Html$text('Home') ]), function () {
@@ -7151,32 +7377,29 @@ var $author$project$Page$Truss$view = function(model) {
 				var chordVert = _v1.chordVert;
 				var members = _v1.members;
 				var trussWidth = upperChordEnd.x;
+				var linesMap1 = $gren_lang$core$Array$pushLast$({ end: lowerChordEnd, start: lowerChordStart }, $gren_lang$core$Array$pushLast$({ end: $author$project$Vector2$sub$(lowerChordEnd, chordVert), start: $author$project$Vector2$sub$(lowerChordStart, chordVert) }, $gren_lang$core$Array$pushLast$({ end: $author$project$Vector2$add$(upperChordEnd, chordVert), start: $author$project$Vector2$sub$(lowerChordEnd, chordVert) }, $gren_lang$core$Array$pushLast$({ end: upperChordEnd, start: upperChordStart }, $gren_lang$core$Array$pushLast$({ end: $author$project$Vector2$add$(upperChordEnd, chordVert), start: $author$project$Vector2$add$(upperChordStart, chordVert) }, $gren_lang$core$Array$pushLast$({ end: $author$project$Vector2$add$(upperChordStart, chordVert), start: $author$project$Vector2$sub$(lowerChordStart, chordVert) }, webLines))))));
+				var linesMap = function () {
+					if (chordDoublingRes.$ === 'Just') {
+						var _v4 = chordDoublingRes.a;
+						var start = _v4.start;
+						var end = _v4.end;
+						return $gren_lang$core$Array$pushLast$({ end: end, start: start }, linesMap1);
+					} else {
+						return linesMap1;
+					}
+				}();
 				var isDown = _Utils_cmp(upperChordEnd.y, upperChordStart.y) < 0;
 				var trussHeight = isDown ? (((upperChordStart.y - lowerChordEnd.y) + chordVert.y) + chordVert.y) : ((upperChordEnd.y + chordVert.y) + chordVert.y);
 				var assumedWidth = 1000.0;
 				var sw = (trussWidth * 1.0) / assumedWidth;
-				var changeCoords = function(_v5) {
-					var x = _v5.x;
-					var y = _v5.y;
+				var changeCoords = function(_v2) {
+					var x = _v2.x;
+					var y = _v2.y;
 					return { x: x + sw, y: isDown ? (((upperChordStart.y - y) + sw) + chordVert.y) : (((trussHeight - y) + sw) - chordVert.y) };
 				};
-				var webLinesMap = A2($gren_lang$core$Array$map, function(_v4) {
-						var start = _v4.start;
-						var end = _v4.end;
-						return { end: changeCoords(end), start: changeCoords(start) };
-					}, webLines);
 				var vbHeight = trussHeight + (sw * 2);
 				var vbWidth = trussWidth + (sw * 2);
-				return A2($gren_lang$browser$Html$div, [ $gren_lang$browser$Html$Attributes$class('center') ], [ $author$project$Page$Truss$makeOutput$('End distance', 'end-distance', endDistance), $author$project$Page$Truss$makeOutputLine$('Up distance', 'up-distance', webOffsetUp), $author$project$Page$Truss$makeOutputLine$('Dn distance', 'dn-distance', webOffsetDn), $author$project$Page$Truss$makeOutputTable(members), A2($gren_lang$browser$Svg$svg, [ A2($gren_lang$browser$Html$Attributes$style, 'width', 'clamp(75%, 1000px, 100%)'), $gren_lang$browser$Svg$Attributes$viewBox('0 0 ' + ($gren_lang$core$String$fromFloat(vbWidth) + (' ' + $gren_lang$core$String$fromFloat(vbHeight)))) ], $gren_lang$core$Array$pushLast$(function () {
-								if (chordDoublingRes.$ === 'Just') {
-									var _v3 = chordDoublingRes.a;
-									var start = _v3.start;
-									var end = _v3.end;
-									return $author$project$Page$Truss$doLine$(sw, changeCoords(start), changeCoords(end));
-								} else {
-									return $gren_lang$browser$Html$text('');
-								}
-							}(), $author$project$Page$Truss$lines$(sw, $gren_lang$core$Array$pushLast$({ end: changeCoords(lowerChordEnd), start: changeCoords(lowerChordStart) }, $gren_lang$core$Array$pushLast$({ end: changeCoords($author$project$Vector2$sub$(lowerChordEnd, chordVert)), start: changeCoords($author$project$Vector2$sub$(lowerChordStart, chordVert)) }, $gren_lang$core$Array$pushLast$({ end: changeCoords($author$project$Vector2$add$(upperChordEnd, chordVert)), start: changeCoords($author$project$Vector2$sub$(lowerChordEnd, chordVert)) }, $gren_lang$core$Array$pushLast$({ end: changeCoords(upperChordEnd), start: changeCoords(upperChordStart) }, $gren_lang$core$Array$pushLast$({ end: changeCoords($author$project$Vector2$add$(upperChordEnd, chordVert)), start: changeCoords($author$project$Vector2$add$(upperChordStart, chordVert)) }, $gren_lang$core$Array$pushLast$({ end: changeCoords($author$project$Vector2$add$(upperChordStart, chordVert)), start: changeCoords($author$project$Vector2$sub$(lowerChordStart, chordVert)) }, webLinesMap))))))))) ]);
+				return A2($gren_lang$browser$Html$div, [ $gren_lang$browser$Html$Attributes$class('center') ], [ $author$project$Page$Truss$makeOutput$('End distance', 'end-distance', endDistance), $author$project$Page$Truss$makeOutputLine$('Up distance', 'up-distance', webOffsetUp), $author$project$Page$Truss$makeOutputLine$('Dn distance', 'dn-distance', webOffsetDn), $author$project$Page$Truss$makeOutputTable(members), $author$project$Page$Truss$makeOutputDxf($author$project$Page$Truss$dxfEncodeLines(linesMap)), A2($gren_lang$browser$Svg$svg, [ A2($gren_lang$browser$Html$Attributes$style, 'width', 'clamp(75%, 1000px, 100%)'), $gren_lang$browser$Svg$Attributes$viewBox('0 0 ' + ($gren_lang$core$String$fromFloat(vbWidth) + (' ' + $gren_lang$core$String$fromFloat(vbHeight)))) ], $author$project$Page$Truss$svgLines$(changeCoords, sw, linesMap)) ]);
 			}
 		}() ]) ], title: model.title };
 };

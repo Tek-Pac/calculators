@@ -5,6 +5,7 @@ module Page.Truss exposing ( Model, Msg(..), update, view, queryParser, queryBui
 
 import Browser
 import Browser.Dom as Dom
+import File.Download as Download
 import Html exposing ( Html, a, br, button, div, h1, hr, input, table, tbody, td, text, th, thead, tr )
 import Html.Attributes exposing ( class, href, id, readonly, step, style, tabindex, type_, value )
 import Html.Events exposing ( onClick, onInput )
@@ -176,6 +177,7 @@ type Msg
     | UpdateTitle String
     | ToggleTitleEdit
     | DoCopy String
+    | DoDownload String
     | NoOp
 
 
@@ -257,6 +259,11 @@ update msg model =
         DoCopy id ->
             { model = model
             , command = CopyId id
+            }
+
+        DoDownload data ->
+            { model = model
+            , command = BaseCmd (Download.string (model.title ++ ".dxf") "application/dxf" data)
             }
 
 
@@ -530,14 +537,50 @@ view model =
                                     trussHeight - y + sw - chordVert.y
                             }
 
-                        webLinesMap =
+                        linesMap1 =
                             webLines
-                                |> Array.map
-                                        (\{ start, end } ->
-                                            { start = changeCoords start
-                                            , end = changeCoords end
-                                            }
-                                        )
+                                -- left line
+                                |> Array.pushLast
+                                        { start = (V2.sub lowerChordStart chordVert)
+                                        , end = (V2.add upperChordStart chordVert)
+                                        }
+                                -- top outer line
+                                |> Array.pushLast
+                                        { start = (V2.add upperChordStart chordVert)
+                                        , end = (V2.add upperChordEnd chordVert)
+                                        }
+                                -- top inner line
+                                |> Array.pushLast
+                                        { start = upperChordStart
+                                        , end = upperChordEnd
+                                        }
+                                -- right line
+                                |> Array.pushLast
+                                        { start = (V2.sub lowerChordEnd chordVert)
+                                        , end = (V2.add upperChordEnd chordVert)
+                                        }
+                                -- bottom outer line
+                                |> Array.pushLast
+                                        { start = (V2.sub lowerChordStart chordVert)
+                                        , end = (V2.sub lowerChordEnd chordVert)
+                                        }
+                                -- bottom inner line
+                                |> Array.pushLast
+                                        { start = lowerChordStart
+                                        , end = lowerChordEnd
+                                        }
+
+                        linesMap =
+                            when chordDoublingRes is
+                                -- removing the wholeLength property
+                                Just {start, end} ->
+                                    linesMap1
+                                        |> Array.pushLast
+                                                { start = start
+                                                , end = end
+                                                }
+                                Nothing ->
+                                    linesMap1
                     in
                     div
                         [ class "center"
@@ -546,62 +589,98 @@ view model =
                         , makeOutputLine "Up distance" "up-distance" webOffsetUp
                         , makeOutputLine "Dn distance" "dn-distance" webOffsetDn
                         , makeOutputTable members
+                        , makeOutputDxf (dxfEncodeLines linesMap)
                         , svg
                             [ -- fill the screen when it is small
                               style "width" "clamp(75%, 1000px, 100%)"
                             , viewBox ("0 0 " ++ String.fromFloat vbWidth ++ " " ++ String.fromFloat vbHeight)
                             ]
-                            (lines
-                                sw
-                                (webLinesMap
-                                    -- left line
-                                    |> Array.pushLast
-                                            { start = changeCoords (V2.sub lowerChordStart chordVert)
-                                            , end = changeCoords (V2.add upperChordStart chordVert)
-                                            }
-                                    -- top outer line
-                                    |> Array.pushLast
-                                            { start = changeCoords (V2.add upperChordStart chordVert)
-                                            , end = changeCoords (V2.add upperChordEnd chordVert)
-                                            }
-                                    -- top inner line
-                                    |> Array.pushLast
-                                            { start = changeCoords upperChordStart
-                                            , end = changeCoords upperChordEnd
-                                            }
-                                    -- right line
-                                    |> Array.pushLast
-                                            { start = changeCoords (V2.sub lowerChordEnd chordVert)
-                                            , end = changeCoords (V2.add upperChordEnd chordVert)
-                                            }
-                                    -- bottom outer line
-                                    |> Array.pushLast
-                                            { start = changeCoords (V2.sub lowerChordStart chordVert)
-                                            , end = changeCoords (V2.sub lowerChordEnd chordVert)
-                                            }
-                                    -- bottom inner line
-                                    |> Array.pushLast
-                                            { start = changeCoords lowerChordStart
-                                            , end = changeCoords lowerChordEnd
-                                            }
-                                )
-                                |> Array.pushLast
-                                        (when chordDoublingRes is
-                                            Just { start, end } ->
-                                                doLine sw (changeCoords start) (changeCoords end)
-
-                                            Nothing ->
-                                                text ""
-                                        )
-                            )
+                            (svgLines changeCoords sw linesMap)
                         ]
             ]
         ]
     }
 
+dxfData : Int -> String -> String
+dxfData n v =
+    String.fromInt n ++ "\n" ++ v ++ "\n"
 
-doLine : Float -> Float2 -> Float2 -> Svg msg
-doLine sw start end =
+foldlineseg : (Float -> Float -> Float) -> LineSeg2 -> Float2 -> Float2
+foldlineseg cmp dat vec =
+    { x = cmp (cmp vec.x dat.start.x) dat.end.x
+    , y = cmp (cmp vec.y dat.start.y) dat.end.y
+    }
+
+dxfEncodeLines : Array LineSeg2 -> String
+dxfEncodeLines linesArr =
+    let
+        minCorner = Array.foldl (foldlineseg min) { x = 0, y = 0 } linesArr
+        maxCorner = Array.foldl (foldlineseg max) { x = 0, y = 0 } linesArr
+        dxfStartData =
+            [ dxfData 999 "Created with TrussGen from calc.tek-pac.com.au"
+            , dxfData 0 "SECTION"
+            , dxfData 2 "HEADER"
+            , dxfData 9 "$EXTMIN"
+            , dxfData 10 (String.fromFloat minCorner.x)
+            , dxfData 20 (String.fromFloat minCorner.y)
+            , dxfData 30 "0"
+            , dxfData 9 "$EXTMAX"
+            , dxfData 10 (String.fromFloat maxCorner.x)
+            , dxfData 20 (String.fromFloat maxCorner.y)
+            , dxfData 30 "100"
+            , dxfData 9 "$LIMMIN"
+            , dxfData 10 (String.fromFloat minCorner.x)
+            , dxfData 20 (String.fromFloat minCorner.y)
+            , dxfData 9 "$LIMMAX"
+            , dxfData 10 (String.fromFloat maxCorner.x)
+            , dxfData 20 (String.fromFloat maxCorner.y)
+            , dxfData 9 "$MEASUREMENT"
+            , dxfData 70 "1" -- metric
+            , dxfData 9 "$INSUNITS"
+            , dxfData 70 "4" -- millimeters
+            , dxfData 0 "ENDSEC"
+            , dxfData 0 "SECTION"
+            , dxfData 2 "TABLES"
+            , dxfData 0 "TABLE"
+            , dxfData 2 "LAYER"
+            , dxfData 70 "1" -- max number of layers
+            , dxfData 0 "LAYER"
+            , dxfData 2 "0"
+            , dxfData 70 "0"
+            , dxfData 62 "7"
+            --wdstr(6, layer.linetype or "CONTINUOUS"
+            , dxfData 0 "ENDTAB"
+            , dxfData 0 "ENDSEC"
+            , dxfData 0 "SECTION"
+            , dxfData 2 "ENTITIES"
+            ]
+
+        dxfLineData =
+            linesArr
+                |> Array.map
+                    (\{ start, end } ->
+                        [ dxfData 0 "LINE"
+                        , dxfData 8 "0"
+                        , dxfData 10 (String.fromFloat start.x)
+                        , dxfData 20 (String.fromFloat start.y)
+                        , dxfData 11 (String.fromFloat end.x)
+                        , dxfData 21 (String.fromFloat end.y)
+                        ])
+                |> Array.flatten
+
+        dxfEndData =
+            [ dxfData 0 "ENDSEC"
+            , dxfData 0 "EOF"
+            ]
+
+        dxfFinData = String.join "" (Array.flatten [ dxfStartData, dxfLineData, dxfEndData ])
+
+    in
+        dxfFinData
+
+
+doSvgLine : Float -> Float2 -> Float2 -> Svg msg
+doSvgLine sw start end =
     line
         [ x1 (String.fromFloat start.x)
         , y1 (String.fromFloat start.y)
@@ -613,10 +692,10 @@ doLine sw start end =
         []
 
 
-lines : Float -> Array LineSeg2 -> Array (Svg msg)
-lines sw linesArr =
+svgLines : (Float2 -> Float2) -> Float -> Array LineSeg2 -> Array (Svg msg)
+svgLines changeCoords sw linesArr =
     linesArr
-        |> Array.map (\ls -> doLine sw ls.start ls.end)
+        |> Array.map (\ls -> doSvgLine sw (changeCoords ls.start) (changeCoords ls.end))
 
 
 polylineF : Float -> Array Float2 -> Svg msg
@@ -735,6 +814,18 @@ makeOutputLine label idTxt { x, y } =
             [ onClick (DoCopy idY)
             ]
             [ text "📋"
+            ]
+        ]
+
+
+makeOutputDxf : String -> Html Msg
+makeOutputDxf data =
+    div
+        []
+        [ button
+            [ onClick (DoDownload data)
+            ]
+            [ text "Download DXF"
             ]
         ]
 
