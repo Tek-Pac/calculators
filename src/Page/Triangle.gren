@@ -46,7 +46,7 @@ queryBuilder model =
     , builderStr "" "c" model.c
     , builderStr "" "theta" model.theta
     ]
-        |> Array.filterMap identity
+        |> Array.mapAndKeepJust identity
 
 
 type alias Model =
@@ -80,7 +80,7 @@ attemptFocus id =
 
 update : Msg -> Model -> Updated
 update msg model =
-    case msg of
+    when msg is
         NoOp ->
             { model = model
             , command = SpaCmd.none
@@ -163,7 +163,7 @@ view model =
             Ok {}
                 |> Result.andThen
                         (\_ ->
-                            case parsedModel.theta of
+                            when parsedModel.theta is
                                 Just theta ->
                                     if theta <= 0 || theta >= 90 then
                                         Err "error: θ should be between 0 and 90 degrees"
@@ -175,7 +175,7 @@ view model =
                         )
                 |> Result.andThen
                         (\_ ->
-                            case Maybe.map2 (>) parsedModel.a parsedModel.c of
+                            when Maybe.map2 (>) parsedModel.a parsedModel.c is
                                 Just True ->
                                     Err "error: A should be less than C"
 
@@ -184,7 +184,7 @@ view model =
                         )
                 |> Result.andThen
                         (\_ ->
-                            case Maybe.map2 (>) parsedModel.b parsedModel.c of
+                            when Maybe.map2 (>) parsedModel.b parsedModel.c is
                                 Just True ->
                                     Err "error: B should be less than C"
 
@@ -195,7 +195,7 @@ view model =
         -- 6 dp
         formatF : Float -> Maybe Float
         formatF value =
-            case error of
+            when error is
                 Err _ ->
                     Just (0 / 0)
 
@@ -203,7 +203,7 @@ view model =
                     Just (toFloat (Math.round (value * 1000000)) / 1000000)
 
         res =
-            case parsedModel of
+            when parsedModel is
                 { a = Just a, b = Just b, c = Nothing, theta = Nothing } ->
                     let
                         theta =
@@ -414,7 +414,7 @@ view model =
                     , w = 150
                     }
                 ]
-            , case error of
+            , when error is
                 Err e ->
                     div
                         [ class "center"
@@ -463,7 +463,7 @@ makeInput { label, idTxt, stepV, calcVal, currTxt, updateMsg, xI, yI, w } =
             [ text label
             , text "         "
             , br [] []
-            , case calcVal of
+            , when calcVal is
                 Just t ->
                     input
                         ([ value (String.fromFloat t)
@@ -482,7 +482,7 @@ makeInput { label, idTxt, stepV, calcVal, currTxt, updateMsg, xI, yI, w } =
                         )
                         []
             , if getButtonExists calcVal currTxt then
-                case calcVal of
+                when calcVal is
                     Just t ->
                         button
                             [ onClick (DoCopy idTxt)
@@ -510,7 +510,7 @@ makeInput { label, idTxt, stepV, calcVal, currTxt, updateMsg, xI, yI, w } =
 
 getButtonExists : Maybe Float -> String -> Bool
 getButtonExists calcVal currTxt =
-    case calcVal of
+    when calcVal is
         Just t ->
             if isNaN t || isInfinite t then
                 False

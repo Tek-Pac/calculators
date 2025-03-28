@@ -29,7 +29,7 @@ queryParser =
                 n =
                     Maybe.withDefault "4" nMaybe
             in
-            case profileType of
+            when profileType is
                 "RHS" ->
                     makeRhsModel n False size
 
@@ -51,7 +51,7 @@ queryBuilder : Model -> Array Builder.QueryParameter
 queryBuilder model =
     [ Builder.string
         "profileType"
-        (case model.ty of
+        (when model.ty is
             Chs ->
                 "CHS"
 
@@ -65,7 +65,7 @@ queryBuilder model =
 
 makeRhsModel : String -> Bool -> String -> Model
 makeRhsModel n c size =
-    case String.split "*" size of
+    when String.split "*" size is
         [ x, y ] ->
             checkCustom
                 { ty = Rhs
@@ -92,7 +92,7 @@ checkCustom : Model -> Model
 checkCustom model =
     let
         library =
-            case model.ty of
+            when model.ty is
                 Chs ->
                     chsLibrary
 
@@ -135,7 +135,7 @@ type Msg
 
 update : Msg -> Model -> Updated
 update msg model =
-    case msg of
+    when msg is
         NoOp ->
             { model = model
             , command = SpaCmd.none
@@ -179,7 +179,7 @@ view : Model -> Browser.Document Msg
 view model =
     let
         tyButton =
-            case model.ty of
+            when model.ty is
                 Chs ->
                     makeButton (UpdateTy Rhs) "CHS"
 
@@ -187,7 +187,7 @@ view model =
                     makeButton (UpdateTy Chs) "RHS"
 
         tyInputs =
-            case model.ty of
+            when model.ty is
                 Chs ->
                     makeChsInputs model
 
@@ -201,11 +201,11 @@ view model =
                 , n : Int
                 }
         tyCalc =
-            case String.toInt model.n of
+            when String.toInt model.n is
                 Just n ->
                     let
                         diagonalRes =
-                            case model.ty of
+                            when model.ty is
                                 Chs ->
                                     calculateChsDiagonal model
 
@@ -246,7 +246,7 @@ view model =
             , hr [] []
             , makeInput "Total no. of holes in void" "n" 1 model.n UpdateN
             , hr [] []
-            , case tyCalc of
+            , when tyCalc is
                 Err e ->
                     div
                         [ class "center"
@@ -294,7 +294,7 @@ view model =
 
 calculateChsDiagonal : Model -> Result String Float
 calculateChsDiagonal model =
-    case String.toFloat model.size of
+    when String.toFloat model.size is
         Just od ->
             Ok od
 
@@ -317,7 +317,7 @@ makeChsInputs model =
     in
     div
         []
-        (case arraySel of
+        (when arraySel is
             Just a ->
                 a
 
@@ -340,7 +340,7 @@ makeChsInputs model =
 
 calculateRhsDiagonal : Model -> Result String Float
 calculateRhsDiagonal model =
-    case getRhsVals model.size of
+    when getRhsVals model.size is
         { x = Just x, y = Just y } ->
             Ok (Math.sqrt (x * x + y * y))
 
@@ -369,7 +369,7 @@ makeRhsInputs model =
     in
     div
         []
-        (case arraySel of
+        (when arraySel is
             Just a ->
                 a
 
@@ -393,7 +393,7 @@ getRhsStrings :
        , y : String
        }
 getRhsStrings size =
-    case String.split "*" size of
+    when String.split "*" size is
         [ x, y ] ->
             { x = x
             , y = y
@@ -502,7 +502,7 @@ modelForTy : String -> ModelTy -> Model
 modelForTy n ty =
     { ty = ty
     , size =
-        case ty of
+        when ty is
             Rhs ->
                 "75*75"
 
@@ -518,7 +518,7 @@ makeArraySelector library val =
     let
         getIndex : Int -> Maybe Int
         getIndex pos =
-            case Array.get pos library of
+            when Array.get pos library is
                 Just v ->
                     if v == val then
                         Just pos
@@ -536,7 +536,7 @@ makeArraySelector library val =
             let
                 prev : String
                 prev =
-                    case Array.get (idx - 1) library of
+                    when Array.get (idx - 1) library is
                         Just a ->
                             a
 
@@ -546,7 +546,7 @@ makeArraySelector library val =
 
                 next : String
                 next =
-                    case Array.get (idx + 1) library of
+                    when Array.get (idx + 1) library is
                         Just a ->
                             a
 
@@ -632,7 +632,7 @@ makeOutput label idTxt calc =
 
 maybeErr : x -> Bool -> Maybe x -> Maybe x
 maybeErr err useDefault orig =
-    case orig of
+    when orig is
         Nothing ->
             if useDefault then
                 Just err

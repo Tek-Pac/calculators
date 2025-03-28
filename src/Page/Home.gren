@@ -45,7 +45,7 @@ type Msg
 
 update : Msg -> Model -> Updated
 update msg model =
-    case msg of
+    when msg is
         DoRedir ->
             { model = init
             , command = RedirectToTekPac

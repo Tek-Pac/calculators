@@ -40,7 +40,7 @@ queryParser =
                     Maybe.withDefault 0.0 (String.toFloat chordHeightOriginalS)
 
                 chordOutsideS =
-                    case chordGapFM of
+                    when chordGapFM is
                         Just chordGapF ->
                             String.fromFloat (chordGapF + chordHeightF * 2)
 
@@ -48,7 +48,7 @@ queryParser =
                             Maybe.withDefault "" chordOutside
 
                 chordHeightS =
-                    case chordGapFM of
+                    when chordGapFM is
                         Just _ ->
                             if String.isEmpty chordHeightOriginalS then
                                 "0"
@@ -59,7 +59,7 @@ queryParser =
                             chordHeightOriginalS
 
                 webStartTopB =
-                    case webStartTop of
+                    when webStartTop is
                         Nothing ->
                             False
 
@@ -131,7 +131,7 @@ queryBuilder model =
         Nothing
     , builderStr "Truss" "title" model.title
     ]
-        |> Array.filterMap identity
+        |> Array.mapAndKeepJust identity
 
 
 type alias Model =
@@ -193,7 +193,7 @@ doFocus model id =
 
 update : Msg -> Model -> Updated
 update msg model =
-    case msg of
+    when msg is
         NoOp ->
             { model = model
             , command = SpaCmd.none
@@ -278,7 +278,7 @@ calculateTruss model =
             , webStart = String.toFloat model.webStart
             }
     in
-    case parsedModel of
+    when parsedModel is
         -- same webs all through
         { chordLen = Just chordLen, chordOutside = Just chordOutside, chordHeight = Just chordHeight, web = Just web, startWeb = Nothing, startCount = Nothing, nextWeb = Nothing, nextCount = Nothing, roof = Just roof, webAngle = Just webAngle, webStart = Just webStart } ->
             finishTrussCalc
@@ -357,7 +357,7 @@ calculateTruss model =
         -- Check the initial webs
         -- The user has entered an initial web width, but not a valid count
         { startCount = Nothing } ->
-            case String.toFloat model.startCount of
+            when String.toFloat model.startCount is
                 Just _ ->
                     -- the user has entered something like 3.5
                     Err "enter an integral number of initial webs"
@@ -373,7 +373,7 @@ calculateTruss model =
         -- Check the next webs
         -- The user has entered a next web width, but not a valid count
         { nextCount = Nothing } ->
-            case String.toFloat model.nextCount of
+            when String.toFloat model.nextCount is
                 Just _ ->
                     -- the user has entered something like 3.5
                     Err "enter an integral number of next webs"
@@ -485,7 +485,7 @@ view model =
                 , makeInput "Web angle" "web-angle" 0.1 model.webAngle UpdateWebAngle
                 ]
             , hr [] []
-            , case calculateTruss model of
+            , when calculateTruss model is
                 Err e ->
                     div
                         [ class "center"
@@ -586,7 +586,7 @@ view model =
                                             }
                                 )
                                 |> Array.pushLast
-                                        (case chordDoublingRes of
+                                        (when chordDoublingRes is
                                             Just { start, end } ->
                                                 doLine sw (changeCoords start) (changeCoords end)
 
@@ -830,7 +830,7 @@ type alias MemberList =
 
 memberToNum : Member -> Int
 memberToNum member =
-    case member.name of
+    when member.name is
         "Chord" ->
             0
 
@@ -849,7 +849,7 @@ memberToNum member =
 
 compareMembers : Member -> Member -> Order
 compareMembers a b =
-    case compare (memberToNum a) (memberToNum b) of
+    when compare (memberToNum a) (memberToNum b) is
         EQ ->
             compare b.length a.length
             -- length largest to smallest
@@ -868,16 +868,12 @@ canCombineMembers name length =
 
 addMember : String -> Float -> MemberList -> MemberList
 addMember name length existing =
-    case Array.findFirst (canCombineMembers name length) existing of
-        Just existingMember ->
+    when Array.findFirst (canCombineMembers name length) existing is
+        Just { index = i, value = existingMember } ->
             existing
-                |> Array.map
-                        (\member ->
-                            if existingMember == member then
-                                { member | qty = member.qty + 1 }
-                            else
-                                member
-                        )
+                |> Array.set
+                        i
+                        { existingMember | qty = existingMember.qty + 1 }
 
         Nothing ->
             existing
@@ -1120,7 +1116,7 @@ type alias TrussCalc =
 
 maybeErr : x -> Bool -> Maybe x -> Maybe x
 maybeErr err useDefault orig =
-    case orig of
+    when orig is
         Nothing ->
             if useDefault then
                 Just err
@@ -1219,7 +1215,7 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
                                     1
                                 )
                      then
-                        case dat.chordDoublingRes of
+                        when dat.chordDoublingRes is
                             Just { end, wholeLength = True } ->
                                 V2.distance end
 
@@ -1248,7 +1244,7 @@ finishTrussCalc { chordLen, chordGap, chordHeight, chordDoubling, web, startWeb,
                 |> maybeErr "web angle should be positive" (webAngle < 0)
                 |> maybeErr "web start distance should be positive" (webStart < 0)
     in
-    case error of
+    when error is
         Just e ->
             Err e
 

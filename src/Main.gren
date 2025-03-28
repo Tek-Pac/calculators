@@ -72,7 +72,7 @@ init path =
 
 view : Model -> Browser.Document Msg
 view model =
-    case model of
+    when model is
         HomeModel m ->
             Home.view m
                 |> mapDocument HomeMsg
@@ -110,11 +110,11 @@ update :
        , command : Cmd Msg
        }
 update msg model =
-    case
+    when
         { m = model
         , v = msg
         }
-    of
+    is
         { v = PageChanged str } ->
             { model = urlToModel str
             , command = Cmd.none
@@ -195,7 +195,7 @@ handleSpaCmd :
        , command : Cmd Msg
        }
 handleSpaCmd { model, command } =
-    case command of
+    when command is
         BaseCmd c ->
             { model = model
             , command = c
@@ -223,7 +223,7 @@ hashToUrl str =
         trimmedStr =
             "http://localhost"
                 ++ (if String.startsWith "#/" str then
-                        String.dropLeft 1 str
+                        String.dropFirst 1 str
                      else
                         "/"
                     )
@@ -262,7 +262,7 @@ modelToUrl : Model -> String
 modelToUrl model =
     "#"
         ++ Builder.absolute
-                (case model of
+                (when model is
                     HomeModel _ ->
                         []
 
@@ -282,7 +282,7 @@ modelToUrl model =
                         [ "truss"
                         ]
                 )
-                (case model of
+                (when model is
                     HomeModel _ ->
                         []
 

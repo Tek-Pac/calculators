@@ -28,14 +28,9 @@ queryParser =
         (Query.string "xa")
         (Query.enum
             "ty"
-            (Dict.fromArray
-                [ { key = "ba"
-                  , value = BendAllowance
-                  }
-                , { key = "xa"
-                  , value = ExtraAllowance
-                  }
-                ]
+            (Dict.empty
+                |> Dict.set "ba" BendAllowance
+                |> Dict.set "xa" ExtraAllowance
             )
         )
 
@@ -71,7 +66,7 @@ queryBuilder model =
     , Just
         (Builder.string
             "ty"
-            (case model.ty of
+            (when model.ty is
                 BendAllowance ->
                     "ba"
 
@@ -80,7 +75,7 @@ queryBuilder model =
             )
         )
     ]
-        |> Array.filterMap identity
+        |> Array.mapAndKeepJust identity
 
 
 type alias Model =
@@ -125,7 +120,7 @@ attemptFocus id =
 
 update : Msg -> Model -> Updated
 update msg model =
-    case msg of
+    when msg is
         NoOp ->
             { model = model
             , command = SpaCmd.none
@@ -256,7 +251,7 @@ view model =
             Just (toFloat (Math.round (value * 1000000)) / 1000000)
 
         res =
-            case parsedModel of
+            when parsedModel is
                 { t = Just t, r = Just r, ba = Just ba, a = Just a, k = Nothing, ty = BendAllowance } ->
                     { emptyResult | k = formatF ((-r + (180 * ba) / (a * Math.pi)) / t) }
 
@@ -294,7 +289,7 @@ view model =
                 []
                 [ text txt
                 , br [] []
-                , case calcF of
+                , when calcF is
                     Just t ->
                         input
                             [ value (String.fromFloat t)
@@ -314,7 +309,7 @@ view model =
                             , step stepV
                             ]
                             []
-                , case calcF of
+                , when calcF is
                     Just t ->
                         button
                             [ onClick (DoCopy idTxt)
@@ -353,13 +348,13 @@ view model =
             [ id "k-factor-div"
             , class "center"
             ]
-            [ case model.ty of
+            [ when model.ty is
                 ExtraAllowance ->
                     text "Extra Allowance "
 
                 BendAllowance ->
                     text "Bend Allowance "
-            , case model.ty of
+            , when model.ty is
                 ExtraAllowance ->
                     makeSwapButton BendAllowance
 
