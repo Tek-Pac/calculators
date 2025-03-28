@@ -112,27 +112,37 @@ builderStr default key val =
         Just (Builder.string key val)
 
 
+maybeAppend : Maybe a -> Array a -> Array a
+maybeAppend item arr =
+    when item is
+        Nothing ->
+            arr
+
+        Just itemv ->
+            Array.pushLast itemv arr
+
+
 queryBuilder : Model -> Array Builder.QueryParameter
 queryBuilder model =
-    [ builderStr "" "chordLen" model.chordLen
-    , builderStr "" "chordOutside" model.chordOutside
-    , builderStr "" "chordHeight" model.chordHeight
-    , builderStr "" "chordDoubling" model.chordDoubling
-    , builderStr "" "web" model.web
-    , builderStr "" "startWeb" model.startWeb
-    , builderStr "" "startCount" model.startCount
-    , builderStr "" "nextWeb" model.nextWeb
-    , builderStr "" "nextCount" model.nextCount
-    , builderStr "" "roof" model.roof
-    , builderStr "45" "webAngle" model.webAngle
-    , builderStr "125" "webStart" model.webStart
-    , if model.webStartTop then
-        Just (Builder.string "webStartTop" "yes")
-      else
-        Nothing
-    , builderStr "Truss" "title" model.title
-    ]
-        |> Array.mapAndKeepJust identity
+    []
+        |> maybeAppend (builderStr "" "chordLen" model.chordLen)
+        |> maybeAppend (builderStr "" "chordOutside" model.chordOutside)
+        |> maybeAppend (builderStr "" "chordHeight" model.chordHeight)
+        |> maybeAppend (builderStr "" "chordDoubling" model.chordDoubling)
+        |> maybeAppend (builderStr "" "web" model.web)
+        |> maybeAppend (builderStr "" "startWeb" model.startWeb)
+        |> maybeAppend (builderStr "" "startCount" model.startCount)
+        |> maybeAppend (builderStr "" "nextWeb" model.nextWeb)
+        |> maybeAppend (builderStr "" "nextCount" model.nextCount)
+        |> maybeAppend (builderStr "" "roof" model.roof)
+        |> maybeAppend (builderStr "45" "webAngle" model.webAngle)
+        |> maybeAppend (builderStr "125" "webStart" model.webStart)
+        |> maybeAppend
+                (if model.webStartTop then
+                    Just (Builder.string "webStartTop" "yes")
+                 else
+                    Nothing)
+        |> maybeAppend (builderStr "Truss" "title" model.title)
 
 
 type alias Model =
@@ -601,9 +611,11 @@ view model =
         ]
     }
 
-dxfData : Int -> String -> String
+dxfData : Int -> String -> Array String
 dxfData n v =
-    String.fromInt n ++ "\n" ++ v ++ "\n"
+    [ String.fromInt n
+    , v
+    ]
 
 foldlineseg : (Float -> Float -> Float) -> LineSeg2 -> Float2 -> Float2
 foldlineseg cmp dat vec =
@@ -673,9 +685,10 @@ dxfEncodeLines linesArr =
         dxfEndData =
             [ dxfData 0 "ENDSEC"
             , dxfData 0 "EOF"
+            , [""]
             ]
 
-        dxfFinData = String.join "" (Array.flatten [ dxfStartData, dxfLineData, dxfEndData ])
+        dxfFinData = String.join "\n" (Array.flatten (Array.flatten [ dxfStartData, dxfLineData, dxfEndData ]))
 
     in
         dxfFinData

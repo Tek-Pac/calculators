@@ -5442,8 +5442,17 @@ var $author$project$Page$Truss$builderStr$ = function(_default, key, val) {
 	return _Utils_eq(val, _default) ? $gren_lang$core$Maybe$Nothing : $gren_lang$core$Maybe$Just($gren_lang$url$Url$Builder$string$(key, val));
 };
 var $author$project$Page$Truss$builderStr = F3($author$project$Page$Truss$builderStr$);
+var $author$project$Page$Truss$maybeAppend$ = function(item, arr) {
+	if (item.$ === 'Nothing') {
+		return arr;
+	} else {
+		var itemv = item.a;
+		return $gren_lang$core$Array$pushLast$(itemv, arr);
+	}
+};
+var $author$project$Page$Truss$maybeAppend = F2($author$project$Page$Truss$maybeAppend$);
 var $author$project$Page$Truss$queryBuilder = function(model) {
-	return $gren_lang$core$Array$mapAndKeepJust$($gren_lang$core$Basics$identity, [ $author$project$Page$Truss$builderStr$('', 'chordLen', model.chordLen), $author$project$Page$Truss$builderStr$('', 'chordOutside', model.chordOutside), $author$project$Page$Truss$builderStr$('', 'chordHeight', model.chordHeight), $author$project$Page$Truss$builderStr$('', 'chordDoubling', model.chordDoubling), $author$project$Page$Truss$builderStr$('', 'web', model.web), $author$project$Page$Truss$builderStr$('', 'startWeb', model.startWeb), $author$project$Page$Truss$builderStr$('', 'startCount', model.startCount), $author$project$Page$Truss$builderStr$('', 'nextWeb', model.nextWeb), $author$project$Page$Truss$builderStr$('', 'nextCount', model.nextCount), $author$project$Page$Truss$builderStr$('', 'roof', model.roof), $author$project$Page$Truss$builderStr$('45', 'webAngle', model.webAngle), $author$project$Page$Truss$builderStr$('125', 'webStart', model.webStart), model.webStartTop ? $gren_lang$core$Maybe$Just($gren_lang$url$Url$Builder$string$('webStartTop', 'yes')) : $gren_lang$core$Maybe$Nothing, $author$project$Page$Truss$builderStr$('Truss', 'title', model.title) ]);
+	return $author$project$Page$Truss$maybeAppend$($author$project$Page$Truss$builderStr$('Truss', 'title', model.title), $author$project$Page$Truss$maybeAppend$(model.webStartTop ? $gren_lang$core$Maybe$Just($gren_lang$url$Url$Builder$string$('webStartTop', 'yes')) : $gren_lang$core$Maybe$Nothing, $author$project$Page$Truss$maybeAppend$($author$project$Page$Truss$builderStr$('125', 'webStart', model.webStart), $author$project$Page$Truss$maybeAppend$($author$project$Page$Truss$builderStr$('45', 'webAngle', model.webAngle), $author$project$Page$Truss$maybeAppend$($author$project$Page$Truss$builderStr$('', 'roof', model.roof), $author$project$Page$Truss$maybeAppend$($author$project$Page$Truss$builderStr$('', 'nextCount', model.nextCount), $author$project$Page$Truss$maybeAppend$($author$project$Page$Truss$builderStr$('', 'nextWeb', model.nextWeb), $author$project$Page$Truss$maybeAppend$($author$project$Page$Truss$builderStr$('', 'startCount', model.startCount), $author$project$Page$Truss$maybeAppend$($author$project$Page$Truss$builderStr$('', 'startWeb', model.startWeb), $author$project$Page$Truss$maybeAppend$($author$project$Page$Truss$builderStr$('', 'web', model.web), $author$project$Page$Truss$maybeAppend$($author$project$Page$Truss$builderStr$('', 'chordDoubling', model.chordDoubling), $author$project$Page$Truss$maybeAppend$($author$project$Page$Truss$builderStr$('', 'chordHeight', model.chordHeight), $author$project$Page$Truss$maybeAppend$($author$project$Page$Truss$builderStr$('', 'chordOutside', model.chordOutside), $author$project$Page$Truss$maybeAppend$($author$project$Page$Truss$builderStr$('', 'chordLen', model.chordLen), [  ]))))))))))))));
 };
 var $author$project$Main$modelToUrl = function(model) {
 	return '#' + $gren_lang$url$Url$Builder$absolute$(function () {
@@ -7235,7 +7244,7 @@ var $author$project$Page$Truss$calculateTruss = function(model) {
 	return $gren_lang$core$Result$Err('enter the angle of the roof');
 };
 var $author$project$Page$Truss$dxfData$ = function(n, v) {
-	return $gren_lang$core$String$fromInt(n) + ('\n' + (v + '\n'));
+	return [ $gren_lang$core$String$fromInt(n), v ];
 };
 var $author$project$Page$Truss$dxfData = F2($author$project$Page$Truss$dxfData$);
 var $gren_lang$core$Array$flatten = _Array_flat;
@@ -7257,8 +7266,8 @@ var $author$project$Page$Truss$dxfEncodeLines = function(linesArr) {
 				var end = _v0.end;
 				return [ $author$project$Page$Truss$dxfData$(0, 'LINE'), $author$project$Page$Truss$dxfData$(8, '0'), $author$project$Page$Truss$dxfData$(10, $gren_lang$core$String$fromFloat(start.x)), $author$project$Page$Truss$dxfData$(20, '0'), $author$project$Page$Truss$dxfData$(30, $gren_lang$core$String$fromFloat(start.y)), $author$project$Page$Truss$dxfData$(11, $gren_lang$core$String$fromFloat(end.x)), $author$project$Page$Truss$dxfData$(21, '0'), $author$project$Page$Truss$dxfData$(31, $gren_lang$core$String$fromFloat(end.y)) ];
 			}, linesArr));
-	var dxfEndData = [ $author$project$Page$Truss$dxfData$(0, 'ENDSEC'), $author$project$Page$Truss$dxfData$(0, 'EOF') ];
-	var dxfFinData = A2($gren_lang$core$String$join, '', $gren_lang$core$Array$flatten([ dxfStartData, dxfLineData, dxfEndData ]));
+	var dxfEndData = [ $author$project$Page$Truss$dxfData$(0, 'ENDSEC'), $author$project$Page$Truss$dxfData$(0, 'EOF'), [ '' ] ];
+	var dxfFinData = A2($gren_lang$core$String$join, '\n', $gren_lang$core$Array$flatten($gren_lang$core$Array$flatten([ dxfStartData, dxfLineData, dxfEndData ])));
 	return dxfFinData;
 };
 var $author$project$Page$Truss$makeInput$ = function(label, idTxt, stepV, currTxt, updateMsg) {
