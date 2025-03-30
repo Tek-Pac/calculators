@@ -1,0 +1,440 @@
+/* Themes */
+:root {
+    --background: #fffff8;
+    --text: #111111;
+    --heading: #503111;
+    /*--heading: #765737;*/
+    --t-shadow: #00000033;
+    --t-grey: #00000033;
+    --t-bold-shadow: #00000066;
+    --link-text: #0000f0;
+    --link-background: #ffffff;
+    --link-visited-background: #fdfdfd;
+    --link-visited-text: #000070;
+    --grey: #eeeeee;
+    --vn-color: #ee0000;
+    --note-color: #a050a0;
+    --serif: Cambria, Georgia, "Segoe UI Emoji", serif;
+    /*--sans-serif: Calibri, Arial, "Segoe UI Emoji", sans-serif;*/
+    --link-deco: none;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #111111;
+        --text: #e0e0d9;
+        --heading: #e6c7a7;
+        --t-shadow: #00000000;
+        --t-grey: #fffff040;
+        --t-bold-shadow: #000000;
+        --link-background: #1c1c1c;
+        --link-text: #7080f0;
+        --link-visited-background: #111111;
+        --link-visited-text: #c060e0;
+        --grey: #333333;
+        --vn-color: #ee2020;
+        --note-color: #c050c0;
+        --link-deco: underline;
+    }
+}
+
+:root.light {
+    --background: #fffff8;
+    --text: #111111;
+    --heading: #503111;
+    /*--heading: #765737;*/
+    --t-shadow: #00000033;
+    --t-grey: #00000033;
+    --t-bold-shadow: #00000066;
+    --link-text: #0000f0;
+    --link-background: #ffffff;
+    --link-visited-background: #fdfdfd;
+    --link-visited-text: #000070;
+    --grey: #eeeeee;
+    --vn-color: #ee0000;
+    --note-color: #a050a0;
+    --link-deco: none;
+}
+
+:root.dark {
+    --background: #111111;
+    --text: #e0e0d9;
+    --heading: #e6c7a7;
+    --t-shadow: #00000000;
+    --t-grey: #fffff040;
+    --t-bold-shadow: #000000;
+    --link-background: #1c1c1c;
+    --link-text: #7080f0;
+    --link-visited-background: #111111;
+    --link-visited-text: #c060e0;
+    --grey: #333333;
+    --vn-color: #ee2020;
+    --note-color: #c050c0;
+    --link-deco: underline;
+}
+
+body {
+    font-family: var(--serif);
+    font-size: 13pt;
+    margin: 0 25pt 30pt 25pt;
+    background: var(--background); /* Slightly creme */
+    color: var(--text);
+    transition: color 0.1s, background 0.1s;
+}
+
+* {
+    scroll-margin-top: 50pt;
+}
+
+/* img {
+    image-rendering: pixelated;
+} */
+
+/* Homepage link */
+a.img-button {
+    padding: 0;
+    height: 22pt;
+    overflow: hidden;
+}
+
+a.img-button > img {
+    height: 22pt;
+}
+
+.icon {
+    text-decoration: none;
+}
+
+/* Floating buttons */
+.left, .left-over, .right, .prev, .next, .prev-below, .next-below {
+    position: fixed;
+    line-height: 17pt;
+    z-index: 2;
+    text-decoration: none;
+}
+
+.left, .left-over, .right { /* Top */
+    top: 2pt;
+}
+
+.prev, .next { /* Halfway down */
+    top: 46%;
+    padding-top: 10pt;
+    padding-bottom: 13pt;
+}
+
+.prev-below, .next-below {
+    bottom: 4pt;
+    padding-top: 10pt;
+    padding-bottom: 13pt;
+}
+
+.left, .prev, .prev-below {
+    left: 2pt;
+}
+
+.left-over {
+    left: 27pt;
+}
+
+.right, .next, .next-below {
+    right: 2pt;
+}
+
+.bottom {
+    bottom: 4pt;
+    top: unset!important;
+}
+
+.top-below {
+    top: 27pt;
+}
+
+.top-below-2 {
+    top: 52pt;
+}
+
+.top-below-3 {
+    top: 77pt;
+}
+
+/* Headings */
+h1, h2, h3, th {
+    text-align: center;
+    line-height: 1.2;
+    color: var(--heading);
+}
+
+h1 {
+    margin-right: 40pt;
+    margin-left: 40pt;
+}
+
+hr {
+    width: 90%;
+    border-top-color: var(--t-grey);
+    /* <hr> has borders on all sides by default */
+    border-bottom: 0 solid transparent;
+    border-left: 0 solid transparent;
+    border-right: 0 solid transparent;
+}
+
+.center,
+.centre {
+    text-align: center;
+}
+
+.center-margin,
+.centre-margin {
+    margin-right: auto;
+    margin-left: auto;
+}
+
+/* Clicky stuff */
+a, button, input, select, details > summary {
+    border-radius: 2.5pt;
+    background: var(--link-background);
+    color: var(--text);
+    padding: 2pt;
+    transition: box-shadow 0.1s, background 0.1s;
+}
+
+a, button, details > summary {
+    box-shadow: 0 1pt 3pt var(--t-shadow);
+}
+
+button, input, select {
+    border: none;
+    font-size: inherit;
+    margin: 2pt;
+    font-family: var(--serif);
+}
+
+input, select {
+    box-shadow: inset 0 0.5pt 2pt var(--t-shadow);
+    padding-bottom: 2.5pt;
+    margin-bottom: 1.5pt;
+}
+
+details {
+    margin-left: 10pt;
+    padding-left: 10pt;
+    border-left: 1pt solid transparent;
+}
+
+details[open] {
+    border-left: 1pt solid var(--t-grey);
+}
+
+/* This is essentially styled like a link */
+details > summary {
+    margin-left: -20pt;
+    list-style: none;
+    display: inline;
+    cursor: pointer;
+}
+
+a {
+    min-width: 17pt;
+    text-align: center;
+    line-height: 21pt;
+}
+
+td > input {
+    margin: 0;
+}
+
+input.search {
+    /* Roughly the amount of text around it */
+    max-width: calc(100% - 100pt);
+}
+
+a, button, details > summary {
+    color: var(--link-text);
+    text-decoration: var(--link-deco);
+    text-underline-offset: 0.1em;
+    /*-webkit-text-underline-position: under;
+    text-underline-position: under; */
+}
+
+a:visited,
+a.visited,
+.header a,
+details[open] > summary,
+.left,
+.left-over,
+.right,
+.prev,
+.next {
+    background: var(--link-visited-background);
+    color: var(--link-visited-text);
+}
+
+a:active, a:focus, button:focus {
+    box-shadow: 0 0 2pt var(--t-shadow)!important;
+    background: var(--grey);
+}
+
+a:active {
+    outline: none!important;
+}
+
+a:target { /* Emphasise target */
+    box-shadow: 0 1pt 4pt 1pt var(--t-bold-shadow)!important;
+    padding: 3pt 3pt;
+    border: 1pt solid;
+    /* Don't affect the text layout */
+    margin: -2pt -2pt;
+    outline: none!important;
+}
+
+a.disabled {
+    box-shadow: none!important;
+    background: var(--link-visited-background);
+    color: var(--text);
+    text-decoration: none;
+}
+
+/* Used for links with lots of text */
+.block {
+    display: inline-block;
+    /*text-decoration: none;*/
+}
+
+/* Headers! */
+.header {
+    color: var(--heading);
+    text-align: center;
+    padding: 0.5em 20pt 0pt 20pt;
+    font-size: 11pt;
+    line-height: 16pt;
+    position: sticky;
+    top: 0;
+    background: var(--background);
+    box-shadow: 0 0 20pt 10pt var(--background);
+    z-index: 1;
+}
+
+.header > hr {
+    margin-bottom: 0;
+}
+
+.header a {
+    text-decoration: none;
+}
+
+/* Main section */
+.article {
+    line-height: 19pt;
+    padding: 0 5pt;
+}
+
+/* Search details */
+.data {
+    font-size: 6pt;
+    line-height: 8pt;
+}
+
+span.highlight {
+    color: var(--heading);
+    font-weight: bold;
+    font-style: italic;
+}
+
+ol, ul {
+    padding-right: 5pt;
+    padding-left: 20pt;
+    line-height: 19pt;
+}
+
+ol.notes {
+    list-style-type: lower-alpha;
+}
+
+.notes,
+.notes a,
+.footnotes,
+.footnotes a {
+    font-size: 11pt;
+    line-height: 16pt;
+}
+
+form {
+    line-height: 25pt;
+}
+
+.cols-large {
+    text-align: center;
+    columns: 3 25em;
+    column-gap: 5em;
+    column-rule: 1px solid var(--t-grey);
+    overflow: visible;
+    padding: 0 5pt;
+}
+
+p:first-child {
+    margin-top: 0;
+}
+
+p:last-child {
+    margin-bottom: 0;
+}
+
+.quote {
+    font-size: smaller;
+    margin-left: 15pt;
+}
+
+.quote td {
+    padding: 1pt;
+}
+
+pre {
+    line-height: 15pt;
+    font-size: 13pt;
+}
+
+/* If changed, make sure to update layout_*.js */
+@media (min-width: 760px) {
+    .fn-article {
+        width: max(min(100%, 675pt), 60%);
+        margin: 0 auto 10pt auto;
+        padding: 0;
+        display: grid;
+        grid-template-columns: 3fr 1px 2fr;
+    }
+    .fn-article > .article-content {
+        grid-column: 1 / 2;
+        padding-right: 20pt;
+        margin-bottom: 10pt;
+    }
+    .fn-article > .data {
+        grid-column: 1 / 4;
+        margin-bottom: 10pt;
+    }
+    .fn-article > hr {
+        display: none;
+    }
+    .fn-article > hr.grid {
+        grid-column: 2 / 3;
+        grid-row: 1 / span 100;
+        display: block;
+        width: 0;
+        height: calc(100% - 40pt);
+        margin-top: 20pt;
+        border-left: 1px solid var(--t-grey);
+        border-top: 0 solid transparent;
+    }
+    .fn-article > .footnotes {
+        grid-column: 3 / 4;
+        padding-left: 25pt;
+        margin-top: 0;
+        margin-bottom: 10pt;
+        height: 0;
+        position: relative;
+    }
+    /* Only if we have JavaScript */
+    .fn-article > .footnotes > li.js {
+        position: absolute;
+    }
+}

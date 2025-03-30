@@ -1,0 +1,117 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculators</title>
+  <!-- Common Header -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="main.css" type="text/css">
+  <script src="scripts/theme.js"></script>
+</head>
+
+<body>
+
+<pre id="gren"></pre>
+
+<script src="scripts/Main.js"></script>
+<script>
+try {
+  // Show a redirect button
+  var initialLocation = document.location.hash;
+  if ((initialLocation == "" || initialLocation == "#/") && document.location.host != "calc.tek-pac.com.au")
+    initialLocation = "#/?show_redir=true";
+
+  var app = Gren.Main.init({ node: document.getElementById("gren"), flags: initialLocation });
+
+  var stateTimeoutId = undefined;
+  var stillTimeoutId = undefined;
+
+  var hasBeenStillForAWhile = false;
+
+  function replaceState(hash) {
+    // If we've been on this one for a little while, save the page
+    if (hasBeenStillForAWhile)
+      window.history.pushState({}, "", hash);
+    else
+      window.history.replaceState({}, "", hash);
+
+    hasBeenStillForAWhile = false;
+    stateTimeoutId = undefined;
+  }
+
+  function setStill() {
+    console.log("Has been still on " + document.location.hash);
+    hasBeenStillForAWhile = true;
+    stillTimeoutId = undefined;
+  }
+
+  function clearTimeouts() {
+    if (stateTimeoutId != undefined)
+      window.clearTimeout(stateTimeoutId);
+    stateTimeoutId = undefined;
+
+    if (stillTimeoutId != undefined)
+      window.clearTimeout(stillTimeoutId);
+    stillTimeoutId = undefined;
+  }
+
+  app.ports.changePage.subscribe(function(hash) {
+    clearTimeouts();
+
+    window.history.pushState({}, "", hash);
+    hasBeenStillForAWhile = false;
+
+    // Note that it has been still after 5s
+    stillTimeoutId = window.setTimeout(setStill, 5000);
+  });
+
+  app.ports.updatePage.subscribe(function(hash) {
+    clearTimeouts();
+
+    // Only update in 250ms to debounce
+    stateTimeoutId = window.setTimeout(replaceState, 250, hash);
+
+    // Note that it has been still after 5s
+    stillTimeoutId = window.setTimeout(setStill, 5000);
+  });
+
+  app.ports.copyId.subscribe(function(id) {
+    var input = document.getElementById(id);
+
+    input.focus();
+    input.select();
+
+    try {
+      var successful = document.execCommand("copy");
+      if (!successful)
+        window.alert("Failed to copy to clipboard");
+    } catch (e) {
+      window.alert("Failed to copy to clipboard: " + e);
+    }
+  });
+
+  app.ports.redirectToTekPac.subscribe(function(hash) {
+    document.location.href = "https://calc.tek-pac.com.au/" + hash;
+  });
+
+  window.addEventListener("hashchange", function(event) {
+    clearTimeouts();
+
+    app.ports.pageChanged.send(document.location.hash);
+  });
+}
+catch (e)
+{
+  // display initialization errors (e.g. bad flags, infinite recursion)
+  var header = document.createElement("h1");
+  header.style.fontFamily = "monospace";
+  header.innerText = "Initialization Error";
+  var pre = document.getElementById("gren");
+  document.body.insertBefore(header, pre);
+  pre.innerText = e;
+  throw e;
+}
+</script>
+
+</body>
+</html>
