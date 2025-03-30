@@ -622,18 +622,18 @@ dxfEncodeLines linesArr =
             , dxfData 2 "HEADER"
             , dxfData 9 "$EXTMIN"
             , dxfData 10 (String.fromFloat minCorner.x)
-            , dxfData 20 (String.fromFloat minCorner.y)
-            , dxfData 30 "0"
+            , dxfData 20 "0"
+            , dxfData 30 (String.fromFloat minCorner.y)
             , dxfData 9 "$EXTMAX"
             , dxfData 10 (String.fromFloat maxCorner.x)
-            , dxfData 20 (String.fromFloat maxCorner.y)
-            , dxfData 30 "100"
+            , dxfData 20 "100"
+            , dxfData 30 (String.fromFloat maxCorner.y)
             , dxfData 9 "$LIMMIN"
             , dxfData 10 (String.fromFloat minCorner.x)
-            , dxfData 20 (String.fromFloat minCorner.y)
+            , dxfData 20 "0"
             , dxfData 9 "$LIMMAX"
             , dxfData 10 (String.fromFloat maxCorner.x)
-            , dxfData 20 (String.fromFloat maxCorner.y)
+            , dxfData 20 "0"
             , dxfData 9 "$MEASUREMENT"
             , dxfData 70 "1" -- metric
             , dxfData 9 "$INSUNITS"
@@ -648,7 +648,7 @@ dxfEncodeLines linesArr =
             , dxfData 2 "0"
             , dxfData 70 "0"
             , dxfData 62 "7"
-            --wdstr(6, layer.linetype or "CONTINUOUS"
+            , dxfData 6 "CONTINUOUS"
             , dxfData 0 "ENDTAB"
             , dxfData 0 "ENDSEC"
             , dxfData 0 "SECTION"
@@ -662,9 +662,11 @@ dxfEncodeLines linesArr =
                         [ dxfData 0 "LINE"
                         , dxfData 8 "0"
                         , dxfData 10 (String.fromFloat start.x)
-                        , dxfData 20 (String.fromFloat start.y)
+                        , dxfData 20 "0"
+                        , dxfData 30 (String.fromFloat start.y)
                         , dxfData 11 (String.fromFloat end.x)
-                        , dxfData 21 (String.fromFloat end.y)
+                        , dxfData 21 "0"
+                        , dxfData 31 (String.fromFloat end.y)
                         ])
                 |> Array.flatten
 
