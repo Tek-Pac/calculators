@@ -9,8 +9,9 @@ local used_files = {
 
 local current_branch
 do
-   local p <close> = io.popen'git branch --show-current'
+   local p = io.popen'git branch --show-current'
    current_branch = p:read()
+   p:close()
 end
 
 -- the workflow is:
@@ -28,8 +29,9 @@ local datename = os.date('%Y-%m-%d %H:%M:%S', ts)
 local file_to_contents = {}
 
 for _, v in ipairs(used_files) do
-   local f <close> = io.open(v, 'r')
+   local f = io.open(v, 'r')
    file_to_contents[v] = f:read'a'
+   f:close()
 end
 
 local file_to_newfn = {}
@@ -85,8 +87,9 @@ for k, v in pairs(file_to_contents) do
    k = file_to_newfn[k] or k
 
    print('writing ' .. k)
-   local f <close> = io.open(k, 'wb')
+   local f = io.open(k, 'wb')
    f:write(v)
+   f:close()
 end
 
 -- add them to git
