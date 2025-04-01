@@ -7,10 +7,32 @@ local used_files = {
    'scripts/theme.js',
 }
 
+local is_dirty
+do
+   local p = io.popen'git status -s'
+   local a = p:read'a'
+   p:close()
+   is_dirty = a:find'%S' and a or false
+end
+
+if is_dirty then
+   print('Please commit your changes before deploying:')
+   print()
+   print(is_dirty)
+   return
+end
+
 local current_branch
 do
    local p = io.popen'git branch --show-current'
    current_branch = p:read()
+   p:close()
+end
+
+local curr_id
+do
+   local p = io.popen('git show ' .. current_branch .. ' -s --pretty=format:%H')
+   curr_id = p:read()
    p:close()
 end
 
@@ -98,7 +120,7 @@ os.execute'git add *'
 
 -- commit
 
-os.execute('git commit -m "Deploy ' .. datename .. '"')
+os.execute('git commit -m "Deploy ' .. datename .. '" -m "Based on commit ' .. curr_id .. '"')
 
 os.execute('git push')
 
