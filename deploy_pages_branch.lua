@@ -98,6 +98,7 @@ for item in io.popen'dir /S /A-D /B':lines() do
    if ext == '.js' or ext == '.css' or ext == '.html' then
       print('removing ' .. item)
       os.remove(item)
+      os.execute('git add "' .. item .. '"')
    end
 
    ::next::
@@ -106,17 +107,16 @@ end
 -- add in our files
 
 for k, v in pairs(file_to_contents) do
-   k = file_to_newfn[k] or k
+   local nk = file_to_newfn[k] or k
 
-   print('writing ' .. k)
-   local f = io.open(k, 'wb')
+   print('writing ' .. nk)
+   local f = io.open(nk, 'wb')
    f:write(v)
    f:close()
+
+   -- add to git
+   os.execute('git add "' .. nk .. '"')
 end
-
--- add them to git
-
-os.execute'git add *'
 
 -- commit
 
