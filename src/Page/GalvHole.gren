@@ -17,8 +17,8 @@ import Url.Parser.Query as Query
 
 queryParser : Query.Parser Model
 queryParser =
-    Query.map3
-        (\profileTypeMaybe sizeMaybe nMaybe ->
+    Query.map4
+        (\profileTypeMaybe sizeMaybe nMaybe internal ->
             let
                 profileType =
                     Maybe.withDefault "" profileTypeMaybe
@@ -28,23 +28,45 @@ queryParser =
 
                 n =
                     Maybe.withDefault "4" nMaybe
+
+                internalB =
+                    when internal is
+                        Nothing ->
+                            False
+
+                        Just "no" ->
+                            False
+
+                        Just _ ->
+                            True
             in
             when profileType is
                 "RHS" ->
-                    makeRhsModel n False size
+                    makeRhsModel n False size internalB
 
                 "SHS" ->
-                    makeRhsModel n False size
+                    makeRhsModel n False size internalB
 
                 "CHS" ->
-                    makeChsModel n False size
+                    makeChsModel n False size internalB
 
                 _ ->
-                    makeRhsModel n False size
+                    makeRhsModel n False size internalB
         )
         (Query.string "profileType")
         (Query.string "size")
         (Query.string "n")
+        (Query.string "internal")
+
+
+maybeAppend : Maybe a -> Array a -> Array a
+maybeAppend item arr =
+    when item is
+        Nothing ->
+            arr
+
+        Just itemv ->
+            Array.pushLast itemv arr
 
 
 queryBuilder : Model -> Array Builder.QueryParameter
@@ -61,10 +83,15 @@ queryBuilder model =
     , Builder.string "size" model.size
     , Builder.string "n" model.n
     ]
+        |> maybeAppend
+                (if model.internal then
+                    Just (Builder.string "internal" "yes")
+                 else
+                    Nothing)
 
 
-makeRhsModel : String -> Bool -> String -> Model
-makeRhsModel n c size =
+makeRhsModel : String -> Bool -> String -> Bool -> Model
+makeRhsModel n c size internal =
     when String.split "*" size is
         [ x, y ] ->
             checkCustom
@@ -72,19 +99,21 @@ makeRhsModel n c size =
                 , size = x ++ "*" ++ y
                 , c = c
                 , n = n
+                , internal = internal
                 }
 
         _ ->
-            modelForTy n Rhs
+            modelForTy n Rhs internal
 
 
-makeChsModel : String -> Bool -> String -> Model
-makeChsModel n c size =
+makeChsModel : String -> Bool -> String -> Bool -> Model
+makeChsModel n c size internal =
     checkCustom
         { ty = Chs
         , size = size
         , c = c
         , n = n
+        , internal = internal
         }
 
 
@@ -110,6 +139,7 @@ type alias Model =
     , size : String
     , c : Bool
     , n : String
+    , internal : Bool
     }
 
 
@@ -129,6 +159,7 @@ type Msg
     | UpdateSizeS String
     | UpdateSizeC String
     | UpdateN String
+    | UpdateInternal Bool
     | DoCopy String
     | NoOp
 
@@ -142,7 +173,7 @@ update msg model =
             }
 
         UpdateTy ty ->
-            { model = modelForTy model.n ty
+            { model = modelForTy model.n ty model.internal
             , command = SpaCmd.none
             }
 
@@ -167,6 +198,14 @@ update msg model =
         UpdateN n ->
             { model = { model | n = n }
             , command = BaseCmd (Task.attempt (\_ -> NoOp) (Dom.focus "n"))
+            }
+
+        UpdateInternal i ->
+            { model =
+                { model
+                    | internal = i
+                }
+            , command = SpaCmd.none
             }
 
         DoCopy id ->
@@ -244,7 +283,19 @@ view model =
             , hr [] []
             , tyInputs
             , hr [] []
-            , makeInput "Total no. of holes in void" "n" 1 model.n UpdateN
+            , makeButton
+                (UpdateInternal (not model.internal))
+                (if model.internal then
+                    "Internal holes"
+                 else
+                    "External holes")
+            , hr [] []
+            , makeInput
+                (if model.internal then
+                    "No. of holes in internal connection"
+                 else
+                    "Total no. of holes in void")
+                "n" 1 model.n UpdateN
             , hr [] []
             , when tyCalc is
                 Err e ->
@@ -256,8 +307,14 @@ view model =
 
                 Ok { diagonal, n } ->
                     let
-                        -- equivalent area to two holes with a diameter of a quarter of the diagonal
+                        -- see https://gaa.com.au/venting-draining-guide/
+                        --
+                        -- Seems to be equivalent required diameter, apart from the connections say
+                        -- a total of at least 50% of the internal diameter of the connecting section
+                        -- (which would presumably be met by the two holes each with a diameter of
+                        -- diagonal / 4)
                         totalAreaDividedByPi =
+                            -- equivalent area to two holes with a diameter of a quarter of the diagonal
                             (diagonal / 8) * (diagonal / 8) * 2
 
                         -- we skip an extra multiply and divide by pi
@@ -498,8 +555,8 @@ chsLibrary =
 -- Shared utilities
 
 
-modelForTy : String -> ModelTy -> Model
-modelForTy n ty =
+modelForTy : String -> ModelTy -> Bool -> Model
+modelForTy n ty internal =
     { ty = ty
     , size =
         when ty is
@@ -510,6 +567,7 @@ modelForTy n ty =
                 "48.3"
     , c = False
     , n = n
+    , internal = internal
     }
 
 

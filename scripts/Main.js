@@ -5097,13 +5097,13 @@ var $author$project$Page$GalvHole$checkCustom = function(model) {
 	var custom = model.c || (!$gren_lang$core$Array$member$(model.size, library));
 	return _Utils_update(model, { c: custom });
 };
-var $author$project$Page$GalvHole$makeChsModel$ = function(n, c, size) {
-	return $author$project$Page$GalvHole$checkCustom({ c: c, n: n, size: size, ty: $author$project$Page$GalvHole$Chs });
+var $author$project$Page$GalvHole$makeChsModel$ = function(n, c, size, internal) {
+	return $author$project$Page$GalvHole$checkCustom({ c: c, internal: internal, n: n, size: size, ty: $author$project$Page$GalvHole$Chs });
 };
-var $author$project$Page$GalvHole$makeChsModel = F3($author$project$Page$GalvHole$makeChsModel$);
+var $author$project$Page$GalvHole$makeChsModel = F4($author$project$Page$GalvHole$makeChsModel$);
 var $author$project$Page$GalvHole$Rhs = { $: 'Rhs' };
-var $author$project$Page$GalvHole$modelForTy$ = function(n, ty) {
-	return { c: false, n: n, size: function () {
+var $author$project$Page$GalvHole$modelForTy$ = function(n, ty, internal) {
+	return { c: false, internal: internal, n: n, size: function () {
 		if (ty.$ === 'Rhs') {
 			return '75*75';
 		} else {
@@ -5111,30 +5111,31 @@ var $author$project$Page$GalvHole$modelForTy$ = function(n, ty) {
 		}
 	}(), ty: ty };
 };
-var $author$project$Page$GalvHole$modelForTy = F2($author$project$Page$GalvHole$modelForTy$);
-var $author$project$Page$GalvHole$makeRhsModel$ = function(n, c, size) {
+var $author$project$Page$GalvHole$modelForTy = F3($author$project$Page$GalvHole$modelForTy$);
+var $author$project$Page$GalvHole$makeRhsModel$ = function(n, c, size, internal) {
 	var _v0 = A2($gren_lang$core$String$split, '*', size);
 	if (_v0.length === 2) {
 		var x = _v0[0];
 		var y = _v0[1];
-		return $author$project$Page$GalvHole$checkCustom({ c: c, n: n, size: x + ('*' + y), ty: $author$project$Page$GalvHole$Rhs });
+		return $author$project$Page$GalvHole$checkCustom({ c: c, internal: internal, n: n, size: x + ('*' + y), ty: $author$project$Page$GalvHole$Rhs });
 	} else {
-		return $author$project$Page$GalvHole$modelForTy$(n, $author$project$Page$GalvHole$Rhs);
+		return $author$project$Page$GalvHole$modelForTy$(n, $author$project$Page$GalvHole$Rhs, internal);
 	}
 };
-var $author$project$Page$GalvHole$makeRhsModel = F3($author$project$Page$GalvHole$makeRhsModel$);
+var $author$project$Page$GalvHole$makeRhsModel = F4($author$project$Page$GalvHole$makeRhsModel$);
 var $gren_lang$url$Url$Parser$Internal$Parser = function (a) {
 	return { $: 'Parser', a: a };
 };
-var $gren_lang$url$Url$Parser$Query$map3$ = function(func, _v0, _v1, _v2) {
+var $gren_lang$url$Url$Parser$Query$map4$ = function(func, _v0, _v1, _v2, _v3) {
 	var a = _v0.a;
 	var b = _v1.a;
 	var c = _v2.a;
+	var d = _v3.a;
 	return $gren_lang$url$Url$Parser$Internal$Parser(function(dict) {
-			return A3(func, a(dict), b(dict), c(dict));
+			return A4(func, a(dict), b(dict), c(dict), d(dict));
 		});
 };
-var $gren_lang$url$Url$Parser$Query$map3 = F4($gren_lang$url$Url$Parser$Query$map3$);
+var $gren_lang$url$Url$Parser$Query$map4 = F5($gren_lang$url$Url$Parser$Query$map4$);
 var $gren_lang$url$Url$Parser$Query$custom$ = function(key, func) {
 	return $gren_lang$url$Url$Parser$Internal$Parser(function(dict) {
 			return func($gren_lang$core$Maybe$withDefault$([  ], $gren_lang$core$Dict$get$(key, dict)));
@@ -5151,21 +5152,32 @@ var $gren_lang$url$Url$Parser$Query$string = function(key) {
 			}
 		});
 };
-var $author$project$Page$GalvHole$queryParser = $gren_lang$url$Url$Parser$Query$map3$(F3(function(profileTypeMaybe, sizeMaybe, nMaybe) {
+var $author$project$Page$GalvHole$queryParser = $gren_lang$url$Url$Parser$Query$map4$(F4(function(profileTypeMaybe, sizeMaybe, nMaybe, internal) {
 			var size = $gren_lang$core$Maybe$withDefault$('', sizeMaybe);
 			var profileType = $gren_lang$core$Maybe$withDefault$('', profileTypeMaybe);
 			var n = $gren_lang$core$Maybe$withDefault$('4', nMaybe);
+			var internalB = function () {
+				if (internal.$ === 'Nothing') {
+					return false;
+				} else {
+					if (internal.a === 'no') {
+						return false;
+					} else {
+						return true;
+					}
+				}
+			}();
 			switch (profileType) {
 				case 'RHS':
-					return $author$project$Page$GalvHole$makeRhsModel$(n, false, size);
+					return $author$project$Page$GalvHole$makeRhsModel$(n, false, size, internalB);
 				case 'SHS':
-					return $author$project$Page$GalvHole$makeRhsModel$(n, false, size);
+					return $author$project$Page$GalvHole$makeRhsModel$(n, false, size, internalB);
 				case 'CHS':
-					return $author$project$Page$GalvHole$makeChsModel$(n, false, size);
+					return $author$project$Page$GalvHole$makeChsModel$(n, false, size, internalB);
 				default:
-					return $author$project$Page$GalvHole$makeRhsModel$(n, false, size);
+					return $author$project$Page$GalvHole$makeRhsModel$(n, false, size, internalB);
 			}
-		}), $gren_lang$url$Url$Parser$Query$string('profileType'), $gren_lang$url$Url$Parser$Query$string('size'), $gren_lang$url$Url$Parser$Query$string('n'));
+		}), $gren_lang$url$Url$Parser$Query$string('profileType'), $gren_lang$url$Url$Parser$Query$string('size'), $gren_lang$url$Url$Parser$Query$string('n'), $gren_lang$url$Url$Parser$Query$string('internal'));
 var $gren_lang$url$Url$Parser$Query$map$ = function(func, _v0) {
 	var a = _v0.a;
 	return $gren_lang$url$Url$Parser$Internal$Parser(function(dict) {
@@ -5211,16 +5223,6 @@ var $author$project$Page$Triangle$finishParse$ = function(a, b, c, theta) {
 	return { a: $gren_lang$core$Maybe$withDefault$('', a), b: $gren_lang$core$Maybe$withDefault$('', b), c: $gren_lang$core$Maybe$withDefault$('', c), theta: $gren_lang$core$Maybe$withDefault$('', theta) };
 };
 var $author$project$Page$Triangle$finishParse = F4($author$project$Page$Triangle$finishParse$);
-var $gren_lang$url$Url$Parser$Query$map4$ = function(func, _v0, _v1, _v2, _v3) {
-	var a = _v0.a;
-	var b = _v1.a;
-	var c = _v2.a;
-	var d = _v3.a;
-	return $gren_lang$url$Url$Parser$Internal$Parser(function(dict) {
-			return A4(func, a(dict), b(dict), c(dict), d(dict));
-		});
-};
-var $gren_lang$url$Url$Parser$Query$map4 = F5($gren_lang$url$Url$Parser$Query$map4$);
 var $author$project$Page$Triangle$queryParser = $gren_lang$url$Url$Parser$Query$map4$($author$project$Page$Triangle$finishParse, $gren_lang$url$Url$Parser$Query$string('a'), $gren_lang$url$Url$Parser$Query$string('b'), $gren_lang$url$Url$Parser$Query$string('c'), $gren_lang$url$Url$Parser$Query$string('theta'));
 var $gren_lang$core$String$fromFloat = _String_fromNumber;
 var $gren_lang$core$Basics$mul = _Basics_mul;
@@ -5387,6 +5389,15 @@ var $gren_lang$url$Url$Builder$absolute$ = function(pathSegments, parameters) {
 	return '/' + (A2($gren_lang$core$String$join, '/', pathSegments) + $gren_lang$url$Url$Builder$toQuery(parameters));
 };
 var $gren_lang$url$Url$Builder$absolute = F2($gren_lang$url$Url$Builder$absolute$);
+var $author$project$Page$GalvHole$maybeAppend$ = function(item, arr) {
+	if (item.$ === 'Nothing') {
+		return arr;
+	} else {
+		var itemv = item.a;
+		return $gren_lang$core$Array$pushLast$(itemv, arr);
+	}
+};
+var $author$project$Page$GalvHole$maybeAppend = F2($author$project$Page$GalvHole$maybeAppend$);
 var $gren_lang$url$Url$Builder$QueryParameter = function (a) {
 	return { $: 'QueryParameter', a: a };
 };
@@ -5396,14 +5407,14 @@ var $gren_lang$url$Url$Builder$string$ = function(key, value) {
 };
 var $gren_lang$url$Url$Builder$string = F2($gren_lang$url$Url$Builder$string$);
 var $author$project$Page$GalvHole$queryBuilder = function(model) {
-	return [ $gren_lang$url$Url$Builder$string$('profileType', function () {
-			var _v0 = model.ty;
-			if (_v0.$ === 'Chs') {
-				return 'CHS';
-			} else {
-				return 'RHS';
-			}
-		}()), $gren_lang$url$Url$Builder$string$('size', model.size), $gren_lang$url$Url$Builder$string$('n', model.n) ];
+	return $author$project$Page$GalvHole$maybeAppend$(model.internal ? $gren_lang$core$Maybe$Just($gren_lang$url$Url$Builder$string$('internal', 'yes')) : $gren_lang$core$Maybe$Nothing, [ $gren_lang$url$Url$Builder$string$('profileType', function () {
+				var _v0 = model.ty;
+				if (_v0.$ === 'Chs') {
+					return 'CHS';
+				} else {
+					return 'RHS';
+				}
+			}()), $gren_lang$url$Url$Builder$string$('size', model.size), $gren_lang$url$Url$Builder$string$('n', model.n) ]);
 };
 var $author$project$Page$KFactor$builderStr$ = function(_default, key, val) {
 	return _Utils_eq(val, _default) ? $gren_lang$core$Maybe$Nothing : $gren_lang$core$Maybe$Just($gren_lang$url$Url$Builder$string$(key, val));
@@ -5557,7 +5568,7 @@ var $author$project$Page$GalvHole$update$ = function(msg, model) {
 			return { command: $author$project$SpaCmd$none, model: model };
 		case 'UpdateTy':
 			var ty = msg.a;
-			return { command: $author$project$SpaCmd$none, model: $author$project$Page$GalvHole$modelForTy$(model.n, ty) };
+			return { command: $author$project$SpaCmd$none, model: $author$project$Page$GalvHole$modelForTy$(model.n, ty, model.internal) };
 		case 'UpdateSizeS':
 			var s = msg.a;
 			return { command: $author$project$SpaCmd$none, model: _Utils_update(model, { c: false, size: s }) };
@@ -5569,6 +5580,9 @@ var $author$project$Page$GalvHole$update$ = function(msg, model) {
 			return { command: $author$project$SpaCmd$BaseCmd($gren_lang$core$Task$attempt$(function(_v1) {
 						return $author$project$Page$GalvHole$NoOp;
 					}, $gren_lang$browser$Browser$Dom$focus('n'))), model: _Utils_update(model, { n: n }) };
+		case 'UpdateInternal':
+			var i = msg.a;
+			return { command: $author$project$SpaCmd$none, model: _Utils_update(model, { internal: i }) };
 		default:
 			var id = msg.a;
 			return { command: $author$project$SpaCmd$CopyId(id), model: model };
@@ -5959,6 +5973,9 @@ var $author$project$Main$mapDocument$ = function(map, doc) {
 	return { body: A2($gren_lang$core$Array$map, $gren_lang$browser$Html$map(map), doc.body), title: doc.title };
 };
 var $author$project$Main$mapDocument = F2($author$project$Main$mapDocument$);
+var $author$project$Page$GalvHole$UpdateInternal = function (a) {
+	return { $: 'UpdateInternal', a: a };
+};
 var $author$project$Page$GalvHole$UpdateN = function (a) {
 	return { $: 'UpdateN', a: a };
 };
@@ -6300,7 +6317,7 @@ var $author$project$Page$GalvHole$view = function(model) {
 			return $author$project$Page$GalvHole$makeButton$($author$project$Page$GalvHole$UpdateTy($author$project$Page$GalvHole$Chs), 'RHS');
 		}
 	}();
-	return { body: [ A2($gren_lang$browser$Html$a, [ $gren_lang$browser$Html$Attributes$class('left'), $gren_lang$browser$Html$Attributes$href('#/') ], [ $gren_lang$browser$Html$text('Home') ]), A2($gren_lang$browser$Html$div, [ $gren_lang$browser$Html$Attributes$id('galv-hole'), $gren_lang$browser$Html$Attributes$class('center') ], [ A2($gren_lang$browser$Html$h1, [  ], [ $gren_lang$browser$Html$text('Galvanising Holes') ]), A2($gren_lang$browser$Html$br, [  ], [  ]), tyButton, A2($gren_lang$browser$Html$hr, [  ], [  ]), tyInputs, A2($gren_lang$browser$Html$hr, [  ], [  ]), $author$project$Page$GalvHole$makeInput$('Total no. of holes in void', 'n', 1, model.n, $author$project$Page$GalvHole$UpdateN), A2($gren_lang$browser$Html$hr, [  ], [  ]), function () {
+	return { body: [ A2($gren_lang$browser$Html$a, [ $gren_lang$browser$Html$Attributes$class('left'), $gren_lang$browser$Html$Attributes$href('#/') ], [ $gren_lang$browser$Html$text('Home') ]), A2($gren_lang$browser$Html$div, [ $gren_lang$browser$Html$Attributes$id('galv-hole'), $gren_lang$browser$Html$Attributes$class('center') ], [ A2($gren_lang$browser$Html$h1, [  ], [ $gren_lang$browser$Html$text('Galvanising Holes') ]), A2($gren_lang$browser$Html$br, [  ], [  ]), tyButton, A2($gren_lang$browser$Html$hr, [  ], [  ]), tyInputs, A2($gren_lang$browser$Html$hr, [  ], [  ]), $author$project$Page$GalvHole$makeButton$($author$project$Page$GalvHole$UpdateInternal(!model.internal), model.internal ? 'Internal holes' : 'External holes'), A2($gren_lang$browser$Html$hr, [  ], [  ]), $author$project$Page$GalvHole$makeInput$(model.internal ? 'No. of holes in internal connection' : 'Total no. of holes in void', 'n', 1, model.n, $author$project$Page$GalvHole$UpdateN), A2($gren_lang$browser$Html$hr, [  ], [  ]), function () {
 			if (tyCalc.$ === 'Err') {
 				var e = tyCalc.a;
 				return A2($gren_lang$browser$Html$div, [ $gren_lang$browser$Html$Attributes$class('center') ], [ $gren_lang$browser$Html$text(e) ]);
