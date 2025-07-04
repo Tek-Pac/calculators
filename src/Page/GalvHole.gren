@@ -17,8 +17,8 @@ import Url.Parser.Query as Query
 
 queryParser : Query.Parser Model
 queryParser =
-    Query.map4
-        (\profileTypeMaybe sizeMaybe nMaybe internal ->
+    Query.map5
+        (\profileTypeMaybe sizeMaybe nMaybe internal holesMaybe ->
             let
                 profileType =
                     Maybe.withDefault "" profileTypeMaybe
@@ -28,6 +28,9 @@ queryParser =
 
                 n =
                     Maybe.withDefault "4" nMaybe
+
+                holes =
+                    Maybe.withDefault "" holesMaybe
 
                 internalB =
                     when internal is
@@ -42,21 +45,22 @@ queryParser =
             in
             when profileType is
                 "RHS" ->
-                    makeRhsModel n False size internalB
+                    makeRhsModel n False size internalB holes
 
                 "SHS" ->
-                    makeRhsModel n False size internalB
+                    makeRhsModel n False size internalB holes
 
                 "CHS" ->
-                    makeChsModel n False size internalB
+                    makeChsModel n False size internalB holes
 
                 _ ->
-                    makeRhsModel n False size internalB
+                    makeRhsModel n False size internalB holes
         )
         (Query.string "profileType")
         (Query.string "size")
         (Query.string "n")
         (Query.string "internal")
+        (Query.string "holes")
 
 
 maybeAppend : Maybe a -> Array a -> Array a
@@ -90,8 +94,8 @@ queryBuilder model =
                     Nothing)
 
 
-makeRhsModel : String -> Bool -> String -> Bool -> Model
-makeRhsModel n c size internal =
+makeRhsModel : String -> Bool -> String -> Bool -> String -> Model
+makeRhsModel n c size internal holes =
     when String.split "*" size is
         [ x, y ] ->
             checkCustom
@@ -100,20 +104,22 @@ makeRhsModel n c size internal =
                 , c = c
                 , n = n
                 , internal = internal
+                , holes = holes
                 }
 
         _ ->
-            modelForTy n Rhs internal
+            modelForTy n Rhs internal holes
 
 
-makeChsModel : String -> Bool -> String -> Bool -> Model
-makeChsModel n c size internal =
+makeChsModel : String -> Bool -> String -> Bool -> String -> Model
+makeChsModel n c size internal holes =
     checkCustom
         { ty = Chs
         , size = size
         , c = c
         , n = n
         , internal = internal
+        , holes = holes
         }
 
 
@@ -140,12 +146,40 @@ type alias Model =
     , c : Bool
     , n : String
     , internal : Bool
+    , holes : String
     }
 
 
 type ModelTy
     = Rhs
     | Chs
+
+
+type alias Holes =
+    { count : Int
+    , dia : Float
+    }
+
+
+parseHolesString : String -> Array Holes
+parseHolesString holesString =
+    -- holes are going to be in syntax 2*30,1*20
+    -- => 2 x D30 holes + 1 x D20 hole + whatever to make up `n`
+    String.split "," holesString
+        |> Array.mapAndKeepJust
+                (\holespec ->
+                    when String.split "*" holespec is
+                        [ countS, diaS ] ->
+                            Maybe.map2
+                                (\count dia ->
+                                    { count = count
+                                    , dia = dia
+                                    }
+                                )
+                                (String.toInt countS)
+                                (String.toFloat diaS)
+                        _ -> Nothing
+                )
 
 
 type alias Updated =
@@ -160,6 +194,7 @@ type Msg
     | UpdateSizeC String
     | UpdateN String
     | UpdateInternal Bool
+    | UpdateHoles String
     | DoCopy String
     | NoOp
 
@@ -173,7 +208,7 @@ update msg model =
             }
 
         UpdateTy ty ->
-            { model = modelForTy model.n ty model.internal
+            { model = modelForTy model.n ty model.internal model.holes
             , command = SpaCmd.none
             }
 
@@ -208,6 +243,14 @@ update msg model =
             , command = SpaCmd.none
             }
 
+        UpdateHoles i ->
+            { model =
+                { model
+                    | holes = i
+                }
+            , command = SpaCmd.none
+            }
+
         DoCopy id ->
             { model = model
             , command = CopyId id
@@ -233,6 +276,42 @@ view model =
                 Rhs ->
                     makeRhsInputs model
 
+        holesInput =
+            div
+                []
+                [ makeInput
+                    "Added Galv Holes"
+                    model.holes
+                    UpdateHoles
+                    [ id "holesAdded" ]
+                ]
+
+        holeItems =
+            parseHolesString model.holes
+
+        holeSums =
+            holeItems
+                |> Array.foldl
+                    (\{ count, dia } { tCount, tArea } ->
+                        { tCount = tCount + count
+                        , tArea = tArea + (toFloat count) * dia * dia / 4
+                        }
+                    )
+                    { tCount = 0
+                    , tArea = 0.0
+                    }
+
+        maybeErr : Bool -> String -> Result String a -> Result String a
+        maybeErr doErr err result =
+            if doErr then
+                when result is
+                    Ok _ ->
+                        Err err
+                    Err e ->
+                        Err e
+            else
+                result
+
         tyCalc :
             Result
                 String
@@ -253,11 +332,14 @@ view model =
                     in
                     diagonalRes
                         |> Result.map
-                                (\diagonal ->
-                                    { diagonal = diagonal
-                                    , n = n
-                                    }
-                                )
+                            (\diagonal ->
+                                { diagonal = diagonal
+                                , n = n
+                                }
+                            )
+                        |> maybeErr
+                            (holeSums.tCount > n)
+                            "more custom holes than holes"
 
                 Nothing ->
                     Err "enter number of holes"
@@ -290,12 +372,14 @@ view model =
                  else
                     "External holes")
             , hr [] []
-            , makeInput
+            , makeInputF
                 (if model.internal then
                     "No. of holes in internal connection"
                  else
                     "Total no. of holes in void")
                 "n" 1 model.n UpdateN
+            , hr [] []
+            , holesInput
             , hr [] []
             , when tyCalc is
                 Err e ->
@@ -317,15 +401,19 @@ view model =
                             -- equivalent area to two holes with a diameter of a quarter of the diagonal
                             (diagonal / 8) * (diagonal / 8) * 2
 
+                        subAreaDividedByPi =
+                            totalAreaDividedByPi - holeSums.tArea
+
                         -- we skip an extra multiply and divide by pi
                         basisHoleRadius =
-                            Math.sqrt (totalAreaDividedByPi / toFloat n)
+                            Math.sqrt (subAreaDividedByPi / toFloat (n - holeSums.tCount))
 
                         finalHoleDiameter =
                             max 10 (basisHoleRadius * 2)
 
                         finalTotalArea =
-                            (finalHoleDiameter / 2) * (finalHoleDiameter / 2) * Math.pi * toFloat n
+                            finalHoleDiameter * finalHoleDiameter / 4 * Math.pi * toFloat n +
+                            holeSums.tArea
 
                         -- 2 dp
                         formatF : Float -> Float
@@ -337,6 +425,7 @@ view model =
                         ]
                         [ makeOutput "Diagonal (mm)" "diagonal" (formatF diagonal)
                         , makeOutput "Required total area (mm²)" "totalArea" (formatF (totalAreaDividedByPi * Math.pi))
+                        , makeOutput "Required unaccounted area (mm²)" "unaccountedArea" (formatF (subAreaDividedByPi * Math.pi))
                         , makeOutput "Min diameter (mm)" "dia" (formatF finalHoleDiameter)
                         , makeOutput "Final total area (mm²)" "finalTotalArea" (formatF finalTotalArea)
                         ]
@@ -386,7 +475,7 @@ makeChsInputs model =
                         UpdateSizeS "48.3"
                     )
                     "Custom"
-                , makeInput "Outer Diameter" "od" 0.5 model.size UpdateSizeC
+                , makeInputF "Outer Diameter" "od" 0.5 model.size UpdateSizeC
                 ]
         )
 
@@ -438,8 +527,8 @@ makeRhsInputs model =
                         UpdateSizeS "75*75"
                     )
                     "Custom"
-                , makeInput "Width" "x" 0.5 x (\nx -> UpdateSizeC (nx ++ "*" ++ y))
-                , makeInput "Height" "y" 0.5 y (\ny -> UpdateSizeC (x ++ "*" ++ ny))
+                , makeInputF "Width" "x" 0.5 x (\nx -> UpdateSizeC (nx ++ "*" ++ y))
+                , makeInputF "Height" "y" 0.5 y (\ny -> UpdateSizeC (x ++ "*" ++ ny))
                 ]
         )
 
@@ -555,8 +644,8 @@ chsLibrary =
 -- Shared utilities
 
 
-modelForTy : String -> ModelTy -> Bool -> Model
-modelForTy n ty internal =
+modelForTy : String -> ModelTy -> Bool -> String -> Model
+modelForTy n ty internal holes =
     { ty = ty
     , size =
         when ty is
@@ -568,6 +657,7 @@ modelForTy n ty internal =
     , c = False
     , n = n
     , internal = internal
+    , holes = holes
     }
 
 
@@ -634,20 +724,29 @@ makeButton click txt =
         ]
 
 
-makeInput : String -> String -> Float -> String -> (String -> Msg) -> Html Msg
-makeInput label idTxt stepV currTxt updateMsg =
+makeInputF : String -> String -> Float -> String -> (String -> Msg) -> Html Msg
+makeInputF label idTxt stepV currTxt updateMsg =
+    makeInput
+        label
+        currTxt
+        updateMsg
+        [ id idTxt
+        , type_ "number"
+        , step (String.fromFloat stepV)
+        ]
+
+makeInput : String -> String -> (String -> Msg) -> Array (Html.Attribute Msg) -> Html Msg
+makeInput label currTxt updateMsg attrs =
     div
         []
         [ text label
         , br [] []
         , text "         "
         , input
-            [ value currTxt
-            , onInput updateMsg
-            , id idTxt
-            , type_ "number"
-            , step (String.fromFloat stepV)
-            ]
+            (attrs
+                |> Array.pushLast (onInput updateMsg)
+                |> Array.pushLast (value currTxt)
+            )
             []
         , if String.isEmpty currTxt then
             button
@@ -686,16 +785,3 @@ makeOutput label idTxt calc =
             [ text "📋"
             ]
         ]
-
-
-maybeErr : x -> Bool -> Maybe x -> Maybe x
-maybeErr err useDefault orig =
-    when orig is
-        Nothing ->
-            if useDefault then
-                Just err
-            else
-                Nothing
-
-        _ ->
-            orig
