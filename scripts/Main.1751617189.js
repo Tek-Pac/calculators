@@ -5097,13 +5097,13 @@ var $author$project$Page$GalvHole$checkCustom = function(model) {
 	var custom = model.c || (!$gren_lang$core$Array$member$(model.size, library));
 	return _Utils_update(model, { c: custom });
 };
-var $author$project$Page$GalvHole$makeChsModel$ = function(n, c, size, internal) {
-	return $author$project$Page$GalvHole$checkCustom({ c: c, internal: internal, n: n, size: size, ty: $author$project$Page$GalvHole$Chs });
+var $author$project$Page$GalvHole$makeChsModel$ = function(n, c, size, internal, holes) {
+	return $author$project$Page$GalvHole$checkCustom({ c: c, holes: holes, internal: internal, n: n, size: size, ty: $author$project$Page$GalvHole$Chs });
 };
-var $author$project$Page$GalvHole$makeChsModel = F4($author$project$Page$GalvHole$makeChsModel$);
+var $author$project$Page$GalvHole$makeChsModel = F5($author$project$Page$GalvHole$makeChsModel$);
 var $author$project$Page$GalvHole$Rhs = { $: 'Rhs' };
-var $author$project$Page$GalvHole$modelForTy$ = function(n, ty, internal) {
-	return { c: false, internal: internal, n: n, size: function () {
+var $author$project$Page$GalvHole$modelForTy$ = function(n, ty, internal, holes) {
+	return { c: false, holes: holes, internal: internal, n: n, size: function () {
 		if (ty.$ === 'Rhs') {
 			return '75*75';
 		} else {
@@ -5111,31 +5111,32 @@ var $author$project$Page$GalvHole$modelForTy$ = function(n, ty, internal) {
 		}
 	}(), ty: ty };
 };
-var $author$project$Page$GalvHole$modelForTy = F3($author$project$Page$GalvHole$modelForTy$);
-var $author$project$Page$GalvHole$makeRhsModel$ = function(n, c, size, internal) {
+var $author$project$Page$GalvHole$modelForTy = F4($author$project$Page$GalvHole$modelForTy$);
+var $author$project$Page$GalvHole$makeRhsModel$ = function(n, c, size, internal, holes) {
 	var _v0 = A2($gren_lang$core$String$split, '*', size);
 	if (_v0.length === 2) {
 		var x = _v0[0];
 		var y = _v0[1];
-		return $author$project$Page$GalvHole$checkCustom({ c: c, internal: internal, n: n, size: x + ('*' + y), ty: $author$project$Page$GalvHole$Rhs });
+		return $author$project$Page$GalvHole$checkCustom({ c: c, holes: holes, internal: internal, n: n, size: x + ('*' + y), ty: $author$project$Page$GalvHole$Rhs });
 	} else {
-		return $author$project$Page$GalvHole$modelForTy$(n, $author$project$Page$GalvHole$Rhs, internal);
+		return $author$project$Page$GalvHole$modelForTy$(n, $author$project$Page$GalvHole$Rhs, internal, holes);
 	}
 };
-var $author$project$Page$GalvHole$makeRhsModel = F4($author$project$Page$GalvHole$makeRhsModel$);
+var $author$project$Page$GalvHole$makeRhsModel = F5($author$project$Page$GalvHole$makeRhsModel$);
 var $gren_lang$url$Url$Parser$Internal$Parser = function (a) {
 	return { $: 'Parser', a: a };
 };
-var $gren_lang$url$Url$Parser$Query$map4$ = function(func, _v0, _v1, _v2, _v3) {
+var $gren_lang$url$Url$Parser$Query$map5$ = function(func, _v0, _v1, _v2, _v3, _v4) {
 	var a = _v0.a;
 	var b = _v1.a;
 	var c = _v2.a;
 	var d = _v3.a;
+	var e = _v4.a;
 	return $gren_lang$url$Url$Parser$Internal$Parser(function(dict) {
-			return A4(func, a(dict), b(dict), c(dict), d(dict));
+			return A5(func, a(dict), b(dict), c(dict), d(dict), e(dict));
 		});
 };
-var $gren_lang$url$Url$Parser$Query$map4 = F5($gren_lang$url$Url$Parser$Query$map4$);
+var $gren_lang$url$Url$Parser$Query$map5 = F6($gren_lang$url$Url$Parser$Query$map5$);
 var $gren_lang$url$Url$Parser$Query$custom$ = function(key, func) {
 	return $gren_lang$url$Url$Parser$Internal$Parser(function(dict) {
 			return func($gren_lang$core$Maybe$withDefault$([  ], $gren_lang$core$Dict$get$(key, dict)));
@@ -5152,7 +5153,7 @@ var $gren_lang$url$Url$Parser$Query$string = function(key) {
 			}
 		});
 };
-var $author$project$Page$GalvHole$queryParser = $gren_lang$url$Url$Parser$Query$map4$(F4(function(profileTypeMaybe, sizeMaybe, nMaybe, internal) {
+var $author$project$Page$GalvHole$queryParser = $gren_lang$url$Url$Parser$Query$map5$(F5(function(profileTypeMaybe, sizeMaybe, nMaybe, internal, holesMaybe) {
 			var size = $gren_lang$core$Maybe$withDefault$('', sizeMaybe);
 			var profileType = $gren_lang$core$Maybe$withDefault$('', profileTypeMaybe);
 			var n = $gren_lang$core$Maybe$withDefault$('4', nMaybe);
@@ -5167,17 +5168,18 @@ var $author$project$Page$GalvHole$queryParser = $gren_lang$url$Url$Parser$Query$
 					}
 				}
 			}();
+			var holes = $gren_lang$core$Maybe$withDefault$('', holesMaybe);
 			switch (profileType) {
 				case 'RHS':
-					return $author$project$Page$GalvHole$makeRhsModel$(n, false, size, internalB);
+					return $author$project$Page$GalvHole$makeRhsModel$(n, false, size, internalB, holes);
 				case 'SHS':
-					return $author$project$Page$GalvHole$makeRhsModel$(n, false, size, internalB);
+					return $author$project$Page$GalvHole$makeRhsModel$(n, false, size, internalB, holes);
 				case 'CHS':
-					return $author$project$Page$GalvHole$makeChsModel$(n, false, size, internalB);
+					return $author$project$Page$GalvHole$makeChsModel$(n, false, size, internalB, holes);
 				default:
-					return $author$project$Page$GalvHole$makeRhsModel$(n, false, size, internalB);
+					return $author$project$Page$GalvHole$makeRhsModel$(n, false, size, internalB, holes);
 			}
-		}), $gren_lang$url$Url$Parser$Query$string('profileType'), $gren_lang$url$Url$Parser$Query$string('size'), $gren_lang$url$Url$Parser$Query$string('n'), $gren_lang$url$Url$Parser$Query$string('internal'));
+		}), $gren_lang$url$Url$Parser$Query$string('profileType'), $gren_lang$url$Url$Parser$Query$string('size'), $gren_lang$url$Url$Parser$Query$string('n'), $gren_lang$url$Url$Parser$Query$string('internal'), $gren_lang$url$Url$Parser$Query$string('holes'));
 var $gren_lang$url$Url$Parser$Query$map$ = function(func, _v0) {
 	var a = _v0.a;
 	return $gren_lang$url$Url$Parser$Internal$Parser(function(dict) {
@@ -5223,6 +5225,16 @@ var $author$project$Page$Triangle$finishParse$ = function(a, b, c, theta) {
 	return { a: $gren_lang$core$Maybe$withDefault$('', a), b: $gren_lang$core$Maybe$withDefault$('', b), c: $gren_lang$core$Maybe$withDefault$('', c), theta: $gren_lang$core$Maybe$withDefault$('', theta) };
 };
 var $author$project$Page$Triangle$finishParse = F4($author$project$Page$Triangle$finishParse$);
+var $gren_lang$url$Url$Parser$Query$map4$ = function(func, _v0, _v1, _v2, _v3) {
+	var a = _v0.a;
+	var b = _v1.a;
+	var c = _v2.a;
+	var d = _v3.a;
+	return $gren_lang$url$Url$Parser$Internal$Parser(function(dict) {
+			return A4(func, a(dict), b(dict), c(dict), d(dict));
+		});
+};
+var $gren_lang$url$Url$Parser$Query$map4 = F5($gren_lang$url$Url$Parser$Query$map4$);
 var $author$project$Page$Triangle$queryParser = $gren_lang$url$Url$Parser$Query$map4$($author$project$Page$Triangle$finishParse, $gren_lang$url$Url$Parser$Query$string('a'), $gren_lang$url$Url$Parser$Query$string('b'), $gren_lang$url$Url$Parser$Query$string('c'), $gren_lang$url$Url$Parser$Query$string('theta'));
 var $gren_lang$core$String$fromFloat = _String_fromNumber;
 var $gren_lang$core$Basics$mul = _Basics_mul;
@@ -5568,7 +5580,7 @@ var $author$project$Page$GalvHole$update$ = function(msg, model) {
 			return { command: $author$project$SpaCmd$none, model: model };
 		case 'UpdateTy':
 			var ty = msg.a;
-			return { command: $author$project$SpaCmd$none, model: $author$project$Page$GalvHole$modelForTy$(model.n, ty, model.internal) };
+			return { command: $author$project$SpaCmd$none, model: $author$project$Page$GalvHole$modelForTy$(model.n, ty, model.internal, model.holes) };
 		case 'UpdateSizeS':
 			var s = msg.a;
 			return { command: $author$project$SpaCmd$none, model: _Utils_update(model, { c: false, size: s }) };
@@ -5583,6 +5595,9 @@ var $author$project$Page$GalvHole$update$ = function(msg, model) {
 		case 'UpdateInternal':
 			var i = msg.a;
 			return { command: $author$project$SpaCmd$none, model: _Utils_update(model, { internal: i }) };
+		case 'UpdateHoles':
+			var i = msg.a;
+			return { command: $author$project$SpaCmd$none, model: _Utils_update(model, { holes: i }) };
 		default:
 			var id = msg.a;
 			return { command: $author$project$SpaCmd$CopyId(id), model: model };
@@ -5973,6 +5988,9 @@ var $author$project$Main$mapDocument$ = function(map, doc) {
 	return { body: A2($gren_lang$core$Array$map, $gren_lang$browser$Html$map(map), doc.body), title: doc.title };
 };
 var $author$project$Main$mapDocument = F2($author$project$Main$mapDocument$);
+var $author$project$Page$GalvHole$UpdateHoles = function (a) {
+	return { $: 'UpdateHoles', a: a };
+};
 var $author$project$Page$GalvHole$UpdateInternal = function (a) {
 	return { $: 'UpdateInternal', a: a };
 };
@@ -6087,6 +6105,8 @@ var $gren_lang$browser$Html$Attributes$stringProperty = F2($gren_lang$browser$Ht
 var $gren_lang$browser$Html$Attributes$class = $gren_lang$browser$Html$Attributes$stringProperty('className');
 var $gren_lang$browser$Html$div = $gren_lang$browser$Html$node('div');
 var $gren_lang$core$Basics$fdiv = _Basics_fdiv;
+var $gren_lang$core$Array$foldl = _Array_foldl;
+var $gren_lang$core$Basics$gt = _Utils_gt;
 var $gren_lang$browser$Html$h1 = $gren_lang$browser$Html$node('h1');
 var $gren_lang$browser$Html$hr = $gren_lang$browser$Html$node('hr');
 var $gren_lang$browser$Html$Attributes$href = function(url) {
@@ -6200,9 +6220,6 @@ var $gren_lang$browser$Html$Events$targetValue = $gren_lang$core$Json$Decode$at$
 var $gren_lang$browser$Html$Events$onInput = function(tagger) {
 	return $gren_lang$browser$Html$Events$stopPropagationOn$('input', A2($gren_lang$core$Json$Decode$map, $gren_lang$browser$Html$Events$alwaysStop, A2($gren_lang$core$Json$Decode$map, tagger, $gren_lang$browser$Html$Events$targetValue)));
 };
-var $gren_lang$browser$Html$Attributes$step = function(n) {
-	return $gren_lang$browser$Html$Attributes$stringProperty$('step', n);
-};
 var $gren_lang$browser$VirtualDom$style = _VirtualDom_style;
 var $gren_lang$browser$Html$Attributes$style = $gren_lang$browser$VirtualDom$style;
 var $gren_lang$browser$VirtualDom$attribute$ = function(key, value) {
@@ -6213,12 +6230,19 @@ var $gren_lang$browser$Html$Attributes$attribute = $gren_lang$browser$VirtualDom
 var $gren_lang$browser$Html$Attributes$tabindex = function(n) {
 	return A2($gren_lang$browser$Html$Attributes$attribute, 'tabIndex', $gren_lang$core$String$fromInt(n));
 };
-var $gren_lang$browser$Html$Attributes$type_ = $gren_lang$browser$Html$Attributes$stringProperty('type');
 var $gren_lang$browser$Html$Attributes$value = $gren_lang$browser$Html$Attributes$stringProperty('value');
-var $author$project$Page$GalvHole$makeInput$ = function(label, idTxt, stepV, currTxt, updateMsg) {
-	return A2($gren_lang$browser$Html$div, [  ], [ $gren_lang$browser$Html$text(label), A2($gren_lang$browser$Html$br, [  ], [  ]), $gren_lang$browser$Html$text('         '), A2($gren_lang$browser$Html$input, [ $gren_lang$browser$Html$Attributes$value(currTxt), $gren_lang$browser$Html$Events$onInput(updateMsg), $gren_lang$browser$Html$Attributes$id(idTxt), $gren_lang$browser$Html$Attributes$type_('number'), $gren_lang$browser$Html$Attributes$step($gren_lang$core$String$fromFloat(stepV)) ], [  ]), $gren_lang$core$String$isEmpty(currTxt) ? A2($gren_lang$browser$Html$button, [ A2($gren_lang$browser$Html$Attributes$style, 'pointer-events', 'none'), A2($gren_lang$browser$Html$Attributes$style, 'opacity', '0'), $gren_lang$browser$Html$Attributes$tabindex(-1) ], [ $gren_lang$browser$Html$text('❌') ]) : A2($gren_lang$browser$Html$button, [ $gren_lang$browser$Html$Events$onClick(updateMsg('')) ], [ $gren_lang$browser$Html$text('❌') ]) ]);
+var $author$project$Page$GalvHole$makeInput$ = function(label, currTxt, updateMsg, attrs) {
+	return A2($gren_lang$browser$Html$div, [  ], [ $gren_lang$browser$Html$text(label), A2($gren_lang$browser$Html$br, [  ], [  ]), $gren_lang$browser$Html$text('         '), A2($gren_lang$browser$Html$input, $gren_lang$core$Array$pushLast$($gren_lang$browser$Html$Attributes$value(currTxt), $gren_lang$core$Array$pushLast$($gren_lang$browser$Html$Events$onInput(updateMsg), attrs)), [  ]), $gren_lang$core$String$isEmpty(currTxt) ? A2($gren_lang$browser$Html$button, [ A2($gren_lang$browser$Html$Attributes$style, 'pointer-events', 'none'), A2($gren_lang$browser$Html$Attributes$style, 'opacity', '0'), $gren_lang$browser$Html$Attributes$tabindex(-1) ], [ $gren_lang$browser$Html$text('❌') ]) : A2($gren_lang$browser$Html$button, [ $gren_lang$browser$Html$Events$onClick(updateMsg('')) ], [ $gren_lang$browser$Html$text('❌') ]) ]);
 };
-var $author$project$Page$GalvHole$makeInput = F5($author$project$Page$GalvHole$makeInput$);
+var $author$project$Page$GalvHole$makeInput = F4($author$project$Page$GalvHole$makeInput$);
+var $gren_lang$browser$Html$Attributes$step = function(n) {
+	return $gren_lang$browser$Html$Attributes$stringProperty$('step', n);
+};
+var $gren_lang$browser$Html$Attributes$type_ = $gren_lang$browser$Html$Attributes$stringProperty('type');
+var $author$project$Page$GalvHole$makeInputF$ = function(label, idTxt, stepV, currTxt, updateMsg) {
+	return $author$project$Page$GalvHole$makeInput$(label, currTxt, updateMsg, [ $gren_lang$browser$Html$Attributes$id(idTxt), $gren_lang$browser$Html$Attributes$type_('number'), $gren_lang$browser$Html$Attributes$step($gren_lang$core$String$fromFloat(stepV)) ]);
+};
+var $author$project$Page$GalvHole$makeInputF = F5($author$project$Page$GalvHole$makeInputF$);
 var $author$project$Page$GalvHole$makeChsInputs = function(model) {
 	var isStandard = $gren_lang$core$Array$member$(model.size, $author$project$Page$GalvHole$chsLibrary);
 	var arraySel = model.c ? $gren_lang$core$Maybe$Nothing : $author$project$Page$GalvHole$makeArraySelector$($author$project$Page$GalvHole$chsLibrary, model.size);
@@ -6227,7 +6251,7 @@ var $author$project$Page$GalvHole$makeChsInputs = function(model) {
 				var a = arraySel.a;
 				return a;
 			} else {
-				return [ $author$project$Page$GalvHole$makeButton$(isStandard ? $author$project$Page$GalvHole$UpdateSizeS(model.size) : $author$project$Page$GalvHole$UpdateSizeS('48.3'), 'Custom'), $author$project$Page$GalvHole$makeInput$('Outer Diameter', 'od', 0.5, model.size, $author$project$Page$GalvHole$UpdateSizeC) ];
+				return [ $author$project$Page$GalvHole$makeButton$(isStandard ? $author$project$Page$GalvHole$UpdateSizeS(model.size) : $author$project$Page$GalvHole$UpdateSizeS('48.3'), 'Custom'), $author$project$Page$GalvHole$makeInputF$('Outer Diameter', 'od', 0.5, model.size, $author$project$Page$GalvHole$UpdateSizeC) ];
 			}
 		}());
 };
@@ -6255,9 +6279,9 @@ var $author$project$Page$GalvHole$makeRhsInputs = function(model) {
 				var a = arraySel.a;
 				return a;
 			} else {
-				return [ $author$project$Page$GalvHole$makeButton$(isStandard ? $author$project$Page$GalvHole$UpdateSizeS(model.size) : $author$project$Page$GalvHole$UpdateSizeS('75*75'), 'Custom'), $author$project$Page$GalvHole$makeInput$('Width', 'x', 0.5, x, function(nx) {
+				return [ $author$project$Page$GalvHole$makeButton$(isStandard ? $author$project$Page$GalvHole$UpdateSizeS(model.size) : $author$project$Page$GalvHole$UpdateSizeS('75*75'), 'Custom'), $author$project$Page$GalvHole$makeInputF$('Width', 'x', 0.5, x, function(nx) {
 						return $author$project$Page$GalvHole$UpdateSizeC(nx + ('*' + y));
-					}), $author$project$Page$GalvHole$makeInput$('Height', 'y', 0.5, y, function(ny) {
+					}), $author$project$Page$GalvHole$makeInputF$('Height', 'y', 0.5, y, function(ny) {
 						return $author$project$Page$GalvHole$UpdateSizeC(x + ('*' + ny));
 					}) ];
 			}
@@ -6273,51 +6297,99 @@ var $gren_lang$core$Result$map$ = function(func, ra) {
 	}
 };
 var $gren_lang$core$Result$map = F2($gren_lang$core$Result$map$);
-var $gren_lang$core$Basics$gt = _Utils_gt;
 var $gren_lang$core$Basics$max$ = function(x, y) {
 	return (_Utils_cmp(x, y) > 0) ? x : y;
 };
 var $gren_lang$core$Basics$max = F2($gren_lang$core$Basics$max$);
+var $gren_lang$core$Maybe$map2$ = function(func, ma, mb) {
+	if (ma.$ === 'Nothing') {
+		return $gren_lang$core$Maybe$Nothing;
+	} else {
+		var a = ma.a;
+		if (mb.$ === 'Nothing') {
+			return $gren_lang$core$Maybe$Nothing;
+		} else {
+			var b = mb.a;
+			return $gren_lang$core$Maybe$Just(A2(func, a, b));
+		}
+	}
+};
+var $gren_lang$core$Maybe$map2 = F3($gren_lang$core$Maybe$map2$);
+var $author$project$Page$GalvHole$parseHolesString = function(holesString) {
+	return $gren_lang$core$Array$mapAndKeepJust$(function(holespec) {
+			var _v0 = A2($gren_lang$core$String$split, '*', holespec);
+			if (_v0.length === 2) {
+				var countS = _v0[0];
+				var diaS = _v0[1];
+				return $gren_lang$core$Maybe$map2$(F2(function(count, dia) {
+							return { count: count, dia: dia };
+						}), $gren_lang$core$String$toInt(countS), $gren_lang$core$String$toFloat(diaS));
+			} else {
+				return $gren_lang$core$Maybe$Nothing;
+			}
+		}, A2($gren_lang$core$String$split, ',', holesString));
+};
 var $gren_lang$core$Math$pi = _Math_pi;
 var $gren_lang$core$Math$round = _Math_round;
 var $gren_lang$core$Basics$toFloat = _Basics_toFloat;
 var $author$project$Page$GalvHole$view = function(model) {
 	var tyInputs = function () {
-		var _v5 = model.ty;
-		if (_v5.$ === 'Chs') {
+		var _v8 = model.ty;
+		if (_v8.$ === 'Chs') {
 			return $author$project$Page$GalvHole$makeChsInputs(model);
 		} else {
 			return $author$project$Page$GalvHole$makeRhsInputs(model);
 		}
 	}();
-	var tyCalc = function () {
-		var _v3 = $gren_lang$core$String$toInt(model.n);
-		if (_v3.$ === 'Just') {
-			var n = _v3.a;
-			var diagonalRes = function () {
-				var _v4 = model.ty;
-				if (_v4.$ === 'Chs') {
-					return $author$project$Page$GalvHole$calculateChsDiagonal(model);
-				} else {
-					return $author$project$Page$GalvHole$calculateRhsDiagonal(model);
-				}
-			}();
-			return $gren_lang$core$Result$map$(function(diagonal) {
-					return { diagonal: diagonal, n: n };
-				}, diagonalRes);
-		} else {
-			return $gren_lang$core$Result$Err('enter number of holes');
-		}
-	}();
 	var tyButton = function () {
-		var _v2 = model.ty;
-		if (_v2.$ === 'Chs') {
+		var _v7 = model.ty;
+		if (_v7.$ === 'Chs') {
 			return $author$project$Page$GalvHole$makeButton$($author$project$Page$GalvHole$UpdateTy($author$project$Page$GalvHole$Rhs), 'CHS');
 		} else {
 			return $author$project$Page$GalvHole$makeButton$($author$project$Page$GalvHole$UpdateTy($author$project$Page$GalvHole$Chs), 'RHS');
 		}
 	}();
-	return { body: [ A2($gren_lang$browser$Html$a, [ $gren_lang$browser$Html$Attributes$class('left'), $gren_lang$browser$Html$Attributes$href('#/') ], [ $gren_lang$browser$Html$text('Home') ]), A2($gren_lang$browser$Html$div, [ $gren_lang$browser$Html$Attributes$id('galv-hole'), $gren_lang$browser$Html$Attributes$class('center') ], [ A2($gren_lang$browser$Html$h1, [  ], [ $gren_lang$browser$Html$text('Galvanising Holes') ]), A2($gren_lang$browser$Html$br, [  ], [  ]), tyButton, A2($gren_lang$browser$Html$hr, [  ], [  ]), tyInputs, A2($gren_lang$browser$Html$hr, [  ], [  ]), $author$project$Page$GalvHole$makeButton$($author$project$Page$GalvHole$UpdateInternal(!model.internal), model.internal ? 'Internal holes' : 'External holes'), A2($gren_lang$browser$Html$hr, [  ], [  ]), $author$project$Page$GalvHole$makeInput$(model.internal ? 'No. of holes in internal connection' : 'Total no. of holes in void', 'n', 1, model.n, $author$project$Page$GalvHole$UpdateN), A2($gren_lang$browser$Html$hr, [  ], [  ]), function () {
+	var maybeErr = F3(function(doErr, err, result) {
+			if (doErr) {
+				if (result.$ === 'Ok') {
+					return $gren_lang$core$Result$Err(err);
+				} else {
+					var e = result.a;
+					return $gren_lang$core$Result$Err(e);
+				}
+			} else {
+				return result;
+			}
+		});
+	var holesInput = A2($gren_lang$browser$Html$div, [  ], [ $author$project$Page$GalvHole$makeInput$('Added Galv Holes', model.holes, $author$project$Page$GalvHole$UpdateHoles, [ $gren_lang$browser$Html$Attributes$id('holesAdded') ]) ]);
+	var holeItems = $author$project$Page$GalvHole$parseHolesString(model.holes);
+	var holeSums = A3($gren_lang$core$Array$foldl, F2(function(_v4, _v5) {
+				var count = _v4.count;
+				var dia = _v4.dia;
+				var tCount = _v5.tCount;
+				var tArea = _v5.tArea;
+				return { tArea: tArea + (((count * dia) * dia) / 4), tCount: tCount + count };
+			}), { tArea: 0.0, tCount: 0 }, holeItems);
+	var tyCalc = function () {
+		var _v2 = $gren_lang$core$String$toInt(model.n);
+		if (_v2.$ === 'Just') {
+			var n = _v2.a;
+			var diagonalRes = function () {
+				var _v3 = model.ty;
+				if (_v3.$ === 'Chs') {
+					return $author$project$Page$GalvHole$calculateChsDiagonal(model);
+				} else {
+					return $author$project$Page$GalvHole$calculateRhsDiagonal(model);
+				}
+			}();
+			return A3(maybeErr, _Utils_cmp(holeSums.tCount, n) > 0, 'more custom holes than holes', $gren_lang$core$Result$map$(function(diagonal) {
+						return { diagonal: diagonal, n: n };
+					}, diagonalRes));
+		} else {
+			return $gren_lang$core$Result$Err('enter number of holes');
+		}
+	}();
+	return { body: [ A2($gren_lang$browser$Html$a, [ $gren_lang$browser$Html$Attributes$class('left'), $gren_lang$browser$Html$Attributes$href('#/') ], [ $gren_lang$browser$Html$text('Home') ]), A2($gren_lang$browser$Html$div, [ $gren_lang$browser$Html$Attributes$id('galv-hole'), $gren_lang$browser$Html$Attributes$class('center') ], [ A2($gren_lang$browser$Html$h1, [  ], [ $gren_lang$browser$Html$text('Galvanising Holes') ]), A2($gren_lang$browser$Html$br, [  ], [  ]), tyButton, A2($gren_lang$browser$Html$hr, [  ], [  ]), tyInputs, A2($gren_lang$browser$Html$hr, [  ], [  ]), $author$project$Page$GalvHole$makeButton$($author$project$Page$GalvHole$UpdateInternal(!model.internal), model.internal ? 'Internal holes' : 'External holes'), A2($gren_lang$browser$Html$hr, [  ], [  ]), $author$project$Page$GalvHole$makeInputF$(model.internal ? 'No. of holes in internal connection' : 'Total no. of holes in void', 'n', 1, model.n, $author$project$Page$GalvHole$UpdateN), A2($gren_lang$browser$Html$hr, [  ], [  ]), holesInput, A2($gren_lang$browser$Html$hr, [  ], [  ]), function () {
 			if (tyCalc.$ === 'Err') {
 				var e = tyCalc.a;
 				return A2($gren_lang$browser$Html$div, [ $gren_lang$browser$Html$Attributes$class('center') ], [ $gren_lang$browser$Html$text(e) ]);
@@ -6326,13 +6398,14 @@ var $author$project$Page$GalvHole$view = function(model) {
 				var diagonal = _v1.diagonal;
 				var n = _v1.n;
 				var totalAreaDividedByPi = ((diagonal / 8) * (diagonal / 8)) * 2;
+				var subAreaDividedByPi = totalAreaDividedByPi - holeSums.tArea;
 				var formatF = function(value) {
 					return $gren_lang$core$Math$round(value * 100) / 100;
 				};
-				var basisHoleRadius = $gren_lang$core$Math$sqrt(totalAreaDividedByPi / n);
+				var basisHoleRadius = $gren_lang$core$Math$sqrt(subAreaDividedByPi / (n - holeSums.tCount));
 				var finalHoleDiameter = $gren_lang$core$Basics$max$(10, basisHoleRadius * 2);
-				var finalTotalArea = (((finalHoleDiameter / 2) * (finalHoleDiameter / 2)) * $gren_lang$core$Math$pi) * n;
-				return A2($gren_lang$browser$Html$div, [ $gren_lang$browser$Html$Attributes$class('center') ], [ $author$project$Page$GalvHole$makeOutput$('Diagonal (mm)', 'diagonal', formatF(diagonal)), $author$project$Page$GalvHole$makeOutput$('Required total area (mm²)', 'totalArea', formatF(totalAreaDividedByPi * $gren_lang$core$Math$pi)), $author$project$Page$GalvHole$makeOutput$('Min diameter (mm)', 'dia', formatF(finalHoleDiameter)), $author$project$Page$GalvHole$makeOutput$('Final total area (mm²)', 'finalTotalArea', formatF(finalTotalArea)) ]);
+				var finalTotalArea = ((((finalHoleDiameter * finalHoleDiameter) / 4) * $gren_lang$core$Math$pi) * n) + holeSums.tArea;
+				return A2($gren_lang$browser$Html$div, [ $gren_lang$browser$Html$Attributes$class('center') ], [ $author$project$Page$GalvHole$makeOutput$('Diagonal (mm)', 'diagonal', formatF(diagonal)), $author$project$Page$GalvHole$makeOutput$('Required total area (mm²)', 'totalArea', formatF(totalAreaDividedByPi * $gren_lang$core$Math$pi)), $author$project$Page$GalvHole$makeOutput$('Required unaccounted area (mm²)', 'unaccountedArea', formatF(subAreaDividedByPi * $gren_lang$core$Math$pi)), $author$project$Page$GalvHole$makeOutput$('Min diameter (mm)', 'dia', formatF(finalHoleDiameter)), $author$project$Page$GalvHole$makeOutput$('Final total area (mm²)', 'finalTotalArea', formatF(finalTotalArea)) ]);
 			}
 		}() ]) ], title: 'Galvanising Holes' };
 };
@@ -6648,20 +6721,6 @@ var $author$project$Page$Triangle$makeInput = function(_v0) {
 				}
 			}() ]) ]);
 };
-var $gren_lang$core$Maybe$map2$ = function(func, ma, mb) {
-	if (ma.$ === 'Nothing') {
-		return $gren_lang$core$Maybe$Nothing;
-	} else {
-		var a = ma.a;
-		if (mb.$ === 'Nothing') {
-			return $gren_lang$core$Maybe$Nothing;
-		} else {
-			var b = mb.a;
-			return $gren_lang$core$Maybe$Just(A2(func, a, b));
-		}
-	}
-};
-var $gren_lang$core$Maybe$map2 = F3($gren_lang$core$Maybe$map2$);
 var $gren_lang$browser$Svg$Attributes$operator = $gren_lang$browser$VirtualDom$attribute('operator');
 var $gren_lang$browser$Svg$Attributes$points = $gren_lang$browser$VirtualDom$attribute('points');
 var $gren_lang$browser$Svg$polygon = $gren_lang$browser$Svg$trustedNode('polygon');
@@ -7265,7 +7324,6 @@ var $author$project$Page$Truss$dxfData$ = function(n, v) {
 };
 var $author$project$Page$Truss$dxfData = F2($author$project$Page$Truss$dxfData$);
 var $gren_lang$core$Array$flatten = _Array_flat;
-var $gren_lang$core$Array$foldl = _Array_foldl;
 var $author$project$Page$Truss$foldlineseg$ = function(cmp, dat, vec) {
 	return { x: A2(cmp, A2(cmp, vec.x, dat.start.x), dat.end.x), y: A2(cmp, A2(cmp, vec.y, dat.start.y), dat.end.y) };
 };
